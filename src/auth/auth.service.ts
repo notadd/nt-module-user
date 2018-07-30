@@ -3,8 +3,6 @@ import * as jwt from 'jsonwebtoken';
 
 import { JwtPayload, JwtReply } from '../interfaces';
 
-
-
 @Injectable()
 export class AuthService {
     constructor() { }

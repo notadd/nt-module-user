@@ -1,11 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
 
+import { User } from '../entities';
 import { JwtPayload, JwtReply } from '../interfaces';
+import { UserService } from '../services/user.service';
 
 @Injectable()
 export class AuthService {
-    constructor() { }
+    constructor(
+        @Inject(UserService) private readonly userService: UserService,
+    ) { }
+
     async createToken(payload: JwtPayload): Promise<JwtReply> {
         /**
          * TODO: 令牌有效期问题：
@@ -21,4 +26,7 @@ export class AuthService {
         return { token, expiresIn: 3600 };
     }
 
+    async validateUser(payload: JwtPayload): Promise<User | undefined> {
+        return this.userService.findOneByUsername(payload.username);
+    }
 }

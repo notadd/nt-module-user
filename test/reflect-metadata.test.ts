@@ -5,14 +5,14 @@ import { MetadataScanner } from '@nestjs/core/metadata-scanner';
 export const SOURCE_DEFINITION = 'user:source_definition';
 export const PERMISSION_DEFINITION = 'user:permission_definition';
 
-function Source(options: { name: string, identify: string, permissions: ('create' | 'delete' | 'update' | 'find')[] }) {
+function Source(options: { name: string, identify: string }) {
     return (target: any) => {
         // console.log('target: ', target);
         Reflect.defineMetadata(SOURCE_DEFINITION, options, target);
     };
 }
 
-function Permission(options: { name: string, action: 'create' | 'delete' | 'update' | 'find', personal?: boolean }) {
+function Permission(options: { name: string, identify: string, action: 'create' | 'delete' | 'update' | 'find', personal?: boolean }) {
     return (target: any, propertyKey: string) => {
         // console.log('name: ', options.name);
         // console.log('action: ', options.action);
@@ -23,9 +23,9 @@ function Permission(options: { name: string, action: 'create' | 'delete' | 'upda
     };
 }
 
-@Source({ name: '角色管理', identify: 'role', permissions: ['create', 'delete', 'update', 'find'] })
+@Source({ name: '角色管理', identify: 'role' })
 class RoleService {
-    @Permission({ name: '添加角色', action: 'create' })
+    @Permission({ name: '添加角色', identify: 'createRole', action: 'create' })
     createRole() {
 
     }

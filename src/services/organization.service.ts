@@ -35,6 +35,11 @@ export class OrganizationService {
         return this.organizationReq.findDescendants(exist);
     }
 
+    /**
+     * 添加组织
+     * @param name 组织名称
+     * @param parentId 父组织ID
+     */
     async createOrganization(name: string, parentId: number): Promise<void> {
         const parent = await this.organizationReq.findOne(parentId);
         if (!parent) {
@@ -54,6 +59,12 @@ export class OrganizationService {
         }
     }
 
+    /**
+     * 更新组织
+     * @param id 组织ID
+     * @param name 组织名称
+     * @param parentId 父组织ID
+     */
     async updateOrganization(id: number, name: string, parentId: number): Promise<void> {
         const exist = await this.organizationReq.findOne(id);
         if (!exist) {
@@ -65,6 +76,21 @@ export class OrganizationService {
             if (exist) {
                 throw new HttpException(`name为：${name}的组织已存在`, 404);
             }
+        }
+
+        let parent: Organization|undefined ;
+        if (parentId !== undefined && parentId !== null) {
+            parent = await this.organizationReq.findOne(parentId);
+            if (!parent) {
+                throw new HttpException(`指定父组织id=${parentId}不存在`, 402);
+            }
+        }
+        try {
+            exist.name = name;
+            exist.parent = parent as any;
+            await this.organizationReq.save(exist);
+        } catch (err) {
+            throw new HttpException(`数据库错误：${err.toString()}`, 401);
         }
     }
 }

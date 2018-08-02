@@ -64,9 +64,9 @@
 
 在 `Resolver`、`Controller` 类上设置定义资源的注解，用于定义当前资源，如：
 
-`@Source({ name: '角色管理', identify: 'role' })`
+`@Resource({ name: '文章管理', identify: 'artical:manage' })`
 
-`name`: 资源的名称，用户定义权限的父级名称，命名方式为: `资源+行为`，如：`应用内文章管理的相关api => '文章管理'`
+`name`: 资源的名称，用于定义权限的父级名称，命名方式为: `资源+行为`，如：`应用内文章管理的相关api => '文章管理'`
 
 `identity`: 资源的唯一标识，命名方式为 `模块名:类名` 或 name 的拆分英文，如： `'文章管理' => 'artical:manage'`
 
@@ -74,11 +74,11 @@
 
 在 `Resolver`、`Controller` 方法上设置定义操作的注解，用户定义对当前资源的操作权限，如：
 
-`@Permission({ name: '添加角色', identify: 'createRole', action: 'create', personal: true })`
+`@Permission({ name: '添加文章', identify: 'artical:create', action: 'create', personal: true })`
 
 `name`: 权限的名称，用于定义具体的权限名称，命名方式为：`操作+资源`，如：`在文章资源中添加文章 => '添加文章'`
 
-`identify`: 权限的唯一标识，命名方式为：资源英文名 + name 的拆分英文，如：`'添加文章' => 'artical:createArtical'`
+`identify`: 权限的唯一标识，命名方式为：资源英文名 + name 的拆分英文，如：`'添加文章' => 'artical:create'`
 
 `action`: 权限操作类型，只能是 `create、delete、update、find` 中的一个
 

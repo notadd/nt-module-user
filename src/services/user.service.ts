@@ -1,14 +1,18 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
+import { AuthService } from '../auth';
 import { User } from '../entities';
 import { UserUpdateInput } from '../interfaces';
+import { CryptoUtil } from '../utils/crypto.util';
 
 @Injectable()
 export class UserService {
     constructor(
         @InjectRepository(User) private readonly userRepo: Repository<User>,
+        @Inject(CryptoUtil) private readonly cryptoUtil: CryptoUtil,
+        @Inject(AuthService) private readonly authService: AuthService
     ) { }
 
     /**
@@ -50,8 +54,12 @@ export class UserService {
      *
      * @param username 用户名
      */
-    async findOneByUsername(username: string): Promise<User | undefined> {
-        return this.userRepo.findOne(username);
+    async findOneByUsername(username: string): Promise<User> {
+        const exist = this.userRepo.findOne(username);
+        if (!exist) {
+            throw new HttpException('用户名错误', 406);
+        }
+        return exist;
     }
 
     /**
@@ -64,5 +72,15 @@ export class UserService {
             throw new HttpException('该用户不存在', 404);
         }
         return exist;
+    }
+
+    async login(username: string, password: string) {
+        // TODO: 查询用户时，同时查询用户所拥有的所有权限
+        const user = await this.findOneByUsername(username);
+        if (user.password !== await this.cryptoUtil.encryptPassword(password)) {
+            throw new HttpException('登录密码错误', 406);
+        }
+        // TODO: 生成 accessToken 时，需要把权限加密后传入options中
+        return this.authService.createToken({ username, options: {} });
     }
 }

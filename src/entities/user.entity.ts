@@ -1,4 +1,6 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+
+import { Role } from './role.entity';
 
 @Entity('user')
 export class User {
@@ -28,6 +30,10 @@ export class User {
         default: false
     })
     recycle: boolean;
+
+    @ManyToMany(type => Role, role => role.users)
+    @JoinTable()
+    roles: Role[];
 
     /**
      * 操作员ID，在数据创建时，保存创建这条数据的操作员ID

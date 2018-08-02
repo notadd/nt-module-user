@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+
 import { Permission } from './permission.entity';
 
 /**
@@ -16,10 +17,10 @@ export class Resource {
     name: string;
 
     /**
-     * 描述
+     * 资源的唯一标识
      */
     @Column()
-    description: string;
+    identify: string;
 
     /**
      * 资源下对应的权限

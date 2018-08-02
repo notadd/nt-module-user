@@ -4,8 +4,8 @@ import { MetadataScanner } from '@nestjs/core/metadata-scanner';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { PERMISSION_DEFINITION } from '../decorators/permission.decorator.test';
-import { RESOURCE_DEFINITION } from '../decorators/resource.decorator.test';
+import { PERMISSION_DEFINITION } from './decorators/permission.decorator.test';
+import { RESOURCE_DEFINITION } from './decorators/resource.decorator.test';
 import { Permission } from './entities/permission.entity';
 import { Resource } from './entities/source.entity';
 import { UserModule } from './modules/user.module';

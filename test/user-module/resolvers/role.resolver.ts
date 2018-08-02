@@ -1,7 +1,7 @@
 import { Mutation, Resolver } from '@nestjs/graphql';
 
-import { Permission } from '../../decorators/permission.decorator.test';
-import { Resource } from '../../decorators/resource.decorator.test';
+import { Permission } from '../decorators/permission.decorator.test';
+import { Resource } from '../decorators/resource.decorator.test';
 
 @Resource({ name: '角色管理', identify: 'role:manage' })
 @Resolver()

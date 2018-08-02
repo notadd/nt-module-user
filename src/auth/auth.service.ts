@@ -8,22 +8,22 @@ import { UserService } from '../services/user.service';
 @Injectable()
 export class AuthService {
     constructor(
-        @Inject(UserService) private readonly userService: UserService,
+        @Inject(UserService) private readonly userService: UserService
     ) { }
 
     async createToken(payload: JwtPayload): Promise<JwtReply> {
         /**
          * TODO: 令牌有效期问题：
          *
-         * 使用刷新令牌机制，即第一次创建token时，返回 token 和 refresh_token，
-         * 当 token 过期时用 refresh_token 刷新获取新的 token，
-         * 当 refre_token 过期时，需要重新登录获取 token 和 refresh_token。
+         * 使用刷新令牌机制，即第一次创建 accessToken 时，返回 accessToken 和 refreshToken，
+         * 当 accessToken 过期时用 refreshToken 刷新获取新的 accessToken，
+         * 当 refreToken 过期时，需要重新登录获取 accessToken 和 refreshToken。
          *
-         * TODO: token 签名秘钥，由安装用户模块的应用管理，在 import 时作为参数传递
+         * TODO: 签名秘钥，由安装用户模块的应用管理，在 import 时作为参数传递
          */
-        const token = jwt.sign(payload, 'secretKey', { expiresIn: 3600 });
+        const accessToken = jwt.sign(payload, 'secretKey', { expiresIn: 3600 });
 
-        return { token, expiresIn: 3600 };
+        return { accessToken, expiresIn: 3600 };
     }
 
     async validateUser(payload: JwtPayload): Promise<User | undefined> {

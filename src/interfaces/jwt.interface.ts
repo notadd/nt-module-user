@@ -4,6 +4,6 @@ export interface JwtPayload {
 }
 
 export interface JwtReply {
-    token: string;
+    accessToken: string;
     expiresIn: number;
 }

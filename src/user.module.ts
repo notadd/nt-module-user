@@ -4,15 +4,20 @@ import { MetadataScanner } from '@nestjs/core/metadata-scanner';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
+import { AuthService, AuthStrategy } from './auth';
 import { PERMISSION_DEFINITION, RESOURCE_DEFINITION } from './decorators';
 import { Permission, Resource, User } from './entities';
+import { UserService } from './services/user.service';
 
 @Module({
     imports: [
         TypeOrmModule.forFeature([User])
     ],
     controllers: [],
-    providers: [],
+    providers: [
+        AuthService, AuthStrategy,
+        UserService
+    ],
     exports: []
 })
 export class UserModule implements OnModuleInit {

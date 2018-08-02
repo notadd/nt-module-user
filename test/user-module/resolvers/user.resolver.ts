@@ -1,9 +1,9 @@
 import { Mutation, Resolver } from '@nestjs/graphql';
 
 import { Permission } from '../../decorators/permission.decorator.test';
-import { Source } from '../../decorators/source.decorator.test';
+import { Resource } from '../../decorators/resource.decorator.test';
 
-@Source({ name: '用户管理', identify: 'user:manage' })
+@Resource({ name: '用户管理', identify: 'user:manage' })
 @Resolver()
 export class UserResolver {
     @Permission({ name: '添加用户', identify: 'createUser', action: 'create' })

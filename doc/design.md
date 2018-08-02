@@ -19,6 +19,47 @@
 
 在调用安全系数较高的方法时，可使用二次验证的机制确保请求中的 access_token 权限值不被篡改，二次验证机制可在权限下级的功能操作表中设置是否开启二次验证字段。
 
+### 授权流程
+
+通过用户名和密码登录，授权服务会验证，验证成功后返回 JWT 签名后的 access_token、refresh_token、expires_in
+
+`access_token`：令牌，计算方法：jwt.sign(username, sha256(permission[]))
+
+`refresh_token`：刷新令牌，当 access_token 失效时，用 refresh_token 进行刷新，计算方法：sha256(username+new Date())
+
+`expires_in`：令牌失效时间，当前时间+2小时
+
+```none
++-----------+                                     +-------------+
+|           |       1-Request Authorization       |             |
+|           |------------------------------------>|             |
+|           |          username&password          |             |--+
+|           |                                     |Authorization|  | 2-Gen
+|  Client   |                                     |   Service   |  |   JWT
+|           |       3-Response Authorization      |             |<-+
+|           |<------------------------------------| Private Key |
+|           |    access_token / refresh_token     |             |
+|           |             expires_in               |             |
++-----------+                                     +-------------+
+```
+
+### 鉴权流程
+
+请求时，在请求头设置 Authorization: bearer Access Token，资源服务对 Access Token 进行验证（解密），成功后，将 access_token 中 permission[] 数组里的权限值和所请求方法上的 @Permission() 注解中的权限值进行比对，如果存在，则代表本次请求的用户拥有对当前资源操作的权限，否则拒绝请求
+
+```none
++-----------+                                    +------------+
+|           |       1-Request Resource           |            |
+|           |----------------------------------->|            |
+|           | Authorization: bearer Access Token |            |--+
+|           |                                    |  Resource  |  | 2-Verify
+|  Client   |                                    |  Service   |  |   Token
+|           |       3-Response Resource          |            |<-+
+|           |<-----------------------------------| Public Key |
+|           |                                    |            |
++-----------+                                    +------------+
+```
+
 #### 资源注解
 
 在 `Resolver`、`Controller` 类上设置定义资源的注解，用于定义当前资源，如：

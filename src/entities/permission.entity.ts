@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, ManyToMany } from 'typeorm';
+import { Column, Entity, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+
 import { Resource } from './resource.entity';
 import { Role } from './role.entity';
 
@@ -32,17 +33,17 @@ export class Permission {
      * 权限的唯一标识
      */
     @Column()
-    methodName: string;
+    identify: string;
 
     /**
-     * 是否私人资源(0:否 1:是)
+     * 是否私人资源
      */
     @Column()
-    personal: number;
+    personal: boolean;
 
     /**
      * 拥有权限的角色
      */
-    @ManyToMany(type => Role)
+    @ManyToMany(type => Role, role => role.permissions)
     roles: Role[];
 }

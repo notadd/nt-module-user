@@ -1,22 +1,41 @@
 import { Inject, Module, OnModuleInit } from '@nestjs/common';
 import { ModulesContainer } from '@nestjs/core/injector/modules-container';
 import { MetadataScanner } from '@nestjs/core/metadata-scanner';
+import { GraphQLModule } from '@nestjs/graphql';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { AuthService, AuthStrategy } from './auth';
 import { PERMISSION_DEFINITION, RESOURCE_DEFINITION } from './decorators';
-import { Permission, Resource, User } from './entities';
+import { Permission, Resource, Role, User } from './entities';
+import { UserResolver } from './resolvers/user.resolver';
 import { UserService } from './services/user.service';
+import { CryptoUtil } from './utils/crypto.util';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([User])
+        GraphQLModule,
+        TypeOrmModule.forFeature([User, Role, Resource, Permission]),
+        TypeOrmModule.forRoot({
+            type: 'postgres',
+            host: 'localhost',
+            port: 5432,
+            username: 'postgres',
+            password: '123456',
+            database: 'postgres',
+            entities: ['./**/*.entity.ts'],
+            maxQueryExecutionTime: 1000,
+            // synchronize: true,
+            // dropSchema: true,
+            logging: true,
+            logger: 'advanced-console'
+        })
     ],
     controllers: [],
     providers: [
         AuthService, AuthStrategy,
-        UserService
+        UserResolver, UserService,
+        CryptoUtil
     ],
     exports: []
 })

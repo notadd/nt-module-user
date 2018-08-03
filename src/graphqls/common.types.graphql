@@ -1,0 +1,7 @@
+# 服务端返回的状态码和消息
+type CommonResult {
+    # 状态码
+    code: Int
+    # 返回消息
+    message: String
+}

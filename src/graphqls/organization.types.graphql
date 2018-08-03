@@ -1,0 +1,6 @@
+type Mutation {
+    # 添加组织
+    createOrganization(name: String!, parentId: Int): CommonResult
+    # 更新组织
+    updateOrganization(id: Int!, name: String!, parentId: Int): CommonResult
+}

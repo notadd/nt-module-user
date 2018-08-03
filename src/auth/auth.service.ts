@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
 
 import { User } from '../entities';
@@ -8,7 +8,7 @@ import { UserService } from '../services/user.service';
 @Injectable()
 export class AuthService {
     constructor(
-        @Inject(UserService) private readonly userService: UserService
+        @Inject(forwardRef(() => UserService)) private readonly userService: UserService
     ) { }
 
     async createToken(payload: JwtPayload): Promise<JwtReply> {
@@ -21,11 +21,12 @@ export class AuthService {
          *
          * TODO: 签名秘钥，由安装用户模块的应用管理，在 import 时作为参数传递
          */
-        const accessToken = jwt.sign(payload, 'secretKey', { expiresIn: 3600 });
+        const accessToken = jwt.sign(payload, 'secretKey', { expiresIn: 7200 });
 
-        return { accessToken, expiresIn: 3600 };
+        return { accessToken, expiresIn: 7200 };
     }
 
+    // FIXME: accessToken 保存在缓存里，每次验证时
     async validateUser(payload: JwtPayload): Promise<User | undefined> {
         return this.userService.findOneByUsername(payload.username);
     }

@@ -1,0 +1,10 @@
+type Mutation {
+    # 添加角色
+    createRole(name: String!): CommonResult
+    # 更新角色
+    updateRole(id: Int!, name: String!): CommonResult
+    # 删除角色
+    deleteRole(id: Int!): CommonResult
+    # 给角色设置权限
+    setPermissions(id: Int!, permissionIds: [Int]!)
+}

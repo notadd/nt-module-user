@@ -19,7 +19,9 @@ export class Resource {
     /**
      * 资源的唯一标识
      */
-    @Column()
+    @Column({
+        unique: true
+    })
     identify: string;
 
     /**

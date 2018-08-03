@@ -32,7 +32,9 @@ export class Permission {
     /**
      * 权限的唯一标识
      */
-    @Column()
+    @Column({
+        unique: true
+    })
     identify: string;
 
     /**

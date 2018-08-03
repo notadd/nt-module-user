@@ -1,4 +1,4 @@
-import { HttpException, Inject, Injectable } from '@nestjs/common';
+import { forwardRef, HttpException, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -12,7 +12,7 @@ export class UserService {
     constructor(
         @InjectRepository(User) private readonly userRepo: Repository<User>,
         @Inject(CryptoUtil) private readonly cryptoUtil: CryptoUtil,
-        @Inject(AuthService) private readonly authService: AuthService
+        @Inject(forwardRef(() => AuthService)) private readonly authService: AuthService
     ) { }
 
     /**
@@ -76,11 +76,17 @@ export class UserService {
 
     async login(username: string, password: string) {
         // TODO: 查询用户时，同时查询用户所拥有的所有权限
-        const user = await this.findOneByUsername(username);
-        if (user.password !== await this.cryptoUtil.encryptPassword(password)) {
-            throw new HttpException('登录密码错误', 406);
-        }
-        // TODO: 生成 accessToken 时，需要把权限加密后传入options中
-        return this.authService.createToken({ username, options: {} });
+        const user = await this.userRepo.findOne({ where: { username }, relations: ['roles', 'roles.permissions'] });
+        // if (user.password !== await this.cryptoUtil.encryptPassword(password)) {
+        //     throw new HttpException('登录密码错误', 406);
+        // }
+        const permissions: string[] = [];
+        user.roles.forEach(role => {
+            role.permissions.forEach(permission => {
+                permissions.push(permission.identify);
+            });
+        });
+        // FIXME: 使用什么数据生成 accessToken？
+        return this.authService.createToken({ username });
     }
 }

@@ -1,0 +1,14 @@
+type Query {
+    login(username: String, password: String): LoginResponse
+}
+
+type LoginResponse {
+    code: Int
+    message: String
+    data: AccessToken
+}
+
+type AccessToken {
+    accessToken: String
+    expiresIn: Int
+}

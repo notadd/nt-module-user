@@ -1,5 +1,5 @@
 import { Inject } from '@nestjs/common';
-import { Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Query, Resolver } from '@nestjs/graphql';
 
 import { AuthService } from '../auth';
 import { UserService } from '../services/user.service';
@@ -17,8 +17,8 @@ export class UserResolver {
         return { code: 200, message: '登录成功', data };
     }
 
-    @Mutation('register')
-    async register(req, body: { username: string, pasword: string, info: any }) {
-        // TODO: 注册时，用户信息是不确定的？？？
-    }
+    // @Mutation('register')
+    // async register(req, body: { username: string, pasword: string, info: any }) {
+    //     // TODO: 注册时，用户信息是不确定的？？？
+    // }
 }

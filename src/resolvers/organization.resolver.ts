@@ -34,4 +34,10 @@ export class OrganizationResolver {
         await this.organizationService.updateOrganization(id, name, parentId);
         return {code: 200, message: '更新成功'};
     }
+
+    async deleteOrganization(req, body: {id: number}) {
+        const {id} = body;
+        await this.organizationService.deleteOrganization(id);
+        return {code: 200, message: '删除成功'};
+    }
 }

@@ -94,4 +94,25 @@ export class OrganizationService {
             throw new HttpException(`数据库错误：${err.toString()}`, 401);
         }
     }
+
+    /**
+     * 删除组织机构
+     * @param id 
+     */
+    async deleteOrganization(id: number): Promise<void> {
+        const exist = await this.organizationReq.findOne(id);
+        if (!exist) {
+            throw new HttpException(`id为：${id}的组织不存在`, 406);
+        }
+
+        const children = await this.organizationReq.findDescendants(exist);
+        if (children) {
+            throw new HttpException(`存在子组织不能删除`, 406);
+        } 
+        try {
+            await this.organizationReq.delete(id);
+        } catch (error) {
+            throw new HttpException(`数据库错误：${error.toString()}`, 401);
+        }
+    }
 }

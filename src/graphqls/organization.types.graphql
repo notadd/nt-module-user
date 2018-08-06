@@ -1,6 +1,38 @@
+type Query {
+    # 获取更目录组织
+    getRoots: OrganizationResult
+    # 获取所有组织
+    getAll: OrganizationResult
+    # 获取组织下面的所有子组织
+    findChildren(id: Int!): OrganizationResult
+}
+
 type Mutation {
     # 添加组织
     createOrganization(name: String!, parentId: Int): CommonResult
     # 更新组织
     updateOrganization(id: Int!, name: String!, parentId: Int): CommonResult
+    # 删除组织
+    deleteOrganization(id: Int!): CommonResult
+    # 给组织添加用户
+    addUsersToOrganization(id: Int!, userIds: [Int]): CommonResult
+    # 移除组织下的用户
+    deleteUserFromOrganization(id: Int!, userIds: [Int]): CommonResult
+}
+
+type OrganizationResult {
+    # 状态码
+    code: Int
+    # 状态消息
+    message: String
+    # 返回数据
+    data: [Organization]
+}
+
+type Organization {
+    id: Int
+    # 组织名称
+    name: String
+    # 父组织
+    parent: Organization
 }

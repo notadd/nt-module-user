@@ -1,4 +1,5 @@
-import { Inject, Module, OnModuleInit } from '@nestjs/common';
+import { Inject, Logger, Module, OnModuleInit } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { ModulesContainer } from '@nestjs/core/injector/modules-container';
 import { MetadataScanner } from '@nestjs/core/metadata-scanner';
 import { GraphQLModule } from '@nestjs/graphql';
@@ -8,6 +9,7 @@ import { Repository } from 'typeorm';
 import { AuthService, AuthStrategy } from './auth';
 import { PERMISSION_DEFINITION, RESOURCE_DEFINITION } from './decorators';
 import { Permission, Resource, Role, User } from './entities';
+import { AuthenticationGurad } from './gurads/authentication.gurad';
 import { UserResolver } from './resolvers/user.resolver';
 import { UserService } from './services/user.service';
 import { CryptoUtil } from './utils/crypto.util';
@@ -33,6 +35,10 @@ import { CryptoUtil } from './utils/crypto.util';
     ],
     controllers: [],
     providers: [
+        {
+            provide: APP_GUARD,
+            useClass: AuthenticationGurad
+        },
         AuthService, AuthStrategy,
         UserResolver, UserService,
         CryptoUtil
@@ -40,14 +46,15 @@ import { CryptoUtil } from './utils/crypto.util';
     exports: []
 })
 export class UserModule implements OnModuleInit {
+    private userModuleLogger: Logger;
     private readonly metadataScanner: MetadataScanner;
 
     constructor(
         @Inject(ModulesContainer) private readonly modulesContainer: ModulesContainer,
         @InjectRepository(Resource) private readonly resourceRepo: Repository<Resource>,
-        @InjectRepository(Permission) private readonly permissionRepo: Repository<Permission>,
-
+        @InjectRepository(Permission) private readonly permissionRepo: Repository<Permission>
     ) {
+        this.userModuleLogger = new Logger('UserModule');
         this.metadataScanner = new MetadataScanner();
     }
 
@@ -86,12 +93,18 @@ export class UserModule implements OnModuleInit {
 
         // 保存所有扫描到的资源定义
         resourceMap.forEach(resource => {
-            this.resourceRepo.save(this.resourceRepo.create(resource));
+            this.resourceRepo.save(this.resourceRepo.create(resource))
+                .catch(error => {
+                    this.userModuleLogger.error('Resouce: ' + error.detail);
+                });
         });
 
         // 保存所有扫描到的权限定义
         permissionMap.forEach(permission => {
-            this.permissionRepo.save(this.permissionRepo.create(permission));
+            this.permissionRepo.save(this.permissionRepo.create(permission))
+                .catch(error => {
+                    this.userModuleLogger.error('Permission: ' + error.detail);
+                });
         });
     }
 }

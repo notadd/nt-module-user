@@ -1,13 +1,15 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { TreeRepository } from 'typeorm';
+import { TreeRepository, Repository } from 'typeorm';
 
 import { Organization } from '../entities/organization.entity';
+import { User } from '../entities';
 
 @Injectable()
 export class OrganizationService {
     constructor(
-        @InjectRepository(Organization) private readonly organizationReq: TreeRepository<Organization>
+        @InjectRepository(Organization) private readonly organizationReq: TreeRepository<Organization>,
+        @InjectRepository(User) private readonly userRep: Repository<User>
     ) { }
 
     /**
@@ -73,13 +75,13 @@ export class OrganizationService {
         }
 
         if (name !== exist.name) {
-            const exist: Organization|undefined = await this.organizationReq.findOne({ name });
+            const exist: Organization | undefined = await this.organizationReq.findOne({ name });
             if (exist) {
                 throw new HttpException(`name为：${name}的组织已存在`, 404);
             }
         }
 
-        let parent: Organization|undefined ;
+        let parent: Organization | undefined;
         if (parentId !== undefined && parentId !== null) {
             parent = await this.organizationReq.findOne(parentId);
             if (!parent) {
@@ -97,7 +99,7 @@ export class OrganizationService {
 
     /**
      * 删除组织机构
-     * @param id 
+     * @param id
      */
     async deleteOrganization(id: number): Promise<void> {
         const exist = await this.organizationReq.findOne(id);
@@ -108,9 +110,46 @@ export class OrganizationService {
         const children = await this.organizationReq.findDescendants(exist);
         if (children) {
             throw new HttpException(`存在子组织不能删除`, 406);
-        } 
+        }
         try {
             await this.organizationReq.delete(id);
+        } catch (error) {
+            throw new HttpException(`数据库错误：${error.toString()}`, 401);
+        }
+    }
+
+    /**
+     * 给部门添加用户
+     * @param id 部门ID
+     * @param userIds 用户ID
+     */
+    async addUsersToOrganization(id: number, userIds: number[]): Promise<void> {
+        const exist = await this.organizationReq.findOne(id, { relations: ['users'] });
+        if (!exist) {
+            throw new HttpException(`id为：${id}的组织不存在`, 406);
+        }
+
+        const userArr = await this.userRep.findByIds(userIds);
+        userIds.forEach(userId => {
+            const find: User | undefined = userArr.find(user => {
+                return user.id === userId;
+            });
+            if (!find) {
+                throw new HttpException(`id为${id}用户不存在`, 402);
+            }
+        });
+
+        exist.users.forEach(user => {
+            const find = userIds.find(id => {
+                return id === user.id;
+            });
+            if (find) {
+                throw new HttpException(`userId为${user.id}用户已在组织下`, 402);
+            }
+        });
+        exist.users.push(...userArr);
+        try {
+            await this.organizationReq.save(exist);
         } catch (error) {
             throw new HttpException(`数据库错误：${error.toString()}`, 401);
         }

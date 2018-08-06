@@ -6,7 +6,7 @@ import { User } from './user.entity';
 /**
  * 角色实体
  */
-@Entity()
+@Entity('role')
 export class Role {
     @PrimaryGeneratedColumn()
     id: number;

@@ -1,3 +1,5 @@
+import 'reflect-metadata';
+
 export const RESOURCE_DEFINITION = 'user:resource_definition';
 
 export function Resource(options: { name: string, identify: string }) {

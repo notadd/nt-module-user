@@ -53,4 +53,11 @@ export class OrganizationResolver {
         await this.organizationService.addUsersToOrganization(id, userIds);
         return { code: 200, message: '添加成功' };
     }
+
+    @Mutation('deleteUserFromOrganization')
+    async deleteUserFromOrganization(req, body: { id: number, userIds: number[] }) {
+        const { id, userIds } = body;
+        await this.organizationService.deleteUserFromOrganization(id, userIds);
+        return { code: 200, message: '移除成功' };
+    }
 }

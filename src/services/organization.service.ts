@@ -135,7 +135,7 @@ export class OrganizationService {
                 return user.id === userId;
             });
             if (!find) {
-                throw new HttpException(`id为${id}用户不存在`, 402);
+                throw new HttpException(`id为${userId}用户不存在`, 402);
             }
         });
 
@@ -144,7 +144,7 @@ export class OrganizationService {
                 return id === user.id;
             });
             if (find) {
-                throw new HttpException(`userId为${user.id}用户已在组织下`, 402);
+                throw new HttpException(`id为${user.id}用户已在组织下`, 402);
             }
         });
         exist.users.push(...userArr);
@@ -152,6 +152,40 @@ export class OrganizationService {
             await this.organizationReq.save(exist);
         } catch (error) {
             throw new HttpException(`数据库错误：${error.toString()}`, 401);
+        }
+    }
+
+    /**
+     * 移除组织下的用户
+     * @param id 组织ID
+     * @param userIds 用户ID
+     */
+    async deleteUserFromOrganization(id: number, userIds: number[]): Promise<void> {
+        const exist = await this.organizationReq.findOne(id, { relations: ['users'] });
+        if (!exist) {
+            throw new HttpException(`id为：${id}的组织不存在`, 406);
+        }
+
+        const userArr = await this.userRep.findByIds(userIds);
+        userIds.forEach(userId => {
+            const find: User|undefined = userArr.find(user => {
+                return user.id === userId;
+            });
+            if (!find) {
+                throw new HttpException(`id为${userId}用户不存在`, 402);
+            }
+            const index = exist.users.findIndex(user => {
+                return user.id === userId;
+            });
+            if (index < 0) {
+                throw new HttpException(`id为${userId}用户不存在在组织下`, 402);
+            }
+            exist.users.splice(index, 1);
+        });
+        try {
+            await this.organizationReq.save(exist);
+        } catch (err) {
+            throw new HttpException(`数据库错误：${err.toString()}`, 401);
         }
     }
 }

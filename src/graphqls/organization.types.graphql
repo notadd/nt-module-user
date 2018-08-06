@@ -16,6 +16,8 @@ type Mutation {
     deleteOrganization(id: Int!): CommonResult
     # 给组织添加用户
     addUsersToOrganization(id: Int!, userIds: [Int]): CommonResult
+    # 移除组织下的用户
+    deleteUserFromOrganization(id: Int!, userIds: [Int]): CommonResult
 }
 
 type OrganizationResult {

@@ -40,7 +40,9 @@ export class Permission {
     /**
      * 是否私人资源
      */
-    @Column()
+    @Column({
+        default: false
+    })
     personal: boolean;
 
     /**

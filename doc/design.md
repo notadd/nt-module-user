@@ -6,17 +6,17 @@
 
 ## 实现逻辑概述
 
-登录授权时，可将计算好的权限值加密到 access_token 中，在调用接口时，通过对 access_token 的解密，获取权限值，将权限值与请求方法进行比对，从而达到鉴权的效果。
+登录授权时，可将用户名、用户的非安全信息等加密到 access_token 中。
 
-鉴权时，使用中间件将 access_token 中的权限赋值到 request 对象中，在方法调用前，使用守卫对权限和方法上的注解进行比对，一致时允许调用，否则返回403。
+鉴权时，access_token 解密后拿到用户名，通过用户名查询当前用户的所有权限，在方法调用前，使用守卫对当前用户的权限和方法上的权限注解进行比对，一致时允许调用，否则返回403。
 
-在调用安全系数较高的方法时，可使用二次验证的机制确保请求中的 access_token 权限值不被篡改，二次验证机制可在权限下级的功能操作表中设置是否开启二次验证字段。
+对于私有资源的请求，需要额外判断当前用户ID和私有资源中的用户ID是否一致。
 
 ### 授权流程
 
 通过用户名和密码登录，授权服务会验证，验证成功后返回 JWT 签名后的 access_token、refresh_token、expires_in
 
-`access_token`：令牌，计算方法：jwt.sign(username, sha256(permission[]))
+`access_token`：令牌，计算方法：jwt.sign(username, options?))
 
 `refresh_token`：刷新令牌，当 access_token 失效时，用 refresh_token 进行刷新，计算方法：sha256(username+new Date())
 
@@ -38,7 +38,7 @@
 
 ### 鉴权流程
 
-请求时，在请求头设置 Authorization: bearer Access Token，资源服务对 Access Token 进行验证（解密），成功后，将 access_token 中 permission[] 数组里的权限值和所请求方法上的 @Permission() 注解中的权限值进行比对，如果存在，则代表本次请求的用户拥有对当前资源操作的权限，否则拒绝请求
+请求时，在请求头设置 Authorization: bearer Access Token，资源服务对 Access Token 进行验证（解密），成功后拿到用户名，通过用户名查询当前用户的所有权限，在方法调用前，使用守卫对当前用户的权限和方法上的权限注解进行比对，如果一致，则代表本次请求的用户拥有对当前资源操作的权限，否则拒绝请求
 
 ```none
 +-----------+                                    +------------+

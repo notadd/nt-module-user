@@ -18,7 +18,7 @@ export class Organization {
      */
     @ManyToMany(type => User)
     @JoinTable()
-    users: User[]
+    users: User[];
 
     /**
      * 父组织

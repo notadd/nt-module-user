@@ -188,4 +188,16 @@ export class OrganizationService {
             throw new HttpException(`数据库错误：${err.toString()}`, 401);
         }
     }
+
+    /**
+     * 获取组织下面的用户
+     * @param id 组织ID
+     */
+    async findUserInOrganization(id: number): Promise<User[]> {
+        const organization = await this.organizationReq.findOne(id, { relations: ['users'] });
+        if (!organization) {
+            throw new HttpException(`id为：${id}的组织不存在`, 406);
+        }
+        return organization.users;
+    }
 }

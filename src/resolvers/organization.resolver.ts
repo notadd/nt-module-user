@@ -26,6 +26,13 @@ export class OrganizationResolver {
         return { code: 200, message: '获取成功', data: organizationArr };
     }
 
+    @Query('findUserInOrganization')
+    async findUserInOrganization(req, body: { id: number }) {
+        const { id } = body;
+        const userArr = await this.organizationService.findUserInOrganization(id);
+        return { code: 200, message: '获取成功', data: userArr };
+    }
+
     @Mutation('createOrganization')
     async createOrganization(req, body: { name: string, parentId: number }) {
         const { name, parentId } = body;

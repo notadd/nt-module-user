@@ -6,7 +6,7 @@ import { Role } from './role.entity';
 /**
  * 权限实体，对应resolver下的每一个method
  */
-@Entity()
+@Entity('permission')
 export class Permission {
     @PrimaryGeneratedColumn()
     id: number;

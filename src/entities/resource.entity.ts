@@ -5,7 +5,7 @@ import { Permission } from './permission.entity';
 /**
  * 资源实体，一个资源对应多个权限
  */
-@Entity()
+@Entity('resource')
 export class Resource {
     @PrimaryGeneratedColumn()
     id: number;

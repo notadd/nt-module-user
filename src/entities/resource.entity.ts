@@ -27,6 +27,8 @@ export class Resource {
     /**
      * 资源下对应的权限
      */
-    @OneToMany(type => Permission, permission => permission.resource)
+    @OneToMany(type => Permission, permission => permission.resource, {
+        cascade: ['insert']
+    })
     permissions: Permission[];
 }

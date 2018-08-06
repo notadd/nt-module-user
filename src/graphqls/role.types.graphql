@@ -6,5 +6,5 @@ type Mutation {
     # 删除角色
     deleteRole(id: Int!): CommonResult
     # 给角色设置权限
-    setPermissions(id: Int!, permissionIds: [Int]!)
+    setPermissions(id: Int!, permissionIds: [Int]!): CommonResult
 }

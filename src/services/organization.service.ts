@@ -44,13 +44,16 @@ export class OrganizationService {
      * @param parentId 父组织ID
      */
     async createOrganization(name: string, parentId: number): Promise<void> {
-        const parent = await this.organizationReq.findOne(parentId);
-        if (!parent) {
-            throw new HttpException(`父组织Id为：${parentId}的组织不存在`, 406);
+        let parent: Organization|undefined;
+        if (parentId !== undefined && parentId !== null) {
+            parent = await this.organizationReq.findOne(parentId);
+            if (!parent) {
+                throw new HttpException(`父组织Id为：${parentId}的组织不存在`, 406);
+            }
         }
 
         const exist = await this.organizationReq.findOne({ name });
-        if (!exist) {
+        if (exist) {
             throw new HttpException(`name为：${name}的组织已存在`, 406);
         }
 
@@ -187,5 +190,17 @@ export class OrganizationService {
         } catch (err) {
             throw new HttpException(`数据库错误：${err.toString()}`, 401);
         }
+    }
+
+    /**
+     * 获取组织下面的用户
+     * @param id 组织ID
+     */
+    async findUserInOrganization(id: number): Promise<User[]> {
+        const organization = await this.organizationReq.findOne(id, { relations: ['users'] });
+        if (!organization) {
+            throw new HttpException(`id为：${id}的组织不存在`, 406);
+        }
+        return organization.users;
     }
 }

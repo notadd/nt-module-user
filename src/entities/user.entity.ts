@@ -1,7 +1,7 @@
 import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
-import { Role } from './role.entity';
 import { Organization } from './organization.entity';
+import { Role } from './role.entity';
 
 @Entity('user')
 export class User {
@@ -40,6 +40,7 @@ export class User {
      * 用户所属的组织
      */
     @ManyToMany(type => Organization, organization => organization.users)
+    @JoinTable()
     organizations: Organization[];
 
     /**

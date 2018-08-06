@@ -1,4 +1,5 @@
-import { Entity, Tree, TreeParent, TreeChildren, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable } from 'typeorm';
+import { Column, Entity, ManyToMany, PrimaryGeneratedColumn, Tree, TreeChildren, TreeParent } from 'typeorm';
+
 import { User } from './user.entity';
 
 @Tree('closure-table')
@@ -16,8 +17,7 @@ export class Organization {
     /**
      * 组织下的用户
      */
-    @ManyToMany(type => User)
-    @JoinTable()
+    @ManyToMany(type => User, user => user.organizations)
     users: User[];
 
     /**

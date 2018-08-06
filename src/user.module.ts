@@ -1,5 +1,4 @@
 import { Inject, Logger, Module, OnModuleInit } from '@nestjs/common';
-import { APP_GUARD } from '@nestjs/core';
 import { ModulesContainer } from '@nestjs/core/injector/modules-container';
 import { MetadataScanner } from '@nestjs/core/metadata-scanner';
 import { GraphQLModule } from '@nestjs/graphql';
@@ -8,16 +7,19 @@ import { Repository } from 'typeorm';
 
 import { AuthService, AuthStrategy } from './auth';
 import { PERMISSION_DEFINITION, RESOURCE_DEFINITION } from './decorators';
-import { Permission, Resource, Role, User } from './entities';
-import { AuthenticationGurad } from './gurads/authentication.gurad';
+import { Organization, Permission, Resource, Role, User } from './entities';
+import { OrganizationResolver } from './resolvers/organization.resolver';
+import { RoleResolver } from './resolvers/role.resolver';
 import { UserResolver } from './resolvers/user.resolver';
+import { OrganizationService } from './services/organization.service';
+import { RoleService } from './services/role.service';
 import { UserService } from './services/user.service';
 import { CryptoUtil } from './utils/crypto.util';
 
 @Module({
     imports: [
         GraphQLModule,
-        TypeOrmModule.forFeature([User, Role, Resource, Permission]),
+        TypeOrmModule.forFeature([Organization, User, Role, Resource, Permission]),
         TypeOrmModule.forRoot({
             type: 'postgres',
             host: 'localhost',
@@ -35,12 +37,10 @@ import { CryptoUtil } from './utils/crypto.util';
     ],
     controllers: [],
     providers: [
-        {
-            provide: APP_GUARD,
-            useClass: AuthenticationGurad
-        },
         AuthService, AuthStrategy,
+        OrganizationResolver, OrganizationService,
         UserResolver, UserService,
+        RoleResolver, RoleService,
         CryptoUtil
     ],
     exports: []

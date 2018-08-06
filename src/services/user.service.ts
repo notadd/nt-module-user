@@ -55,7 +55,7 @@ export class UserService {
      * @param username 用户名
      */
     async findOneByUsername(username: string): Promise<User> {
-        const exist = this.userRepo.findOne(username);
+        const exist = this.userRepo.findOne({ where: { username } });
         if (!exist) {
             throw new HttpException('用户名错误', 406);
         }
@@ -74,18 +74,34 @@ export class UserService {
         return exist;
     }
 
-    async login(username: string, password: string) {
-        // TODO: 查询用户时，同时查询用户所拥有的所有权限
+    /**
+     * 通过用户名查询用户及其关联信息(角色、权限)
+     *
+     * @param username 用户名
+     */
+    async findUserWithRelations(username: string): Promise<User> {
         const user = await this.userRepo.findOne({ where: { username }, relations: ['roles', 'roles.permissions'] });
+        if (!user) {
+            throw new HttpException('用户不存在', 404);
+        }
+        return user;
+    }
+
+    async login(username: string, password: string) {
+        // TODO: 查询用户时，同时查询用户所拥有的所有权限，如果启用了用户模块的缓存选项，则缓存权限
+        const user = await this.findUserWithRelations(username);
         // if (user.password !== await this.cryptoUtil.encryptPassword(password)) {
         //     throw new HttpException('登录密码错误', 406);
         // }
-        const permissions: string[] = [];
-        user.roles.forEach(role => {
-            role.permissions.forEach(permission => {
-                permissions.push(permission.identify);
-            });
-        });
+
+        // TODO: 缓存权限的数据结构
+        // const permissions: string[] = [];
+        // user.roles.forEach(role => {
+        //     role.permissions.forEach(permission => {
+        //         permissions.push(permission.identify);
+        //     });
+        // });
+
         // FIXME: 使用什么数据生成 accessToken？
         return this.authService.createToken({ username });
     }

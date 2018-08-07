@@ -1,0 +1,20 @@
+mutation {
+  createOrganization(name: "本初网络") {
+    code
+    message
+  }
+}
+
+mutation {
+  createOrganization(name: "软件部", parentId: 1) {
+    code
+    message
+  }
+}
+
+mutation {
+  createOrganization(name: "硬件部", parentId: 1) {
+    code
+    message
+  }
+}

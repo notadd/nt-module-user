@@ -1,0 +1,13 @@
+mutation {
+  createRole(name: "后端工程师") {
+    code
+    message
+  }
+}
+
+mutation {
+  createRole(name: "前端工程师") {
+    code
+    message
+  }
+}

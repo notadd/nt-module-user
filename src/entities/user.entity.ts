@@ -13,6 +13,18 @@ export class User {
     })
     username: string;
 
+    @Column({
+        unique: true,
+        nullable: true
+    })
+    email: string;
+
+    @Column({
+        unique: true,
+        nullable: true
+    })
+    mobile: string;
+
     @Column()
     password: string;
 
@@ -42,22 +54,6 @@ export class User {
     @ManyToMany(type => Organization, organization => organization.users)
     @JoinTable()
     organizations: Organization[];
-
-    /**
-     * 操作员ID，在数据创建时，保存创建这条数据的操作员ID
-     */
-    @Column({
-        name: 'create_by'
-    })
-    createBy: number;
-
-    /**
-     * 操作员ID，在数据更新时，保存更新这条数据的操作员ID
-     */
-    @Column({
-        name: 'update_by'
-    })
-    updateBy: number;
 
     @CreateDateColumn()
     createTime: Date;

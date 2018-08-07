@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 
 import { AuthService } from '../auth';
 import { User } from '../entities';
-import { UserUpdateInput } from '../interfaces';
+import { JwtReply, UserUpdateInput } from '../interfaces';
 import { CryptoUtil } from '../utils/crypto.util';
 
 @Injectable()
@@ -18,14 +18,10 @@ export class UserService {
     /**
      * 创建用户
      *
-     * @param operatorId 操作员ID
      * @param user 用户对象
      */
-    async createUser(operatorId: number, user: User): Promise<void> {
-        if (await this.findOneByUsername(user.username)) {
-            throw new HttpException('用户名已存在', 409);
-        }
-        user.createBy = user.updateBy = operatorId;
+    async createUser(user: User): Promise<void> {
+        await this.checkUsernameExist(user.username);
         this.userRepo.save(this.userRepo.create(user));
     }
 
@@ -50,26 +46,13 @@ export class UserService {
     }
 
     /**
-     * 通过用户名查找用户
-     *
-     * @param username 用户名
-     */
-    async findOneByUsername(username: string): Promise<User> {
-        const exist = this.userRepo.findOne({ where: { username } });
-        if (!exist) {
-            throw new HttpException('用户名错误', 406);
-        }
-        return exist;
-    }
-
-    /**
      * 通过ID查找用户
      * @param id 用户ID
      */
     async findOneById(id: number): Promise<User> {
         const exist = this.userRepo.findOne(id);
         if (!exist) {
-            throw new HttpException('该用户不存在', 404);
+            throw new HttpException('用户不存在', 404);
         }
         return exist;
     }
@@ -87,12 +70,29 @@ export class UserService {
         return user;
     }
 
-    async login(username: string, password: string) {
+    /**
+     * 检查用户名是否存在
+     *
+     * @param username 用户名
+     */
+    async checkUsernameExist(username: string): Promise<void> {
+        if (await this.userRepo.findOne({ where: { username } })) {
+            throw new HttpException('用户名已存在', 409);
+        }
+    }
+
+    /**
+     * 用户登录
+     *
+     * @param username 用户名
+     * @param password 密码
+     */
+    async login(username: string, password: string): Promise<JwtReply> {
         // TODO: 查询用户时，同时查询用户所拥有的所有权限，如果启用了用户模块的缓存选项，则缓存权限
         const user = await this.findUserWithRelations(username);
-        // if (user.password !== await this.cryptoUtil.encryptPassword(password)) {
-        //     throw new HttpException('登录密码错误', 406);
-        // }
+        if (!await this.cryptoUtil.checkPassword(password, user.password)) {
+            throw new HttpException('登录密码错误', 406);
+        }
 
         // TODO: 缓存权限的数据结构
         // const permissions: string[] = [];
@@ -104,5 +104,17 @@ export class UserService {
 
         // FIXME: 使用什么数据生成 accessToken？
         return this.authService.createToken({ username });
+    }
+
+    /**
+     * 用户注册
+     *
+     * @param username 用户名
+     * @param password 密码
+     */
+    async register(username: string, password: string): Promise<void> {
+        await this.checkUsernameExist(username);
+        password = await this.cryptoUtil.encryptPassword(password);
+        this.userRepo.save(this.userRepo.create({ username, password }));
     }
 }

@@ -1,7 +1,8 @@
 import { Inject } from '@nestjs/common';
-import { Query, Resolver } from '@nestjs/graphql';
+import { Mutation, Query, Resolver } from '@nestjs/graphql';
 
 import { AuthService } from '../auth';
+import { CommonResult } from '../interfaces';
 import { UserService } from '../services/user.service';
 
 @Resolver()
@@ -12,13 +13,14 @@ export class UserResolver {
     ) { }
 
     @Query('login')
-    async login(req, body: { username: string, password: string }) {
+    async login(req, body: { username: string, password: string }): Promise<CommonResult> {
         const data = await this.userService.login(body.username, body.password);
         return { code: 200, message: '登录成功', data };
     }
 
-    // @Mutation('register')
-    // async register(req, body: { username: string, pasword: string, info: any }) {
-    //     // TODO: 注册时，用户信息是不确定的？？？
-    // }
+    @Mutation('register')
+    async register(req, body: { username: string, password: string }): Promise<CommonResult> {
+        await this.userService.register(body.username, body.password);
+        return { code: 200, message: '注册成功' };
+    }
 }

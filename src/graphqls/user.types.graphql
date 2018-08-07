@@ -1,5 +1,9 @@
 type Query {
-    login(username: String, password: String): LoginResponse
+    login(username: String!, password: String!): LoginResponse
+}
+
+type Mutation {
+    register(username: String!, password: String!): CommonResult
 }
 
 type LoginResponse {

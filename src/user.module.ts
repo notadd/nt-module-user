@@ -8,12 +8,8 @@ import { Repository } from 'typeorm';
 import { AuthService, AuthStrategy } from './auth';
 import { PERMISSION_DEFINITION, RESOURCE_DEFINITION } from './decorators';
 import { Organization, Permission, Resource, Role, User } from './entities';
-import { OrganizationResolver } from './resolvers/organization.resolver';
-import { RoleResolver } from './resolvers/role.resolver';
-import { UserResolver } from './resolvers/user.resolver';
-import { OrganizationService } from './services/organization.service';
-import { RoleService } from './services/role.service';
-import { UserService } from './services/user.service';
+import { OrganizationResolver, RoleResolver, UserResolver } from './resolvers';
+import { OrganizationService, RoleService, UserService } from './services';
 import { CryptoUtil } from './utils/crypto.util';
 
 @Module({
@@ -30,7 +26,7 @@ import { CryptoUtil } from './utils/crypto.util';
             entities: ['./**/*.entity.ts'],
             maxQueryExecutionTime: 1000,
             synchronize: true,
-            dropSchema: true,
+            // dropSchema: true,
             logging: true,
             logger: 'advanced-console'
         })

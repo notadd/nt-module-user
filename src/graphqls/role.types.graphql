@@ -1,3 +1,8 @@
+type Query {
+    # 查询所有角色
+    findRoles: RolesResult
+}
+
 type Mutation {
     # 添加角色
     createRole(name: String!): CommonResult
@@ -7,4 +12,20 @@ type Mutation {
     deleteRole(id: Int!): CommonResult
     # 给角色设置权限
     setPermissions(id: Int!, permissionIds: [Int]!): CommonResult
+}
+
+type RolesResult {
+    code: Int
+
+    message: String
+
+    data: [Role]
+}
+
+type Role {
+    id: Int
+
+    name: String
+
+    permissions: [Permission]
 }

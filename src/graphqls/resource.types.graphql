@@ -1,0 +1,34 @@
+type Query {
+    # 查询所有资源权限
+    findResources: ResourcesResult
+}
+
+type ResourcesResult {
+    code: Int
+
+    message: String
+
+    data: [Resource]
+}
+
+type Resource {
+    id: Int
+
+    name: String
+
+    identify: String
+
+    permissions: [Permission]
+}
+
+type Permission {
+    id: Int
+
+    name: String
+
+    action: String
+
+    identify: String
+
+    personal: Boolean
+}

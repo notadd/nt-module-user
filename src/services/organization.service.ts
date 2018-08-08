@@ -30,13 +30,13 @@ export class OrganizationService {
      * 获取组织下面的所有部门
      * @param id 组织ID
      */
-    async findChildren(id: number): Promise<Organization[]> {
+    async findChildren(id: number): Promise<Organization> {
         const exist = await this.organizationReq.findOne(id);
         if (!exist) {
             throw new HttpException(`id为：${id}的组织不存在`, 406);
         }
         const children = await this.organizationReq.findDescendantsTree(exist);
-        return [children];
+        return children;
     }
 
     /**

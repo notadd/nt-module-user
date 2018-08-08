@@ -16,22 +16,22 @@ export class OrganizationResolver {
     @Query('getAll')
     async getAll() {
         const organizationArr = await this.organizationService.getAll();
-        return { code: 200, message: '获取成功', data: organizationArr };
+        return { code: 200, message: '获取成功', data: JSON.stringify(organizationArr) };
     }
 
     @Query('findChildren')
     async findChildren(req, body: { id: number }) {
         const { id } = body;
-        const organizationArr = await this.organizationService.findChildren(id);
-        return { code: 200, message: '获取成功', data: organizationArr };
+        const organization = await this.organizationService.findChildren(id);
+        return { code: 200, message: '获取成功', data: JSON.stringify(organization) };
     }
 
-    @Query('findUserInOrganization')
-    async findUserInOrganization(req, body: { id: number }) {
-        const { id } = body;
-        const userArr = await this.organizationService.findUserInOrganization(id);
-        return { code: 200, message: '获取成功', data: userArr };
-    }
+    // @Query('findUserInOrganization')
+    // async findUserInOrganization(req, body: { id: number }) {
+    //     const { id } = body;
+    //     const userArr = await this.organizationService.findUserInOrganization(id);
+    //     return { code: 200, message: '获取成功', data: userArr };
+    // }
 
     @Mutation('createOrganization')
     async createOrganization(req, body: { name: string, parentId: number }) {

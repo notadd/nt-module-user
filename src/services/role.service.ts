@@ -100,4 +100,8 @@ export class RoleService {
             throw new HttpException(`数据库错误：${error.toString()}`, 401);
         }
     }
+
+    async findRoles() {
+        return this.roleRep.find();
+    }
 }

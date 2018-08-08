@@ -1,11 +1,17 @@
 import { RoleService } from './../services/role.service';
-import { Resolver, Mutation } from '@nestjs/graphql';
+import { Resolver, Mutation, Query } from '@nestjs/graphql';
 
 @Resolver()
 export class RoleResolver {
     constructor (
         private readonly roleService: RoleService
     ) { }
+
+    @Query('findRoles')
+    async findRoles(req, body) {
+        const roleArr = await this.roleService.findRoles();
+        return {code: 200, message: '获取成功', data: roleArr};
+    }
 
     @Mutation('createRole')
     async createRole(req, body: {name: string}) {

@@ -11,6 +11,8 @@ import { Organization, Permission, Resource, Role, User } from './entities';
 import { OrganizationResolver, RoleResolver, UserResolver } from './resolvers';
 import { OrganizationService, RoleService, UserService } from './services';
 import { CryptoUtil } from './utils/crypto.util';
+import { ResourceResolver } from './resolvers/resource.resolver';
+import { ResourceService } from './services/resource.service';
 
 @Module({
     imports: [
@@ -37,6 +39,7 @@ import { CryptoUtil } from './utils/crypto.util';
         OrganizationResolver, OrganizationService,
         UserResolver, UserService,
         RoleResolver, RoleService,
+        ResourceResolver, ResourceService,
         CryptoUtil
     ],
     exports: []

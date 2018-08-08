@@ -35,4 +35,6 @@ type Organization {
     name: String
     # 父组织
     parent: Organization
+    # 子组织
+    children: [Organization]
 }

@@ -23,7 +23,7 @@ export class OrganizationService {
      * 获取所有组织
      */
     async getAll(): Promise<Organization[]> {
-        return this.organizationReq.find();
+        return this.organizationReq.findTrees();
     }
 
     /**
@@ -35,7 +35,8 @@ export class OrganizationService {
         if (!exist) {
             throw new HttpException(`id为：${id}的组织不存在`, 406);
         }
-        return this.organizationReq.findDescendants(exist);
+        const children = await this.organizationReq.findDescendantsTree(exist);
+        return [children];
     }
 
     /**

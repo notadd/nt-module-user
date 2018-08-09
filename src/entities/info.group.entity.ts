@@ -1,0 +1,36 @@
+import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
+
+import { InfoItem } from './info-item.entity';
+import { Role } from './role.entity';
+
+/**
+ * 信息组
+ */
+@Entity('info_gourp')
+export class InfoGroup {
+    /**
+     * 自增ID
+     */
+    @PrimaryGeneratedColumn()
+    id: number;
+
+    /**
+     * 信息组名称
+     */
+    @Column({
+        unique: true
+    })
+    name: string;
+
+    /**
+     * 信息组包含的信息项
+     */
+    @ManyToMany(type => InfoItem, InfoItem => InfoItem.infoGroups)
+    infoItems: InfoItem[];
+
+    /**
+     * 信息组所属的角色
+     */
+    @ManyToMany(type => Role, role => role.infoGroups)
+    roles: Role[];
+}

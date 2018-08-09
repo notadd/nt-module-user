@@ -7,20 +7,21 @@ export class OrganizationResolver {
         private readonly organizationService: OrganizationService
     ) { }
 
-    @Query('getRoots')
-    async getRoots() {
-        const roots = await this.organizationService.getRoots();
+    @Query('findRootOrganizations')
+    async findRootOrganizations() {
+        const roots = await this.organizationService.findRoots();
         return { code: 200, message: '获取成功', data: roots };
     }
 
-    @Query('getAll')
-    async getAll() {
-        const organizationArr = await this.organizationService.getAll();
+    @Query('findAllOrganizations')
+    async findAllOrganizations() {
+        const organizationArr = await this.organizationService.findAllTrees();
+        // 由于graphql不支持递归，需要把数据转换成JSON字符串
         return { code: 200, message: '获取成功', data: JSON.stringify(organizationArr) };
     }
 
-    @Query('findChildren')
-    async findChildren(req, body: { id: number }) {
+    @Query('findChildrenOrganizations')
+    async findChildrenOrganizations(req, body: { id: number }) {
         const { id } = body;
         const organization = await this.organizationService.findChildren(id);
         return { code: 200, message: '获取成功', data: JSON.stringify(organization) };

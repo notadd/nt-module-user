@@ -15,14 +15,14 @@ export class OrganizationService {
     /**
      * 获取根组织
      */
-    async getRoots(): Promise<Organization[]> {
+    async findRoots(): Promise<Organization[]> {
         return this.organizationReq.findRoots();
     }
 
     /**
      * 获取所有组织
      */
-    async getAll(): Promise<Organization[]> {
+    async findAllTrees(): Promise<Organization[]> {
         return this.organizationReq.findTrees();
     }
 

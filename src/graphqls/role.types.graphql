@@ -15,17 +15,19 @@ type Mutation {
 }
 
 type RolesResult {
+    # 状态码
     code: Int
-
+    # 状态消息
     message: String
-
+    # 返回数据
     data: [Role]
 }
 
 type Role {
+    # 角色ID
     id: Int
-
+    # 角色名称
     name: String
-
+    # 角色拥有的资源
     permissions: [Permission]
 }

@@ -5,13 +5,13 @@ type Query {
 
 type Mutation {
     # 添加角色
-    createRole(name: String!): CommonResult
+    createRole(name: String!): UserModuleCommonResult
     # 更新角色
-    updateRole(id: Int!, name: String!): CommonResult
+    updateRole(id: Int!, name: String!): UserModuleCommonResult
     # 删除角色
-    deleteRole(id: Int!): CommonResult
+    deleteRole(id: Int!): UserModuleCommonResult
     # 给角色设置权限
-    setPermissions(id: Int!, permissionIds: [Int]!): CommonResult
+    setPermissions(id: Int!, permissionIds: [Int]!): UserModuleCommonResult
 }
 
 type RolesResult {

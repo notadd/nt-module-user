@@ -9,15 +9,15 @@ type Query {
 
 type Mutation {
     # 添加组织
-    createOrganization(name: String!, parentId: Int): CommonResult
+    createOrganization(name: String!, parentId: Int): UserModuleCommonResult
     # 更新组织
-    updateOrganization(id: Int!, name: String!, parentId: Int): CommonResult
+    updateOrganization(id: Int!, name: String!, parentId: Int): UserModuleCommonResult
     # 删除组织
-    deleteOrganization(id: Int!): CommonResult
+    deleteOrganization(id: Int!): UserModuleCommonResult
     # 给组织添加用户
-    addUsersToOrganization(id: Int!, userIds: [Int]): CommonResult
+    addUsersToOrganization(id: Int!, userIds: [Int]): UserModuleCommonResult
     # 移除组织下的用户
-    deleteUserFromOrganization(id: Int!, userIds: [Int]): CommonResult
+    deleteUserFromOrganization(id: Int!, userIds: [Int]): UserModuleCommonResult
 }
 
 type OrganizationsResult {

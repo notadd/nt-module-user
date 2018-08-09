@@ -3,7 +3,7 @@ type Query {
 }
 
 type Mutation {
-    register(username: String!, password: String!): CommonResult
+    register(username: String!, password: String!): UserModuleCommonResult
 }
 
 type LoginResponse {

@@ -28,6 +28,6 @@ export class AuthService {
 
     // TODO: 如果用户模块启用了缓存选项，则在缓存中通过 username 查询权限集，否则查数据库中的权限集
     async validateUser(payload: JwtPayload): Promise<User | undefined> {
-        return this.userService.findUserWithRelations(payload.username);
+        return this.userService.findOneWithRolesAndPermissions(payload.username);
     }
 }

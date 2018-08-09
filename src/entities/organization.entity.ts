@@ -1,9 +1,9 @@
-import { Column, Entity, ManyToMany, PrimaryGeneratedColumn, Tree, TreeChildren, TreeParent } from 'typeorm';
+import { Column, Entity, ManyToMany, PrimaryGeneratedColumn, Tree, TreeChildren, TreeParent, TreeLevelColumn } from 'typeorm';
 
 import { User } from './user.entity';
 
-@Tree('closure-table')
 @Entity('organization')
+@Tree('closure-table')
 export class Organization {
     @PrimaryGeneratedColumn()
     id: number;
@@ -29,6 +29,6 @@ export class Organization {
     /**
      * 子组织
      */
-    @TreeChildren()
+    @TreeChildren({ cascade: true })
     children: Organization[];
 }

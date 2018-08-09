@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToMany, PrimaryGeneratedColumn, Tree, TreeChildren, TreeParent } from 'typeorm';
+import { Column, Entity, ManyToMany, PrimaryGeneratedColumn, Tree, TreeChildren, TreeParent, TreeLevelColumn } from 'typeorm';
 
 import { User } from './user.entity';
 
@@ -31,4 +31,10 @@ export class Organization {
      */
     @TreeChildren()
     children: Organization[];
+
+    /**
+     * 层级
+     */
+    @TreeLevelColumn()
+    level: number;
 }

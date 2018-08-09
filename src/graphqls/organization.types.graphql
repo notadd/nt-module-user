@@ -37,6 +37,8 @@ type Organization {
     parent: Organization
     # 子组织
     children: [Organization]
+    # 层级
+    level: Int
 }
 
 type OrganizationJsonResult {

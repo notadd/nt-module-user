@@ -1,0 +1,37 @@
+type Mutation {
+    createInfoGroup(infoGroup: InfoGroupInput): UserModuleCommonResult
+    deleteInfoGroup(groupId: Int!): UserModuleCommonResult
+    updateInfoGroup(groupId: Int!, name: String!): UserModuleCommonResult
+}
+
+type Query {
+    findAllInfoGroup: InfoGroupResult
+    findInfoItemsByGroupId(groupId: Int!): InfoItemResult
+}
+
+input InfoGroupInput {
+    name: String!
+}
+
+type InfoGroupResult {
+    code: Int
+    message: String
+    data: [InfoGroupData]
+}
+
+type InfoGroupData {
+    name: String
+}
+
+type InfoItemResult {
+    code: Int
+    message: String
+    data: [InfoItemData]
+}
+
+type InfoItemData {
+    name: String
+    label: String
+    description: String
+    type: String
+}

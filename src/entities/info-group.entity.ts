@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 import { InfoItem } from './info-item.entity';
 import { Role } from './role.entity';
@@ -32,5 +32,6 @@ export class InfoGroup {
      * 信息组所属的角色
      */
     @ManyToMany(type => Role, role => role.infoGroups)
+    @JoinTable()
     roles: Role[];
 }

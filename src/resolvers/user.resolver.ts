@@ -1,14 +1,12 @@
 import { Inject } from '@nestjs/common';
 import { Mutation, Query, Resolver } from '@nestjs/graphql';
 
-import { AuthService } from '../auth';
-import { CommonResult } from '../interfaces';
+import { CommonResult } from '../interfaces/common-result.interface';
 import { UserService } from '../services/user.service';
 
 @Resolver()
 export class UserResolver {
     constructor(
-        @Inject(AuthService) private readonly authService: AuthService,
         @Inject(UserService) private readonly userService: UserService
     ) { }
 

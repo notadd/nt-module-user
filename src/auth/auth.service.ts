@@ -1,8 +1,8 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
 
-import { User } from '../entities';
-import { JwtPayload, JwtReply } from '../interfaces';
+import { User } from '../entities/user.entity';
+import { JwtPayload, JwtReply } from '../interfaces/jwt.interface';
 import { UserService } from '../services/user.service';
 
 @Injectable()

@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 
-export const RESOURCE_DEFINITION = 'user:resource_definition';
+export const RESOURCE_DEFINITION = '__resource_definition__';
 
 export function Resource(options: { name: string, identify: string }) {
     return (target: any) => {

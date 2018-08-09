@@ -2,9 +2,10 @@ import { forwardRef, HttpException, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { AuthService } from '../auth';
-import { User } from '../entities';
-import { JwtReply, UserUpdateInput } from '../interfaces';
+import { AuthService } from '../auth/auth.service';
+import { User } from '../entities/user.entity';
+import { JwtReply } from '../interfaces/jwt.interface';
+import { UserUpdateInput } from '../interfaces/user.interface';
 import { CryptoUtil } from '../utils/crypto.util';
 import { RoleService } from './role.service';
 

@@ -1,6 +1,6 @@
 import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
 
-import { InfoGroup } from './info.group.entity';
+import { InfoGroup } from './info-group.entity';
 import { Permission } from './permission.entity';
 import { User } from './user.entity';
 

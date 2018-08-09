@@ -2,8 +2,8 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { Permission } from '../entities';
 import { InfoItem } from '../entities/info-item.entity';
+import { Permission } from '../entities/permission.entity';
 import { Role } from '../entities/role.entity';
 
 @Injectable()

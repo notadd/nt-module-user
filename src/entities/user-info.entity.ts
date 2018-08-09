@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 import { InfoItem } from './info-item.entity';
 import { User } from './user.entity';
@@ -30,5 +30,6 @@ export class UserInfo {
      * 所属信息项
      */
     @ManyToMany(type => InfoItem, infoItem => infoItem.userInfos)
+    @JoinTable()
     infoItems: InfoItem[];
 }

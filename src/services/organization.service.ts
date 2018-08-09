@@ -1,9 +1,9 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { TreeRepository, Repository } from 'typeorm';
+import { Repository, TreeRepository } from 'typeorm';
 
 import { Organization } from '../entities/organization.entity';
-import { User } from '../entities';
+import { User } from '../entities/user.entity';
 
 @Injectable()
 export class OrganizationService {

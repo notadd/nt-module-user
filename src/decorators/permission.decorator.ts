@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 
-export const PERMISSION_DEFINITION = 'user:permission_definition';
+export const PERMISSION_DEFINITION = '__permission_definition__';
 
 export function Permission(options: { name: string, identify: string, action: 'create' | 'delete' | 'update' | 'find', personal?: boolean }) {
     return (target: any, propertyKey: string) => {

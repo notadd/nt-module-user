@@ -1,0 +1,16 @@
+type Mutation {
+    createInfoItem(infoItem: InfoItemInput!): UserModuleCommonResult
+    deleteInfoItem(infoItemId: Int!): UserModuleCommonResult
+    updateInfoItem(infoItemId: Int!, name: String!, label: String!, description: String!, type: String!): UserModuleCommonResult
+}
+
+type Query {
+    findAllInfoItem: InfoItemResult
+}
+
+input InfoItemInput {
+    name: String
+    label: String
+    description: String
+    type: String
+}

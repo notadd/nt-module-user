@@ -26,7 +26,9 @@ export class InfoGroupService {
      * @param id 信息组ID
      */
     async delete(id: number) {
-        this.infoGroupRepo.delete(id);
+        const infoGroup = await this.infoGroupRepo.findOne(id, { relations: ['roles'] });
+        this.infoGroupRepo.createQueryBuilder('infoGroup').relation(InfoGroup, 'roles').of(infoGroup).remove(infoGroup.roles);
+        this.infoGroupRepo.remove(infoGroup);
     }
 
     /**

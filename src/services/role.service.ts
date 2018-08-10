@@ -61,13 +61,14 @@ export class RoleService {
      * @param id
      */
     async deleteRole(id: number) {
-        const role = await this.roleRepo.findOne(id);
+        const role = await this.roleRepo.findOne(id, { relations: ['permissions'] });
         if (!role) {
             new HttpException(`id为${id}的角色不存在`, 404);
         }
 
         try {
-            await this.roleRepo.delete(role);
+            this.roleRepo.createQueryBuilder('role').relation(Role, 'permissions').of(role).remove(role.permissions);
+            await this.roleRepo.remove(role);
         } catch (err) {
             throw new HttpException(`数据库错误：${err.toString()}`, 401);
         }

@@ -1,13 +1,18 @@
 type Mutation {
+    # 新增信息项
     createInfoItem(infoItem: InfoItemInput!): UserModuleCommonResult
+    # 删除指定ID的信息项
     deleteInfoItem(infoItemId: Int!): UserModuleCommonResult
+    # 更新指定ID的信息项名称、标签、描述、类型
     updateInfoItem(infoItemId: Int!, name: String!, label: String!, description: String!, type: String!): UserModuleCommonResult
 }
 
 type Query {
+    # 查询所有信息项
     findAllInfoItem: InfoItemResult
 }
 
+# 新增信息项的请求体
 input InfoItemInput {
     name: String
     label: String

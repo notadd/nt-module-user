@@ -1,18 +1,24 @@
 type Query {
+    # 用户登录
     login(username: String!, password: String!): LoginResponse
 }
 
 type Mutation {
+    # 用户注册
     register(username: String!, password: String!): UserModuleCommonResult
 }
 
+# 用户登录返回消息
 type LoginResponse {
     code: Int
     message: String
     data: AccessToken
 }
 
+# 授权令牌信息
 type AccessToken {
+    # 授权令牌数据
     accessToken: String
+    # 授权令牌有效时间，单位为秒
     expiresIn: Int
 }

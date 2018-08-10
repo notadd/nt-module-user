@@ -1,37 +1,52 @@
 type Mutation {
+    # 新增信息组
     createInfoGroup(infoGroup: InfoGroupInput): UserModuleCommonResult
+    # 删除指定ID的信息组
     deleteInfoGroup(groupId: Int!): UserModuleCommonResult
+    # 更新指定ID的信息组名称
     updateInfoGroup(groupId: Int!, name: String!): UserModuleCommonResult
 }
 
 type Query {
+    # 查询所有信息组
     findAllInfoGroup: InfoGroupResult
+    # 查询指定信息组ID下的所有信息项
     findInfoItemsByGroupId(groupId: Int!): InfoItemResult
 }
 
+# 新增信息组的请求体
 input InfoGroupInput {
     name: String!
 }
 
+# 查询信息组返回消息
 type InfoGroupResult {
     code: Int
     message: String
     data: [InfoGroupData]
 }
 
+# 信息组数据
 type InfoGroupData {
+    # 信息组名称
     name: String
 }
 
+# 查询信息项返回消息
 type InfoItemResult {
     code: Int
     message: String
     data: [InfoItemData]
 }
 
+# 信息项数据
 type InfoItemData {
+    # 信息项名称
     name: String
+    # 信息项标签
     label: String
+    # 信息项描述
     description: String
+    # 信息项类型
     type: String
 }

@@ -3,9 +3,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { AuthService } from '../auth/auth.service';
+import { UserInfo } from '../entities/user-info.entity';
 import { User } from '../entities/user.entity';
 import { JwtReply } from '../interfaces/jwt.interface';
-import { UserUpdateInput } from '../interfaces/user.interface';
+import { CreateUserInput, UpdateUserInput } from '../interfaces/user.interface';
 import { CryptoUtil } from '../utils/crypto.util';
 import { RoleService } from './role.service';
 
@@ -13,6 +14,7 @@ import { RoleService } from './role.service';
 export class UserService {
     constructor(
         @InjectRepository(User) private readonly userRepo: Repository<User>,
+        @InjectRepository(UserInfo) private readonly userInfoRepo: Repository<UserInfo>,
         @Inject(CryptoUtil) private readonly cryptoUtil: CryptoUtil,
         @Inject(forwardRef(() => AuthService)) private readonly authService: AuthService,
         @Inject(RoleService) private readonly roleService: RoleService
@@ -23,41 +25,116 @@ export class UserService {
      *
      * @param user 用户对象
      */
-    async createUser(user: User): Promise<void> {
-        await this.checkUsernameExist(user.username);
-        this.userRepo.save(this.userRepo.create(user));
+    async createUser(createUserInput: CreateUserInput): Promise<void> {
+        await this.checkUsernameExist(createUserInput.username);
+        const user = await this.userRepo.save(this.userRepo.create(createUserInput));
+        // 将当前用户与角色进行关联，保存用户和角色的关系
+        if (!!!createUserInput.roleIds && (createUserInput.roleIds.length !== 0)) {
+            this.userRepo.createQueryBuilder('user').relation(User, 'roles').of(user).add(createUserInput.roleIds);
+        }
+        // 如果创建用户时，指定了组织，则将当前用户与组织进行关联，保存用户和组织的关系
+        if (createUserInput.organizationIds && (createUserInput.organizationIds.length !== 0)) {
+            this.userRepo.createQueryBuilder('user').relation(User, 'organizations').of(user).add(createUserInput.organizationIds);
+        }
+        // 声明将要保存的用户信息项和信息值，newUserInfoItemIds 为信息项ID数组，newUserInfos 为信息值对象数组
+        this.createOrUpdateUserInfos(user, createUserInput.infoKVs, 'create');
     }
 
     /**
-     * 删除用户
+     * 给用户添加角色
+     *
+     * @param userId 用户ID
+     * @param roleId 角色ID
+     */
+    async addUserRole(userId: number, roleId: number) {
+        this.userRepo.createQueryBuilder('user').relation(User, 'roles').of(userId).add(roleId);
+    }
+
+    /**
+     * 给用户添加组织
+     *
+     * @param userId 用户ID
+     * @param organizationId 组织ID
+     */
+    async addUserOrganization(userId: number, organizationId: number) {
+        this.userRepo.createQueryBuilder('user').relation(User, 'organizations').of(userId).add(organizationId);
+    }
+
+    /**
+     * 删除用户角色
+     *
+     * @param userId 用户ID
+     * @param roleId 角色ID
+     */
+    async deleteUserRole(userId: number, roleId: number) {
+        this.userRepo.createQueryBuilder('user').relation(User, 'roles').of(userId).remove(roleId);
+    }
+
+    /**
+     * 删除用户组织
+     *
+     * @param userId 用户ID
+     * @param organizationId 组织ID
+     */
+    async deleteUserOrganization(userId: number, organizationId: number) {
+        this.userRepo.createQueryBuilder('user').relation(User, 'organizations').of(userId).remove(organizationId);
+    }
+
+    /**
+     * 删除用户到回收站
+     *
+     * @param id 用户ID
+     */
+    async recycleUser(id: number): Promise<void> {
+        const user = await this.findOneById(id);
+        user.recycle = true;
+        this.userRepo.save(user);
+    }
+
+    /**
+     * 删除回收站内的用户
+     *
      * @param id 用户ID
      */
     async deleteUser(id: number): Promise<void> {
-        await this.findOneById(id);
-        this.userRepo.delete(id);
+        const user = await this.userRepo.findOne(id, { relations: ['roles', 'organizations'] });
+        this.userRepo.createQueryBuilder('user').relation(User, 'roles').of(user).remove(user.roles);
+        this.userRepo.createQueryBuilder('user').relation(User, 'organizations').of(user).remove(user.organizations);
+        this.userRepo.remove(user);
     }
 
     /**
-     * 更新用户
+     * 更新用户信息
+     *
+     * 会根据传入的参数做相应的信息更新
      *
      * @param id 用户ID
      * @param userUpdateInput 用户更新的信息数据
      */
-    async updateUser(id: number, userUpdateInput: UserUpdateInput): Promise<void> {
-        const exist = await this.findOneById(id);
-        this.userRepo.save({ ...exist, ...userUpdateInput });
-    }
-
-    /**
-     * 通过ID查找用户
-     * @param id 用户ID
-     */
-    async findOneById(id: number): Promise<User> {
-        const exist = this.userRepo.findOne(id);
-        if (!exist) {
-            throw new HttpException('用户不存在', 404);
+    async updateUserInfo(id: number, userUpdateInput: UpdateUserInput): Promise<void> {
+        const user = await this.userRepo.findOne(id, { relations: ['userInfo'] });
+        // 更新邮箱
+        if (userUpdateInput.email) {
+            user.email = userUpdateInput.email;
         }
-        return exist;
+        // 更新手机号
+        if (userUpdateInput.mobile) {
+            user.mobile = userUpdateInput.mobile;
+        }
+        // 更新密码
+        if (userUpdateInput.password) {
+            user.password = userUpdateInput.password;
+        }
+
+        // 邮箱、手机号、密码的更新逻辑
+        if (userUpdateInput.email || userUpdateInput.mobile || userUpdateInput.password) {
+            this.userRepo.save(user);
+        }
+
+        // 更新用户信息项的值
+        if (userUpdateInput.infoKVs && (userUpdateInput.infoKVs.length !== 0)) {
+            this.createOrUpdateUserInfos(user, userUpdateInput.infoKVs, 'update');
+        }
     }
 
     /**
@@ -89,17 +166,6 @@ export class UserService {
     }
 
     /**
-     * 检查用户名是否存在
-     *
-     * @param username 用户名
-     */
-    async checkUsernameExist(username: string): Promise<void> {
-        if (await this.userRepo.findOne({ where: { username } })) {
-            throw new HttpException('用户名已存在', 409);
-        }
-    }
-
-    /**
      * 用户登录
      *
      * TODO: 登录时，通过用户角色查询其所有的信息项
@@ -127,9 +193,11 @@ export class UserService {
     }
 
     /**
-     * 用户注册
+     * 普通用户注册
      *
-     * TODO: 注册只能注册为默认的普通用户，普通用户角色、普通用户的信息组及其信息项默认生成最常用的字段，可以由超级管理员修改
+     * TODO: 注册只提供普通用户最基本的信息写入，即用户名+密码
+     *
+     * 普通用户注册成功后，需要完善默认的普通用户组下的信息项信息
      *
      * @param username 用户名
      * @param password 密码
@@ -138,5 +206,62 @@ export class UserService {
         await this.checkUsernameExist(username);
         password = await this.cryptoUtil.encryptPassword(password);
         this.userRepo.save(this.userRepo.create({ username, password }));
+    }
+
+    /**
+     * 通过ID查找用户
+     *
+     * @param id 用户ID
+     */
+    private async findOneById(id: number): Promise<User> {
+        const exist = this.userRepo.findOne(id);
+        if (!exist) {
+            throw new HttpException('用户不存在', 404);
+        }
+        return exist;
+    }
+
+    /**
+     * 检查用户名是否存在
+     *
+     * @param username 用户名
+     */
+    private async checkUsernameExist(username: string): Promise<void> {
+        if (await this.userRepo.findOne({ where: { username } })) {
+            throw new HttpException('用户名已存在', 409);
+        }
+    }
+
+    /**
+     * 创建或更新用户信息项的值
+     *
+     * @param user 用户实体
+     * @param infoKVs 信息项键值对，key是信息项的ID(infoItem.id)，值是信息项的值(userInfo.value)
+     * @param action 操作类型，创建或更新(create | update)
+     */
+    private async createOrUpdateUserInfos(user: User, infoKVs: { key: number, value: string }[], action: 'create' | 'update') {
+        if (infoKVs.length !== 0) {
+            if (action === 'create') {
+                const userInfoItemIds: number[] = [];
+                const newUserInfos: UserInfo[] = [];
+                infoKVs.forEach(infoKV => {
+                    userInfoItemIds.push(infoKV.key);
+                    newUserInfos.push(this.userInfoRepo.create({
+                        value: infoKV.value,
+                        user
+                    }));
+                });
+                // 保存用户信息项的值
+                const userInfos = await this.userInfoRepo.save(newUserInfos);
+                // 保存信息值与信息项的关系
+                this.userInfoRepo.createQueryBuilder('userInfo').relation(UserInfo, 'infoItem').of(userInfos).set(userInfoItemIds);
+                return;
+            }
+
+            // 更新用户信息项的值
+            infoKVs.forEach(async infoKV => {
+                this.userInfoRepo.update(user.userInfos.map(userInfo => userInfo.id), { value: infoKV.value });
+            });
+        }
     }
 }

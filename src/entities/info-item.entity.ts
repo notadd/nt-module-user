@@ -1,4 +1,4 @@
-import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 import { InfoGroup } from './info-group.entity';
 import { UserInfo } from './user-info.entity';
@@ -43,13 +43,15 @@ export class InfoItem {
     /**
      * 用户信息项对应的值
      */
-    @ManyToMany(type => UserInfo, userInfo => userInfo.infoItems)
-    userInfos: UserInfo[];
+    @OneToOne(type => UserInfo, userInfo => userInfo.infoItem)
+    userInfo: UserInfo;
 
     /**
      * 信息项所属的信息组
      */
-    @ManyToMany(type => InfoGroup, infoGroup => infoGroup.infoItems)
+    @ManyToMany(type => InfoGroup, infoGroup => infoGroup.infoItems, {
+        onDelete: 'CASCADE'
+    })
     @JoinTable()
     infoGroups: InfoGroup[];
 }

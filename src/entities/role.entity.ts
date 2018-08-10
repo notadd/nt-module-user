@@ -21,7 +21,9 @@ export class Role {
     /**
      * 角色拥有的权限
      */
-    @ManyToMany(type => Permission, permission => permission.roles)
+    @ManyToMany(type => Permission, permission => permission.roles, {
+        onDelete: 'CASCADE'
+    })
     @JoinTable()
     permissions: Permission[];
 

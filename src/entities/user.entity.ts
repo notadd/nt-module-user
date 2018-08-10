@@ -81,14 +81,18 @@ export class User {
     /**
      * 用户角色
      */
-    @ManyToMany(type => Role, role => role.users)
+    @ManyToMany(type => Role, role => role.users, {
+        onDelete: 'CASCADE'
+    })
     @JoinTable()
     roles: Role[];
 
     /**
      * 用户所属的组织
      */
-    @ManyToMany(type => Organization, organization => organization.users)
+    @ManyToMany(type => Organization, organization => organization.users, {
+        onDelete: 'CASCADE'
+    })
     @JoinTable()
     organizations: Organization[];
 

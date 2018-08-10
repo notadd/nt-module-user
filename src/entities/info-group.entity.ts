@@ -31,7 +31,9 @@ export class InfoGroup {
     /**
      * 信息组所属的角色
      */
-    @ManyToMany(type => Role, role => role.infoGroups)
+    @ManyToMany(type => Role, role => role.infoGroups, {
+        onDelete: 'CASCADE'
+    })
     @JoinTable()
     roles: Role[];
 }

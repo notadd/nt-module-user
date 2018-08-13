@@ -6,6 +6,51 @@ type Query {
 type Mutation {
     # 用户注册
     register(username: String!, password: String!): UserModuleCommonResult
+    # 创建用户
+    createUser(createUserInput: CreateUserInput): UserModuleCommonResult
+    # 删除用户到回收站
+    recycleUser(userId: Int!): UserModuleCommonResult
+    # 删除回收站内的用户
+    deleteRecycledUser(userId: Int!): UserModuleCommonResult
+    # 更新用户信息
+    updateUserInfo(userId: Int!, updateUserInput: UpdateUserInput): UserModuleCommonResult
+}
+
+input CreateUserInput {
+    # 用户名
+    username: String!
+    # 邮箱
+    email: String
+    # 手机号
+    mobile: String
+    # 登录密码
+    password: String
+    # 信息项键值对，key是信息项的ID(infoItem.id)，值是信息项的值(userInfo.value)
+    infoKVs: [infoKV]!
+    # 拥有的角色ID
+    roleIds: [Int]!
+    # 所属组织ID
+    organizationIds: [Int]!
+}
+
+input UpdateUserInput {
+    # 邮箱
+    email: String
+    # 手机号
+    mobile: String
+    # 登录密码
+    password: String
+    # 信息项值键值对，key是用户信息项的ID(userInfo.id)，value是信息项的值(userInfo.value)
+    infoKVs: [infoKV]
+    # 拥有的角色ID
+    roleIds: [Int]
+    # 所属组织ID
+    organizationIds: [Int]
+}
+
+input infoKV {
+    key: Int
+    value: String
 }
 
 # 用户登录返回消息

@@ -2,7 +2,7 @@ import { Inject } from '@nestjs/common';
 import { Mutation, Query, Resolver } from '@nestjs/graphql';
 
 import { CommonResult } from '../interfaces/common-result.interface';
-import { CreateUserInput } from '../interfaces/user.interface';
+import { CreateUserInput, UpdateUserInput } from '../interfaces/user.interface';
 import { UserService } from '../services/user.service';
 
 @Resolver()
@@ -26,7 +26,7 @@ export class UserResolver {
     @Mutation('createUser')
     async createUser(req, body: { createUserInput: CreateUserInput }): Promise<CommonResult> {
         await this.userService.createUser(body.createUserInput);
-        return { code: 200, message: '添加用户成功' };
+        return { code: 200, message: '创建用户成功' };
     }
 
     @Mutation('recycleUser')
@@ -39,5 +39,11 @@ export class UserResolver {
     async deleteRecycledUser(req, body: { userId: number }): Promise<CommonResult> {
         await this.userService.deleteUser(body.userId);
         return { code: 200, message: '删除回收站内的用户成功' };
+    }
+
+    @Mutation('updateUserInfo')
+    async updateUserInfo(req, body: { userId: number, updateUserInput: UpdateUserInput }): Promise<CommonResult> {
+        await this.userService.updateUserInfo(body.userId, body.updateUserInput);
+        return { code: 200, message: '更新用户信息成功' };
     }
 }

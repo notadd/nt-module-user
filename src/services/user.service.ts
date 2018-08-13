@@ -27,6 +27,7 @@ export class UserService {
      */
     async createUser(createUserInput: CreateUserInput): Promise<void> {
         await this.checkUsernameExist(createUserInput.username);
+        createUserInput.password = await this.cryptoUtil.encryptPassword(createUserInput.password);
         const user = await this.userRepo.save(this.userRepo.create(createUserInput));
         // 将当前用户与角色进行关联，保存用户和角色的关系
         if (createUserInput.roleIds && (createUserInput.roleIds.length !== 0)) {

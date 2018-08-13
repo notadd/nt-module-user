@@ -12,9 +12,9 @@ export class InfoGroupResolver {
     ) { }
 
     @Mutation('createInfoGroup')
-    async createInfoGroup(req, body: { infoGroup: InfoGroup }): Promise<CommonResult> {
-        await this.infoGroupService.create(body.infoGroup);
-        return { code: 200, message: '添加信息组成功' };
+    async createInfoGroup(req, body: { name: string, roleId: number }): Promise<CommonResult> {
+        await this.infoGroupService.create(body.name, body.roleId);
+        return { code: 200, message: '创建信息组成功' };
     }
 
     @Mutation('deleteInfoGroup')
@@ -24,9 +24,21 @@ export class InfoGroupResolver {
     }
 
     @Mutation('updateInfoGroup')
-    async updateInfoGroup(req, body: { groupId: number, name: string }): Promise<CommonResult> {
-        await this.infoGroupService.update(body.groupId, body.name);
+    async updateInfoGroup(req, body: { groupId: number, name: string, roleId: number }): Promise<CommonResult> {
+        await this.infoGroupService.update(body.groupId, body.name, body.roleId);
         return { code: 200, message: '更新信息组成功' };
+    }
+
+    @Mutation('addInfoItemToInfoGroup')
+    async addInfoItemToInfoGroup(req, body: { infoGroupId: number, infoItemIds: number[] }): Promise<CommonResult> {
+        await this.infoGroupService.addInfoItem(body.infoGroupId, body.infoItemIds);
+        return { code: 200, message: '添加信息项成功' };
+    }
+
+    @Mutation('removeInfoItemFromInfoGroup')
+    async removeInfoItemFromInfoGroup(req, body: { infoGroupId: number, infoItemIds: number[] }): Promise<CommonResult> {
+        await this.infoGroupService.removeInfo(body.infoGroupId, body.infoItemIds);
+        return { code: 200, message: '移除信息项成功' };
     }
 
     @Query('findAllInfoGroup')

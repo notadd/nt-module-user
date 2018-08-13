@@ -1,0 +1,52 @@
+# 创建信息项
+mutation {
+  createInfoItem(infoItem: {
+    type: "text",
+    name: "fullname",
+    label: "姓名",
+    description: "管理员姓名"
+  }) {
+    code
+    message
+  }
+}
+
+# 创建信息项
+mutation {
+  createInfoItem(infoItem: {
+    type: "radio",
+    name: "sex",
+    label: "性别",
+    description: "管理员性别"
+  }) {
+    code
+    message
+  }
+}
+
+# 创建信息项
+mutation {
+  createInfoItem(infoItem: {
+    type: "radio",
+    name: "age",
+    label: "年龄",
+    description: "管理员年龄"
+  }) {
+    code
+    message
+  }
+}
+
+# 查询所有信息项
+{
+  findAllInfoItem {
+    code
+    message
+    data {
+      type
+      name
+      label
+      description
+    }
+  }
+}

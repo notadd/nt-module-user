@@ -117,7 +117,7 @@ export class RoleService {
         let infoItemsArr: InfoItem[] = [];
         const roles = await this.roleRepo.findByIds(ids, { relations: ['infoGroup', 'infoGroup.infoItem'] });
         roles.forEach(role => {
-            role.infoGroups.forEach(infoGroup => infoGroup.infoItems.forEach(infoItem => infoItemsArr.push(infoItem)));
+            role.infoGroup.infoItems.forEach(infoItem => infoItemsArr.push(infoItem));
         });
 
         const temp = {};

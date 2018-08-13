@@ -43,7 +43,7 @@ export interface UpdateUserInput {
      */
     password?: string;
     /**
-     * 信息项键值对
+     * 信息项值键值对，key是用户信息项的ID(userInfo.id)，value是信息项的值(userInfo.value)
      */
     infoKVs?: { key: number, value: string }[];
     /**

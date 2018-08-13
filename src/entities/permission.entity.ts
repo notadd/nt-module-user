@@ -40,14 +40,6 @@ export class Permission {
     identify: string;
 
     /**
-     * 是否私人资源
-     */
-    @Column({
-        default: false
-    })
-    personal: boolean;
-
-    /**
      * 拥有权限的角色
      */
     @ManyToMany(type => Role, role => role.permissions)

@@ -14,8 +14,8 @@ type Query {
 
 # 新增信息项的请求体
 input InfoItemInput {
+    type: String
     name: String
     label: String
     description: String
-    type: String
 }

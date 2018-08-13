@@ -1,4 +1,4 @@
-import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn, OneToOne, JoinColumn } from 'typeorm';
 
 import { InfoItem } from './info-item.entity';
 import { Role } from './role.entity';
@@ -31,9 +31,9 @@ export class InfoGroup {
     /**
      * 信息组所属的角色
      */
-    @ManyToMany(type => Role, role => role.infoGroups, {
+    @OneToOne(type => Role, role => role.infoGroup, {
         onDelete: 'CASCADE'
     })
-    @JoinTable()
-    roles: Role[];
+    @JoinColumn()
+    role: Role;
 }

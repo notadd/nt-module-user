@@ -1,9 +1,8 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 
-import { PERMISSION_DEFINITION } from '../decorators/permission.decorator';
+import { PERMISSION_DEFINITION } from '../decorators';
 import { Permission } from '../entities/permission.entity';
 import { User } from '../entities/user.entity';
-
 
 @Injectable()
 export class AuthenticationGurad implements CanActivate {

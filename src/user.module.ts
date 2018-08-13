@@ -7,8 +7,7 @@ import { Repository } from 'typeorm';
 
 import { AuthService } from './auth/auth.service';
 import { AuthStrategy } from './auth/auth.strategy';
-import { PERMISSION_DEFINITION } from './decorators/permission.decorator';
-import { RESOURCE_DEFINITION } from './decorators/resource.decorator';
+import { PERMISSION_DEFINITION, RESOURCE_DEFINITION } from './decorators';
 import { InfoGroup } from './entities/info-group.entity';
 import { InfoItem } from './entities/info-item.entity';
 import { Organization } from './entities/organization.entity';
@@ -17,19 +16,19 @@ import { Resource } from './entities/resource.entity';
 import { Role } from './entities/role.entity';
 import { UserInfo } from './entities/user-info.entity';
 import { User } from './entities/user.entity';
+import { InfoGroupResolver } from './resolvers/info-group.resolver';
+import { InfoItemResolver } from './resolvers/info-item.resolver';
 import { OrganizationResolver } from './resolvers/organization.resolver';
 import { ResourceResolver } from './resolvers/resource.resolver';
 import { RoleResolver } from './resolvers/role.resolver';
 import { UserResolver } from './resolvers/user.resolver';
+import { InfoGroupService } from './services/info-group.service';
+import { InfoItemService } from './services/info-item.service';
 import { OrganizationService } from './services/organization.service';
 import { ResourceService } from './services/resource.service';
 import { RoleService } from './services/role.service';
 import { UserService } from './services/user.service';
 import { CryptoUtil } from './utils/crypto.util';
-import { InfoGroupResolver } from './resolvers/info-group.resolver';
-import { InfoGroupService } from './services/info-group.service';
-import { InfoItemResolver } from './resolvers/info-item.resolver';
-import { InfoItemService } from './services/info-item.service';
 
 @Module({
     imports: [

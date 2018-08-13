@@ -16,8 +16,18 @@ export class InfoGroupService {
      *
      * @param infoGroup 信息组信息
      */
-    async create(infoGroup: InfoGroup) {
-        this.infoGroupRepo.save(this.infoGroupRepo.create(infoGroup));
+    async create(name: string, roleId: number) {
+        this.infoGroupRepo.save(this.infoGroupRepo.create({ name, role: { id: roleId } }));
+    }
+
+    /**
+     * 向指定信息组添加指定信息项
+     *
+     * @param infoGroupId 信息组ID
+     * @param infoItemIds 信息项ID
+     */
+    async addInfoItem(infoGroupId: number, infoItemIds: number[]) {
+        this.infoGroupRepo.createQueryBuilder('infoGroup').relation(InfoGroup, 'infoItems').of(infoGroupId).add(infoItemIds);
     }
 
     /**
@@ -26,9 +36,17 @@ export class InfoGroupService {
      * @param id 信息组ID
      */
     async delete(id: number) {
-        const infoGroup = await this.infoGroupRepo.findOne(id, { relations: ['roles'] });
-        this.infoGroupRepo.createQueryBuilder('infoGroup').relation(InfoGroup, 'roles').of(infoGroup).remove(infoGroup.roles);
-        this.infoGroupRepo.remove(infoGroup);
+        this.infoGroupRepo.delete(id);
+    }
+
+    /**
+     * 移除指定信息组的指定信息项
+     *
+     * @param infoGroupId 信息组ID
+     * @param infoItemIds 信息项ID
+     */
+    async removeInfo(infoGroupId: number, infoItemIds: number[]) {
+        this.infoGroupRepo.createQueryBuilder('infoGroup').relation(InfoGroup, 'infoItems').of(infoGroupId).remove(infoItemIds);
     }
 
     /**
@@ -37,8 +55,8 @@ export class InfoGroupService {
      * @param id 信息组ID
      * @param name 信息组名称
      */
-    async update(id: number, name: string) {
-        this.infoGroupRepo.update(id, { name });
+    async update(id: number, name: string, roleId: number) {
+        this.infoGroupRepo.update(id, { name, role: { id: roleId } });
     }
 
     /**
@@ -54,6 +72,6 @@ export class InfoGroupService {
      * @param id 信息组ID
      */
     async findItemsById(id: number) {
-        return this.infoGroupRepo.find({ where: { id }, relations: ['infoItem'] });
+        return this.infoGroupRepo.createQueryBuilder('infoGroup').relation(InfoGroup, 'infoItems').of(id).loadMany();
     }
 }

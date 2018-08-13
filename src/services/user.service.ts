@@ -29,7 +29,7 @@ export class UserService {
         await this.checkUsernameExist(createUserInput.username);
         const user = await this.userRepo.save(this.userRepo.create(createUserInput));
         // 将当前用户与角色进行关联，保存用户和角色的关系
-        if (!!!createUserInput.roleIds && (createUserInput.roleIds.length !== 0)) {
+        if (createUserInput.roleIds && (createUserInput.roleIds.length !== 0)) {
             this.userRepo.createQueryBuilder('user').relation(User, 'roles').of(user).add(createUserInput.roleIds);
         }
         // 如果创建用户时，指定了组织，则将当前用户与组织进行关联，保存用户和组织的关系
@@ -109,31 +109,26 @@ export class UserService {
      * 会根据传入的参数做相应的信息更新
      *
      * @param id 用户ID
-     * @param userUpdateInput 用户更新的信息数据
+     * @param updateUserInput 用户更新的信息数据
      */
-    async updateUserInfo(id: number, userUpdateInput: UpdateUserInput): Promise<void> {
-        const user = await this.userRepo.findOne(id, { relations: ['userInfo'] });
+    async updateUserInfo(id: number, updateUserInput: UpdateUserInput): Promise<void> {
+        const user = await this.userRepo.findOne(id, { relations: ['userInfos'] });
         // 更新邮箱
-        if (userUpdateInput.email) {
-            user.email = userUpdateInput.email;
+        if (updateUserInput.email) {
+            this.userRepo.update(user.id, { email: updateUserInput.email });
         }
         // 更新手机号
-        if (userUpdateInput.mobile) {
-            user.mobile = userUpdateInput.mobile;
+        if (updateUserInput.mobile) {
+            this.userRepo.update(user.id, { mobile: updateUserInput.mobile });
         }
         // 更新密码
-        if (userUpdateInput.password) {
-            user.password = userUpdateInput.password;
-        }
-
-        // 邮箱、手机号、密码的更新逻辑
-        if (userUpdateInput.email || userUpdateInput.mobile || userUpdateInput.password) {
-            this.userRepo.save(user);
+        if (updateUserInput.password) {
+            this.userRepo.update(user.id, { password: updateUserInput.password });
         }
 
         // 更新用户信息项的值
-        if (userUpdateInput.infoKVs && (userUpdateInput.infoKVs.length !== 0)) {
-            this.createOrUpdateUserInfos(user, userUpdateInput.infoKVs, 'update');
+        if (updateUserInput.infoKVs && (updateUserInput.infoKVs.length !== 0)) {
+            this.createOrUpdateUserInfos(user, updateUserInput.infoKVs, 'update');
         }
     }
 
@@ -242,25 +237,15 @@ export class UserService {
     private async createOrUpdateUserInfos(user: User, infoKVs: { key: number, value: string }[], action: 'create' | 'update') {
         if (infoKVs.length !== 0) {
             if (action === 'create') {
-                const userInfoItemIds: number[] = [];
-                const newUserInfos: UserInfo[] = [];
-                infoKVs.forEach(infoKV => {
-                    userInfoItemIds.push(infoKV.key);
-                    newUserInfos.push(this.userInfoRepo.create({
-                        value: infoKV.value,
-                        user
-                    }));
+                infoKVs.forEach(async infoKV => {
+                    this.userInfoRepo.save(this.userInfoRepo.create({ value: infoKV.value, user, infoItem: { id: infoKV.key } }));
                 });
-                // 保存用户信息项的值
-                const userInfos = await this.userInfoRepo.save(newUserInfos);
-                // 保存信息值与信息项的关系
-                this.userInfoRepo.createQueryBuilder('userInfo').relation(UserInfo, 'infoItem').of(userInfos).set(userInfoItemIds);
                 return;
             }
 
             // 更新用户信息项的值
             infoKVs.forEach(async infoKV => {
-                this.userInfoRepo.update(user.userInfos.map(userInfo => userInfo.id), { value: infoKV.value });
+                this.userInfoRepo.update(infoKV.key, { value: infoKV.value });
             });
         }
     }

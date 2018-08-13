@@ -1,0 +1,41 @@
+# 创建信息组
+mutation {
+  createInfoGroup(name: "管理员信息组", roleId: 1) {
+    code
+    message
+  }
+}
+
+# 项指定信息组添加指定信息项
+mutation {
+  addInfoItemToInfoGroup(infoGroupId: 1, infoItemIds: [1, 2, 3]) {
+    code
+    message
+  }
+}
+
+# 查询所有信息组
+{
+  findAllInfoGroup {
+    code
+    message
+    data {
+      name
+    }
+  }
+}
+
+# 查询指定信息组下的所有信息项
+{
+  findInfoItemsByGroupId(groupId: 1) {
+    code
+    message
+    data {
+      type
+      name
+      label
+      description
+    }
+  }
+}
+

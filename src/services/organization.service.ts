@@ -4,7 +4,7 @@ import { Repository, TreeRepository } from 'typeorm';
 
 import { Organization } from '../entities/organization.entity';
 import { User } from '../entities/user.entity';
-import { OrganizationUserData } from '../interfaces/organization.interface';
+import { UserInfoData } from '../interfaces/user.interface';
 import { UserService } from './user.service';
 
 @Injectable()
@@ -200,23 +200,16 @@ export class OrganizationService {
      * 获取组织下面的用户
      * @param id 组织ID
      */
-    async findUserInOrganization(id: number): Promise<OrganizationUserData[]> {
+    async findUserInOrganization(id: number): Promise<UserInfoData[]> {
         const organization = await this.organizationReq.findOne(id, { relations: ['users'] });
         if (!organization) {
             throw new HttpException(`id为：${id}的组织不存在`, 406);
         }
-
-        const organizationUsers: OrganizationUserData[] = [];
+        const organizationUserInfos: UserInfoData[] = [];
         organization.users.forEach(async user => {
-            const userRolesAndPermissions = await this.userService.findOneWithRolesAndPermissions(user.username);
-            const userInfos = await this.userService.findUserInfo(user.username);
-            organizationUsers.push({
-                userId: user.id,
-                userRoles: userRolesAndPermissions.roles,
-                userInfos
-            });
+            const userInfo = await this.userService.findUserInfo(user.username);
+            organizationUserInfos.push(userInfo);
         });
-
-        return organizationUsers;
+        return organizationUserInfos;
     }
 }

@@ -1,10 +1,19 @@
 export interface UserInfoData {
-    id: number;
-    name: string;
-    value: string;
-    label: string;
-    description: string;
-    type: string;
+    userId: number;
+    banned: boolean;
+    recycle: boolean;
+    userRoles: {
+        id: number;
+        name: string
+    }[];
+    userInfos: {
+        id: number;
+        name: string;
+        value: string;
+        label: string;
+        description: string;
+        type: string;
+    }[];
 }
 
 export interface CreateUserInput {

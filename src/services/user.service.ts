@@ -1,8 +1,9 @@
 import { forwardRef, HttpException, Inject, Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
+import { EntityManager, Repository } from 'typeorm';
 
 import { AuthService } from '../auth/auth.service';
+import { Role } from '../entities/role.entity';
 import { UserInfo } from '../entities/user-info.entity';
 import { User } from '../entities/user.entity';
 import { JwtReply } from '../interfaces/jwt.interface';
@@ -13,6 +14,7 @@ import { RoleService } from './role.service';
 @Injectable()
 export class UserService {
     constructor(
+        @InjectEntityManager() private readonly entityManager: EntityManager,
         @InjectRepository(User) private readonly userRepo: Repository<User>,
         @InjectRepository(UserInfo) private readonly userInfoRepo: Repository<UserInfo>,
         @Inject(CryptoUtil) private readonly cryptoUtil: CryptoUtil,
@@ -134,6 +136,21 @@ export class UserService {
     }
 
     /**
+     * 通过角色ID查询用户
+     *
+     * @param roleId 角色ID
+     */
+    async findByRoleId(roleId: number) {
+        const users = await this.entityManager.createQueryBuilder().relation(Role, 'users').of(roleId).loadMany<User>();
+        const roleUserInfos: UserInfoData[] = [];
+        users.forEach(async user => {
+            const userInfo = await this.findUserInfo(user.username);
+            roleUserInfos.push(userInfo);
+        });
+        return roleUserInfos;
+    }
+
+    /**
      * 通过用户名查询用户及其关联信息(角色、权限)
      *
      * @param username 用户名
@@ -151,19 +168,25 @@ export class UserService {
      *
      * @param username 用户名
      */
-    async findUserInfo(username: string): Promise<UserInfoData[]> {
-        const userInfos = await this.userInfoRepo.find({ where: { user: { username }, relations: ['infoItem'] } });
-        return userInfos.map(userInfo => {
-            const userInfoData: UserInfoData = {
-                id: userInfo.id,
-                name: userInfo.infoItem.name,
-                value: userInfo.value,
-                label: userInfo.infoItem.label,
-                description: userInfo.infoItem.description,
-                type: userInfo.infoItem.type
-            };
-            return userInfoData;
-        });
+    async findUserInfo(username: string): Promise<UserInfoData> {
+        const user = await this.userRepo.findOne({ where: { user: { username }, relations: ['roles', 'userInfos', 'userInfos.infoItem'] } });
+        const userInfoData: UserInfoData = {
+            userId: user.id,
+            banned: user.banned,
+            recycle: user.recycle,
+            userRoles: user.roles,
+            userInfos: user.userInfos.map(userInfo => {
+                return {
+                    id: userInfo.id,
+                    name: userInfo.infoItem.name,
+                    value: userInfo.value,
+                    label: userInfo.infoItem.label,
+                    description: userInfo.infoItem.description,
+                    type: userInfo.infoItem.type
+                };
+            })
+        };
+        return userInfoData;
     }
 
     /**

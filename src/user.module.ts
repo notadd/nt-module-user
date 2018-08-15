@@ -2,8 +2,8 @@ import { Inject, Logger, Module, OnModuleInit } from '@nestjs/common';
 import { ModulesContainer } from '@nestjs/core/injector/modules-container';
 import { MetadataScanner } from '@nestjs/core/metadata-scanner';
 import { GraphQLModule } from '@nestjs/graphql';
-import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { InjectEntityManager, InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
+import { EntityManager, In, Not, Repository } from 'typeorm';
 
 import { AuthService } from './auth/auth.service';
 import { AuthStrategy } from './auth/auth.strategy';
@@ -68,6 +68,7 @@ export class UserModule implements OnModuleInit {
 
     constructor(
         @Inject(ModulesContainer) private readonly modulesContainer: ModulesContainer,
+        @InjectEntityManager() private readonly entityManager: EntityManager,
         @InjectRepository(Resource) private readonly resourceRepo: Repository<Resource>,
         @InjectRepository(Permission) private readonly permissionRepo: Repository<Permission>
     ) {
@@ -75,8 +76,8 @@ export class UserModule implements OnModuleInit {
         this.metadataScanner = new MetadataScanner();
     }
 
-    onModuleInit() {
-        const resourceMap: Map<string, { resource: Resource, permissions: Permission[] }> = new Map();
+    async onModuleInit() {
+        const metadataMap: Map<string, { resource: Resource, permissions: Permission[] }> = new Map();
         // 遍历 Module
         this.modulesContainer.forEach(value => {
             // 遍历 Module 中的 components
@@ -99,21 +100,51 @@ export class UserModule implements OnModuleInit {
                             return Reflect.getMetadata(PERMISSION_DEFINITION, value.instance, name);
                         });
                         // 如果元数据存在，则添加到资源集合中，此时会根据 resource.indetify 自动去重
-                        if (resource) resourceMap.set(resource.identify, { resource, permissions });
+                        if (resource) metadataMap.set(resource.identify, { resource, permissions });
                     }
                 }
             });
         });
 
-        // TODO: 删除注解集中移除的资源和权限定义
-        // 保存所有扫描到的资源、权限定义
-        resourceMap.forEach(value => {
-            const resource = this.resourceRepo.create(value.resource);
-            resource.permissions = this.permissionRepo.create(value.permissions);
-            this.resourceRepo.save(resource)
-                .catch(error => {
-                    this.userModuleLogger.error('LoadDecorate: ' + error.detail);
-                });
-        });
+        /**
+         * LOOK ME:
+         *
+         * 以下是资源、权限的新增和删除逻辑
+         *
+         * 当权限唯一标识 identify 更改时，被更改的权限与对应的所有角色的关系也将被删除
+         *
+         * TODO:  根据注解定义，自动更新数据库中对应的 name identify action 信息
+         */
+
+        // 扫描到的所有资源注解
+        const scannedResources = [...metadataMap.values()].map(matadataValue => matadataValue.resource);
+        // 删除注解中移除的资源及其权限
+        const resourceIdentifies = [...metadataMap.keys()].length === 0 ? ['__delete_all_resource__'] : [...metadataMap.keys()];
+        const notExistResources = await this.resourceRepo.find({ where: { identify: Not(In(resourceIdentifies)) } });
+        if (notExistResources.length > 0) await this.resourceRepo.delete(notExistResources.map(v => v.id));
+        // 过滤出新增的资源
+        const existResources = await this.resourceRepo.find({ order: { id: 'ASC' } });
+        const newResourcess = scannedResources.filter(sr => !existResources.map(v => v.identify).includes(sr.identify));
+        // 保存新增的资源
+        if (newResourcess.length > 0) await this.entityManager.insert(Resource, this.resourceRepo.create(newResourcess));
+
+        // 扫描到的所有权限注解
+        const scannedPermissions = <Permission[]>[].concat(...await Promise.all([...metadataMap.values()].map(async matadataValue => {
+            const resource = await this.resourceRepo.findOne({ where: { identify: matadataValue.resource.identify } });
+            matadataValue.permissions.forEach(permission => {
+                permission.resource = resource;
+            });
+            return matadataValue.permissions;
+        })));
+        // 删除注解中移除的权限
+        // tslint:disable-next-line:max-line-length
+        const permissionIdentifies = scannedPermissions.map(v => v.identify).length === 0 ? ['__delete_all_permission__'] : scannedPermissions.map(v => v.identify);
+        const notExistPermissions = await this.permissionRepo.find({ where: { identify: Not(In(permissionIdentifies)) } });
+        if (notExistPermissions.length > 0) await this.permissionRepo.delete(notExistPermissions.map(v => v.id));
+        // 过滤出新增的权限并保存
+        const existPermissions = await this.permissionRepo.find({ order: { id: 'ASC' } });
+        const newPermissions = scannedPermissions.filter(sr => !existPermissions.map(v => v.identify).includes(sr.identify));
+        // 保存新增的权限
+        if (newPermissions.length > 0) await this.entityManager.insert(Permission, this.permissionRepo.create(newPermissions));
     }
 }

@@ -1,39 +1,32 @@
 # 创建信息项
-mutation {
-  createInfoItem(infoItem: {
-    type: "text",
-    name: "fullname",
-    label: "姓名",
-    description: "管理员姓名"
-  }) {
+mutation createInfoItem($infoItemInput: InfoItemInput!) {
+  createInfoItem(infoItemInput: $infoItemInput) {
     code
     message
   }
 }
-
-# 创建信息项
-mutation {
-  createInfoItem(infoItem: {
-    type: "radio",
-    name: "sex",
-    label: "性别",
-    description: "管理员性别"
-  }) {
-    code
-    message
+{
+  "infoItemInput": {
+    "type": "text",
+    "name": "fullname",
+    "label": "姓名",
+    "description": "管理员姓名"
   }
 }
-
-# 创建信息项
-mutation {
-  createInfoItem(infoItem: {
-    type: "radio",
-    name: "age",
-    label: "年龄",
-    description: "管理员年龄"
-  }) {
-    code
-    message
+{
+  "infoItemInput": {
+    "type": "radio",
+    "name": "sex",
+    "label": "性别",
+    "description": "管理员性别"
+  }
+}
+{
+  "infoItemInput": {
+    "type": "text",
+    "name": "age",
+    "label": "年龄",
+    "description": "管理员年龄"
   }
 }
 

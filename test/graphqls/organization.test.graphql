@@ -1,20 +1,32 @@
-mutation {
-  createOrganization(name: "本初网络") {
+# 创建组织
+mutation createOrganization($name: String!) {
+  createOrganization(name: $name) {
     code
     message
   }
 }
+{
+	"name": "本初网络"
+}
 
-mutation {
-  createOrganization(name: "软件部", parentId: 1) {
+mutation createOrganization($name: String!, $parentId: Int) {
+  createOrganization(name: $name, parentId: $parentId) {
     code
     message
   }
 }
+{
+	"name": "软件部",
+  "parentId": 1
+}
 
-mutation {
-  createOrganization(name: "硬件部", parentId: 1) {
+mutation createOrganization($name: String!, $parentId: Int) {
+  createOrganization(name: $name, parentId: $parentId) {
     code
     message
   }
+}
+{
+	"name": "硬件部",
+  "parentId": 1
 }

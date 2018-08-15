@@ -1,17 +1,25 @@
 # 创建信息组
-mutation {
-  createInfoGroup(name: "管理员信息组", roleId: 1) {
+mutation createInfoGroup($name: String!, $roleId: Int!) {
+  createInfoGroup(name: $name, roleId: $roleId) {
     code
     message
   }
 }
+{
+  "name": "管理员信息组",
+  "roleId": 1
+}
 
 # 项指定信息组添加指定信息项
-mutation {
-  addInfoItemToInfoGroup(infoGroupId: 1, infoItemIds: [1, 2, 3]) {
+mutation addInfoItemToInfoGroup($infoGroupId: Int!, $infoItemIds: [Int]!) {
+  addInfoItemToInfoGroup(infoGroupId: $infoGroupId, infoItemIds: $infoItemIds) {
     code
     message
   }
+}
+{
+  "infoGroupId": 1,
+  "infoItemIds": [1, 2, 3]
 }
 
 # 查询所有信息组

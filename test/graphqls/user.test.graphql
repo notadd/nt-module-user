@@ -1,19 +1,87 @@
+# 用户注册
+mutation register($username: String!, $password: String!){
+	register(username: $username, password: $password) {
+		code
+		message
+	}
+}
+{
+	"username": "dzy",
+	"password": "123qwe"
+}
+
+# 用户登录
+query login($username: String!, $password: String!) {
+	login(username: $username, password: $password) {
+		code
+		message
+		data {
+			accessToken
+			expiresIn
+		}
+	}
+}
+{
+	"username": "dzy",
+	"password": "123qwe"
+}
+
 # 创建用户
-mutation {
-  createUser(createUserInput: {
-    username: "dzzzzzy",
-    password: "123qwe",
-    infoKVs: [
-      {key: 1, value: "段泽尧"},
-      {key: 2, value: "男"},
-      {key: 3, value: "23"}
-    ],
-    roleIds: [1],
-    organizationIds: [2]
-  }) {
-    code
-    message
-  }
+mutation createUser($createUserInput: CreateUserInput) {
+	createUser(createUserInput: $createUserInput) {
+		code
+		message
+	}
+}
+{
+	"createUserInput": {
+		"username": "dzy",
+		"password": "123qwe",
+		"infoKVs": [
+			{
+				"key": 1,
+				"value": "段泽尧"
+			},
+			{
+				"key": 2,
+				"value": "男"
+			},
+			{
+				"key": 3,
+				"value": "23"
+			}
+		],
+		"roleIds": [
+			1
+		],
+		"organizationIds": [
+			2
+		]
+	}
+}
+
+# 给用户添加角色
+mutation addUserRole($userId: Int!, $roleId: Int!) {
+	addUserRole(userId: $userId, roleId: $roleId) {
+		code
+		message
+	}
+}
+{
+	"userId": 1,
+	"roleId": 1
+}
+
+# 给用户添加组织
+mutation addUserOrganization($userId: Int!, $organizationId: Int!) {
+	addUserOrganization(userId: $userId, organizationId: $organizationId) {
+		code
+		message
+	}
+}
+{
+	"userId": 1,
+	"organizationId": 2
 }
 
 # 更新用户信息

@@ -1,3 +1,12 @@
+export interface UserInfoData {
+    id: number;
+    name: string;
+    value: string;
+    label: string;
+    description: string;
+    type: string;
+}
+
 export interface CreateUserInput {
     /**
      * 用户名

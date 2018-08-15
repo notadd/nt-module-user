@@ -11,7 +11,7 @@ type Mutation {
     # 删除角色
     deleteRole(id: Int!): UserModuleCommonResult
     # 给角色设置权限
-    setPermissions(id: Int!, permissionIds: [Int]!): UserModuleCommonResult
+    setPermissionsToRole(roleId: Int!, permissionIds: [Int]!): UserModuleCommonResult
 }
 
 type RolesResult {

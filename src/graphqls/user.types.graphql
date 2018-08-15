@@ -1,6 +1,8 @@
 type Query {
     # 用户登录
     login(username: String!, password: String!): LoginResponse
+    # 查询用户信息
+    findUserInfo: UserInfoResult
 }
 
 type Mutation {
@@ -8,6 +10,14 @@ type Mutation {
     register(username: String!, password: String!): UserModuleCommonResult
     # 创建用户
     createUser(createUserInput: CreateUserInput): UserModuleCommonResult
+    # 给用户添加角色
+    addUserRole(userId: Int!, roleId: Int!): UserModuleCommonResult
+    # 给用户添加组织
+    addUserOrganization(userId: Int!, organizationId: Int!): UserModuleCommonResult
+    # 删除用户角色
+    deleteUserRole(userId: Int!, roleId: Int!): UserModuleCommonResult
+    # 删除用户组织
+    deleteUserOrganization(userId: Int!, organizationId: Int!): UserModuleCommonResult
     # 删除用户到回收站
     recycleUser(userId: Int!): UserModuleCommonResult
     # 删除回收站内的用户
@@ -66,4 +76,19 @@ type AccessToken {
     accessToken: String
     # 授权令牌有效时间，单位为秒
     expiresIn: Int
+}
+
+type UserInfoResult {
+    code: Int
+    message: String
+    data: [UserInfoData]
+}
+
+type UserInfoData {
+    id: Int
+    name: string;
+    value: String
+    label: String
+    description: String
+    type: String
 }

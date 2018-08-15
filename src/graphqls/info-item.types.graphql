@@ -1,6 +1,6 @@
 type Mutation {
     # 新增信息项
-    createInfoItem(infoItem: InfoItemInput!): UserModuleCommonResult
+    createInfoItem(infoItemInput: InfoItemInput!): UserModuleCommonResult
     # 删除指定ID的信息项
     deleteInfoItem(infoItemId: Int!): UserModuleCommonResult
     # 更新指定ID的信息项名称、标签、描述、类型

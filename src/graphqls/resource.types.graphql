@@ -32,6 +32,4 @@ type Permission {
     action: String
     # 权限唯一标识
     identify: String
-    # 是否私人资源
-    personal: Boolean
 }

@@ -1,5 +1,5 @@
 type Query {
-    # 获取更目录组织
+    # 获取根组织
     findRootOrganizations: OrganizationsResult
     # 获取所有组织
     findAllOrganizations: OrganizationJsonResult
@@ -8,7 +8,7 @@ type Query {
 }
 
 type Mutation {
-    # 添加组织
+    # 创建组织
     createOrganization(name: String!, parentId: Int): UserModuleCommonResult
     # 更新组织
     updateOrganization(id: Int!, name: String!, parentId: Int): UserModuleCommonResult
@@ -16,7 +16,7 @@ type Mutation {
     deleteOrganization(id: Int!): UserModuleCommonResult
     # 给组织添加用户
     addUsersToOrganization(id: Int!, userIds: [Int]): UserModuleCommonResult
-    # 移除组织下的用户
+    # 删除组织下的用户
     deleteUserFromOrganization(id: Int!, userIds: [Int]): UserModuleCommonResult
 }
 

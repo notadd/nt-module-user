@@ -7,8 +7,8 @@ type Mutation {
     updateInfoGroup(groupId: Int!, name: String, roleId: Int): UserModuleCommonResult
     # 向指定信息组添加指定信息项
     addInfoItemToInfoGroup(infoGroupId: Int!, infoItemIds: [Int]!): UserModuleCommonResult
-    # 移除指定信息组的指定信息项
-    removeInfoItemFromInfoGroup(infoGroupId: Int!, infoItemIds: [Int]!): UserModuleCommonResult
+    # 删除指定信息组的指定信息项
+    deleteIntoItemFromInfoGroup(infoGroupId: Int!, infoItemIds: [Int]!): UserModuleCommonResult
 }
 
 type Query {

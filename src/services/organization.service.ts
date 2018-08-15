@@ -160,7 +160,7 @@ export class OrganizationService {
     }
 
     /**
-     * 移除组织下的用户
+     * 删除组织下的用户
      * @param id 组织ID
      * @param userIds 用户ID
      */

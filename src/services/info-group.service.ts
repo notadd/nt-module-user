@@ -45,7 +45,7 @@ export class InfoGroupService {
      * @param infoGroupId 信息组ID
      * @param infoItemIds 信息项ID
      */
-    async removeInfo(infoGroupId: number, infoItemIds: number[]) {
+    async deleteIntoItem(infoGroupId: number, infoItemIds: number[]) {
         this.infoGroupRepo.createQueryBuilder('infoGroup').relation(InfoGroup, 'infoItems').of(infoGroupId).remove(infoItemIds);
     }
 

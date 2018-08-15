@@ -21,7 +21,7 @@ export class Permission {
      * 权限所属的资源
      */
     @ManyToOne(type => Resource, resource => resource.permissions, {
-        onDelete: 'SET NULL'
+        onDelete: 'CASCADE'
     })
     resource: Resource;
 

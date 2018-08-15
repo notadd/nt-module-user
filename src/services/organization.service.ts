@@ -1,14 +1,17 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, TreeRepository } from 'typeorm';
 
 import { Organization } from '../entities/organization.entity';
 import { User } from '../entities/user.entity';
+import { OrganizationUserData } from '../interfaces/organization.interface';
+import { UserService } from './user.service';
 
 @Injectable()
 export class OrganizationService {
     constructor(
         @InjectRepository(Organization) private readonly organizationReq: TreeRepository<Organization>,
+        @Inject(UserService) private readonly userService: UserService,
         @InjectRepository(User) private readonly userRep: Repository<User>
     ) { }
 
@@ -45,7 +48,7 @@ export class OrganizationService {
      * @param parentId 父组织ID
      */
     async createOrganization(name: string, parentId: number): Promise<void> {
-        let parent: Organization|undefined;
+        let parent: Organization | undefined;
         if (parentId !== undefined && parentId !== null) {
             parent = await this.organizationReq.findOne(parentId);
             if (!parent) {
@@ -172,7 +175,7 @@ export class OrganizationService {
 
         const userArr = await this.userRep.findByIds(userIds);
         userIds.forEach(userId => {
-            const find: User|undefined = userArr.find(user => {
+            const find: User | undefined = userArr.find(user => {
                 return user.id === userId;
             });
             if (!find) {
@@ -197,11 +200,23 @@ export class OrganizationService {
      * 获取组织下面的用户
      * @param id 组织ID
      */
-    async findUserInOrganization(id: number): Promise<User[]> {
+    async findUserInOrganization(id: number): Promise<OrganizationUserData[]> {
         const organization = await this.organizationReq.findOne(id, { relations: ['users'] });
         if (!organization) {
             throw new HttpException(`id为：${id}的组织不存在`, 406);
         }
-        return organization.users;
+
+        const organizationUsers: OrganizationUserData[] = [];
+        organization.users.forEach(async user => {
+            const userRolesAndPermissions = await this.userService.findOneWithRolesAndPermissions(user.username);
+            const userInfos = await this.userService.findUserInfo(user.username);
+            organizationUsers.push({
+                userId: user.id,
+                userRoles: userRolesAndPermissions.roles,
+                userInfos
+            });
+        });
+
+        return organizationUsers;
     }
 }

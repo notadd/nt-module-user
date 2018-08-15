@@ -92,3 +92,8 @@ type UserInfoData {
     description: String
     type: String
 }
+
+type UserRoleData {
+    id: Int
+    name: String
+}

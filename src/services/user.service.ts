@@ -164,21 +164,6 @@ export class UserService {
             };
             return userInfoData;
         });
-        /*
-
-            {
-                id
-                value
-                infoItem {
-                    id
-                    type
-                    name
-                    label
-                    description
-                }
-            }
-
-        */
     }
 
     /**

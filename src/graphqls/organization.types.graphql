@@ -5,6 +5,8 @@ type Query {
     findAllOrganizations: OrganizationJsonResult
     # 获取组织下面的所有子组织
     findChildrenOrganizations(id: Int!): OrganizationJsonResult
+    # 获取组织下面的用户
+    findUserInOrganization(id: Int!): OrganizationUserResult
 }
 
 type Mutation {
@@ -46,4 +48,16 @@ type OrganizationJsonResult {
     message: String
     # 返回数据
     data: String
+}
+
+type OrganizationUserResult {
+    code: Int
+    message: String
+    data: [OrganizationUserData]
+}
+
+type OrganizationUserData {
+    userId: Int
+    userRoles: [UserRoleData]
+    userInfos: [UserInfoData]
 }

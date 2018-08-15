@@ -6,7 +6,7 @@ import { AuthService } from '../auth/auth.service';
 import { UserInfo } from '../entities/user-info.entity';
 import { User } from '../entities/user.entity';
 import { JwtReply } from '../interfaces/jwt.interface';
-import { CreateUserInput, UpdateUserInput } from '../interfaces/user.interface';
+import { CreateUserInput, UpdateUserInput, UserInfoData } from '../interfaces/user.interface';
 import { CryptoUtil } from '../utils/crypto.util';
 import { RoleService } from './role.service';
 
@@ -144,6 +144,41 @@ export class UserService {
             throw new HttpException('用户不存在', 404);
         }
         return user;
+    }
+
+    /**
+     * 通过用户名查询用户信息
+     *
+     * @param username 用户名
+     */
+    async findUserInfo(username: string): Promise<UserInfoData[]> {
+        const userInfos = await this.userInfoRepo.find({ where: { user: { username }, relations: ['infoItem'] } });
+        return userInfos.map(userInfo => {
+            const userInfoData: UserInfoData = {
+                id: userInfo.id,
+                name: userInfo.infoItem.name,
+                value: userInfo.value,
+                label: userInfo.infoItem.label,
+                description: userInfo.infoItem.description,
+                type: userInfo.infoItem.type
+            };
+            return userInfoData;
+        });
+        /*
+
+            {
+                id
+                value
+                infoItem {
+                    id
+                    type
+                    name
+                    label
+                    description
+                }
+            }
+
+        */
     }
 
     /**

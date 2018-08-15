@@ -3,6 +3,8 @@ type Query {
     login(username: String!, password: String!): LoginResponse
     # 查询用户信息
     findUserInfo: UserInfoResult
+    # 查询指定角色ID下的所有用户信息
+    findUserByRoleId(roleId: Int!): UserInfosResult
 }
 
 type Mutation {
@@ -81,19 +83,33 @@ type AccessToken {
 type UserInfoResult {
     code: Int
     message: String
+    data: UserInfoData
+}
+
+type UserInfosResult {
+    code: Int
+    message: String
     data: [UserInfoData]
 }
 
 type UserInfoData {
+    userId: Int
+    banned: Boolean
+    recycle: Boolean
+    userRoles: [UserRole]
+    userInfos: [UserInfo]
+}
+
+type UserRole {
+    id: Int
+    name: String
+}
+
+type UserInfo {
     id: Int
     name: String
     value: String
     label: String
     description: String
     type: String
-}
-
-type UserRoleData {
-    id: Int
-    name: String
 }

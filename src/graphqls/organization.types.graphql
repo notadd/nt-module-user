@@ -53,11 +53,5 @@ type OrganizationJsonResult {
 type OrganizationUserResult {
     code: Int
     message: String
-    data: [OrganizationUserData]
-}
-
-type OrganizationUserData {
-    userId: Int
-    userRoles: [UserRoleData]
-    userInfos: [UserInfoData]
+    data: [UserInfoData]
 }

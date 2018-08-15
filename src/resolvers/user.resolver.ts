@@ -29,6 +29,30 @@ export class UserResolver {
         return { code: 200, message: '创建用户成功' };
     }
 
+    @Mutation('addUserRole')
+    async addUserRole(req, body: { userId: number, roleId: number }): Promise<CommonResult> {
+        await this.userService.addUserRole(body.userId, body.roleId);
+        return { code: 200, message: '添加角色成功' };
+    }
+
+    @Mutation('addUserOrganization')
+    async addUserOrganization(req, body: { userId: number, organizationId: number }): Promise<CommonResult> {
+        await this.userService.addUserOrganization(body.userId, body.organizationId);
+        return { code: 200, message: '添加组织成功' };
+    }
+
+    @Mutation('deleteUserRole')
+    async deleteUserRole(req, body: { userId: number, roleId: number }): Promise<CommonResult> {
+        await this.userService.deleteUserRole(body.userId, body.roleId);
+        return { code: 200, message: '删除角色成功' };
+    }
+
+    @Mutation('deleteUserOrganization')
+    async deleteUserOrganization(req, body: { userId: number, organizationId: number }): Promise<CommonResult> {
+        await this.userService.deleteUserOrganization(body.userId, body.organizationId);
+        return { code: 200, message: '删除组织成功' };
+    }
+
     @Mutation('recycleUser')
     async recycleUser(req, body: { userId: number }): Promise<CommonResult> {
         await this.userService.recycleUser(body.userId);
@@ -45,5 +69,11 @@ export class UserResolver {
     async updateUserInfo(req, body: { userId: number, updateUserInput: UpdateUserInput }): Promise<CommonResult> {
         await this.userService.updateUserInfo(body.userId, body.updateUserInput);
         return { code: 200, message: '更新用户信息成功' };
+    }
+
+    @Query('findUserInfo')
+    async findUserInfo(req): Promise<CommonResult> {
+        const data = await this.userService.findUserInfo(req.user.username);
+        return { code: 200, message: '查询用户信息成功', data };
     }
 }

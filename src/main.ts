@@ -3,6 +3,7 @@ import { GraphQLFactory } from '@nestjs/graphql';
 import * as bodyParser from 'body-parser';
 import { fastifyGraphiQL, fastifyGraphQL } from 'fastify-graphql-middleware';
 
+import { AuthenticationGurad } from './gurads/authentication.gurad';
 import { authentication } from './middlewares/authentication.middleware';
 import { UserModule } from './user.module';
 
@@ -18,9 +19,11 @@ async function bootstrap() {
     // 授权中间件
     app.use('/graphql', authentication);
 
+    app.useGlobalGuards(new AuthenticationGurad());
+
     /* graphql 配置 */
     const graphQLFactory = app.get(GraphQLFactory);
-    const typeDefs = graphQLFactory.mergeTypesByPaths('./**/*.graphql');
+    const typeDefs = graphQLFactory.mergeTypesByPaths('./**/*.types.graphql');
     const schema = graphQLFactory.createSchema({ typeDefs });
     app.use('/graphql', fastifyGraphQL(req => ({ schema, rootValue: req })));
 

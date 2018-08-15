@@ -1,7 +1,6 @@
 import { Inject } from '@nestjs/common';
 import { Mutation, Query, Resolver } from '@nestjs/graphql';
 
-import { InfoGroup } from '../entities/info-group.entity';
 import { CommonResult } from '../interfaces/common-result.interface';
 import { InfoGroupService } from '../services/info-group.service';
 
@@ -35,10 +34,10 @@ export class InfoGroupResolver {
         return { code: 200, message: '添加信息项成功' };
     }
 
-    @Mutation('removeInfoItemFromInfoGroup')
-    async removeInfoItemFromInfoGroup(req, body: { infoGroupId: number, infoItemIds: number[] }): Promise<CommonResult> {
-        await this.infoGroupService.removeInfo(body.infoGroupId, body.infoItemIds);
-        return { code: 200, message: '移除信息项成功' };
+    @Mutation('deleteIntoItemFromInfoGroup')
+    async deleteIntoItemFromInfoGroup(req, body: { infoGroupId: number, infoItemIds: number[] }): Promise<CommonResult> {
+        await this.infoGroupService.deleteIntoItem(body.infoGroupId, body.infoItemIds);
+        return { code: 200, message: '删除信息项成功' };
     }
 
     @Query('findAllInfoGroup')

@@ -12,8 +12,8 @@ export class InfoItemResolver {
     ) { }
 
     @Mutation('createInfoItem')
-    async createInfoItem(req, body: { infoItem: InfoItem }): Promise<CommonResult> {
-        await this.infoItemService.create(body.infoItem);
+    async createInfoItem(req, body: { infoItemInput: InfoItem }): Promise<CommonResult> {
+        await this.infoItemService.create(body.infoItemInput);
         return { code: 200, message: '创建信息项成功' };
     }
 

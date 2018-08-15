@@ -9,15 +9,13 @@
         "noImplicitAny": false,
         "noLib": false,
         "lib": [
-            "es6",
-            "dom",
-            "esnext.asynciterable"
+            "es2017",
         ],
         "noUnusedLocals": false,
         "removeComments": true,
         "strict": false,
         "strictPropertyInitialization": false,
-        "target": "es6",
+        "target": "es2017",
         "outDir": "dist"
     },
     "include": [

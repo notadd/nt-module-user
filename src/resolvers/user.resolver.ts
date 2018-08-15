@@ -76,4 +76,10 @@ export class UserResolver {
         const data = await this.userService.findUserInfo(req.user.username);
         return { code: 200, message: '查询用户信息成功', data };
     }
+
+    @Query('findUserByRoleId')
+    async findUserByRoleId(req, body: { roleId: number }): Promise<CommonResult> {
+        const data = await this.userService.findByRoleId(body.roleId);
+        return { code: 200, message: '查询用户信息成功', data };
+    }
 }

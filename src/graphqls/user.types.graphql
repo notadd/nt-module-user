@@ -86,7 +86,7 @@ type UserInfoResult {
 
 type UserInfoData {
     id: Int
-    name: string;
+    name: String
     value: String
     label: String
     description: String

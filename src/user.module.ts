@@ -57,13 +57,24 @@ export class UserModule implements OnModuleInit {
         @Inject(ModulesContainer) private readonly modulesContainer: ModulesContainer,
         @InjectEntityManager() private readonly entityManager: EntityManager,
         @InjectRepository(Resource) private readonly resourceRepo: Repository<Resource>,
-        @InjectRepository(Permission) private readonly permissionRepo: Repository<Permission>
+        @InjectRepository(Permission) private readonly permissionRepo: Repository<Permission>,
+        @InjectRepository(Role) private readonly roleRepo: Repository<Role>,
+        @InjectRepository(InfoGroup) private readonly infoGroupRepo: Repository<InfoGroup>
     ) {
         this.userModuleLogger = new Logger('UserModule');
         this.metadataScanner = new MetadataScanner();
     }
 
     async onModuleInit() {
+        await this.loadResourcesAndPermissions();
+        await this.createDefaultRole();
+        await this.createDefaultInfoGroup();
+    }
+
+    /**
+     * 加载资源、权限注解，并将其保存到数据库中
+     */
+    private async loadResourcesAndPermissions() {
         const metadataMap: Map<string, { resource: Resource, permissions: Permission[] }> = new Map();
         // 遍历 Module
         this.modulesContainer.forEach(value => {
@@ -133,5 +144,40 @@ export class UserModule implements OnModuleInit {
         const newPermissions = scannedPermissions.filter(sr => !existPermissions.map(v => v.identify).includes(sr.identify));
         // 保存新增的权限
         if (newPermissions.length > 0) await this.entityManager.insert(Permission, this.permissionRepo.create(newPermissions));
+    }
+
+    /**
+     * 创建默认普通用户角色
+     *
+     * 默认的普通用户角色ID始终为1
+     */
+    private async createDefaultRole() {
+        const defaultRole = await this.roleRepo.findOne(1);
+
+        if (defaultRole) return;
+
+        this.roleRepo.save(this.roleRepo.create({
+            id: 1,
+            name: '普通用户'
+        }));
+    }
+
+    /**
+     * 创建默认信息组
+     *
+     * 默认的信息组为普通用户角色的信息组，其ID始终为1
+     */
+    private async createDefaultInfoGroup() {
+        const defaultInfoGroup = await this.infoGroupRepo.findOne(1);
+
+        if (defaultInfoGroup) return;
+
+        this.infoGroupRepo.save(this.infoGroupRepo.create({
+            id: 1,
+            name: '普通用户信息组',
+            role: {
+                id: 1
+            }
+        }));
     }
 }

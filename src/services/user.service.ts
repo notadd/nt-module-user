@@ -278,7 +278,7 @@ export class UserService {
      * @param action 操作类型，创建或更新(create | update)
      */
     private async createOrUpdateUserInfos(user: User, infoKVs: { key: number, value: string }[], action: 'create' | 'update') {
-        if (infoKVs.length !== 0) {
+        if (infoKVs && infoKVs.length !== 0) {
             if (action === 'create') {
                 infoKVs.forEach(infoKV => {
                     this.userInfoRepo.save(this.userInfoRepo.create({ value: infoKV.value, user, infoItem: { id: infoKV.key } }));

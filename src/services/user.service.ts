@@ -169,7 +169,7 @@ export class UserService {
      * @param username 用户名
      */
     async findUserInfo(username: string): Promise<UserInfoData> {
-        const user = await this.userRepo.findOne({ where: { user: { username } }, relations: ['roles', 'userInfos', 'userInfos.infoItem'] });
+        const user = await this.userRepo.findOne({ where: { username }, relations: ['roles', 'userInfos', 'userInfos.infoItem'] });
         const userInfoData: UserInfoData = {
             userId: user.id,
             banned: user.banned,

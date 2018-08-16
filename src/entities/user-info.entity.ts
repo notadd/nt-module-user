@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 import { InfoItem } from './info-item.entity';
 import { User } from './user.entity';
@@ -31,9 +31,8 @@ export class UserInfo {
     /**
      * 所属信息项
      */
-    @OneToOne(type => InfoItem, infoItem => infoItem.userInfo, {
+    @ManyToOne(type => InfoItem, infoItem => infoItem.userInfos, {
         onDelete: 'CASCADE'
     })
-    @JoinColumn()
     infoItem: InfoItem;
 }

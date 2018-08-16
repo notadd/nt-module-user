@@ -25,7 +25,7 @@ export class InfoItemService {
      * @param id 信息项ID
      */
     async delete(id: number) {
-        const infoItem = await this.infoItemRepo.findOne(id, { relations: ['userInfo', 'infoGroups'] });
+        const infoItem = await this.infoItemRepo.findOne(id, { relations: ['userInfos', 'infoGroups'] });
         this.infoItemRepo.createQueryBuilder('infoItem').relation(InfoItem, 'infoGroups').of(id).remove(infoItem.infoGroups);
         this.infoItemRepo.remove(infoItem);
     }

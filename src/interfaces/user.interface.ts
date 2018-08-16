@@ -36,7 +36,7 @@ export interface CreateUserInput {
     /**
      * 信息项键值对，key是信息项的ID(infoItem.id)，值是信息项的值(userInfo.value)
      */
-    infoKVs: { key: number, value: string }[];
+    infoKVs?: { key: number, value: string }[];
     /**
      * 拥有的角色ID数组
      */

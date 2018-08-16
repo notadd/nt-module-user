@@ -11,7 +11,7 @@ type Query {
 
 type Mutation {
     # 用户注册
-    register(username: String!, password: String!): UserModuleCommonResult
+    register(registerUserInput: RegisterUserInput): UserModuleCommonResult
     # 创建用户
     createUser(createUserInput: CreateUserInput): UserModuleCommonResult
     # 给用户添加角色
@@ -30,6 +30,19 @@ type Mutation {
     updateUserInfo(userId: Int!, updateUserInput: UpdateUserInput): UserModuleCommonResult
 }
 
+input RegisterUserInput {
+     # 用户名
+    username: String!
+    # 邮箱
+    email: String
+    # 手机号
+    mobile: String
+    # 登录密码
+    password: String!
+    # 信息项键值对，key是信息项的ID(infoItem.id)，值是信息项的值(userInfo.value)
+    infoKVs: [infoKV]
+}
+
 input CreateUserInput {
     # 用户名
     username: String!
@@ -38,13 +51,13 @@ input CreateUserInput {
     # 手机号
     mobile: String
     # 登录密码
-    password: String
+    password: String!
     # 信息项键值对，key是信息项的ID(infoItem.id)，值是信息项的值(userInfo.value)
-    infoKVs: [infoKV]!
+    infoKVs: [infoKV]
     # 拥有的角色ID
-    roleIds: [Int]!
+    roleIds: [Int]
     # 所属组织ID
-    organizationIds: [Int]!
+    organizationIds: [Int]
 }
 
 input UpdateUserInput {

@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { InfoGroup } from '../entities/info-group.entity';
+import { InfoItem } from '../entities/info-item.entity';
 
 
 @Injectable()
@@ -27,6 +28,15 @@ export class InfoGroupService {
      * @param infoItemIds 信息项ID
      */
     async addInfoItem(infoGroupId: number, infoItemIds: number[]) {
+        const infoItems = await this.infoGroupRepo
+            .createQueryBuilder('infoGroup')
+            .relation(InfoGroup, 'infoItems')
+            .of(infoGroupId)
+            .loadMany<InfoItem>();
+
+        const duplicateIds = infoItems.map(infoItem => infoItem.id).filter(infoItemId => infoItemIds.includes(infoItemId));
+        if (duplicateIds) throw new HttpException(`信息项 ID: ${duplicateIds} 已存在`, 409);
+
         this.infoGroupRepo.createQueryBuilder('infoGroup').relation(InfoGroup, 'infoItems').of(infoGroupId).add(infoItemIds);
     }
 

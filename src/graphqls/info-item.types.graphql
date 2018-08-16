@@ -19,3 +19,24 @@ input InfoItemInput {
     label: String
     description: String
 }
+
+# 查询信息项返回消息
+type InfoItemResult {
+    code: Int
+    message: String
+    data: [InfoItemData]
+}
+
+# 信息项数据
+type InfoItemData {
+    # 信息项ID
+    id: Int
+    # 信息项名称
+    name: String
+    # 信息项标签
+    label: String
+    # 信息项描述
+    description: String
+    # 信息项类型
+    type: String
+}

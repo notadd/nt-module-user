@@ -18,8 +18,8 @@ export class UserResolver {
     }
 
     @Mutation('register')
-    async register(req, body: { username: string, password: string }): Promise<CommonResult> {
-        await this.userService.register(body.username, body.password);
+    async register(req, body: { registerUserInput: CreateUserInput }): Promise<CommonResult> {
+        await this.userService.register(body.registerUserInput);
         return { code: 200, message: '注册成功' };
     }
 
@@ -71,8 +71,8 @@ export class UserResolver {
         return { code: 200, message: '更新用户信息成功' };
     }
 
-    @Query('findUserInfo')
-    async findUserInfo(req): Promise<CommonResult> {
+    @Query('findCurrentUserInfo')
+    async findCurrentUserInfo(req): Promise<CommonResult> {
         const data = await this.userService.findUserInfo(req.user.username);
         return { code: 200, message: '查询用户信息成功', data };
     }
@@ -80,6 +80,12 @@ export class UserResolver {
     @Query('findUserByRoleId')
     async findUserByRoleId(req, body: { roleId: number }): Promise<CommonResult> {
         const data = await this.userService.findByRoleId(body.roleId);
-        return { code: 200, message: '查询用户信息成功', data };
+        return { code: 200, message: '查询用户成功', data };
+    }
+
+    @Query('findRegisterUserInfoItem')
+    async findRegisterUserInputInfo(): Promise<CommonResult> {
+        const data = await this.userService.findOneWithInfoItemsByRole([1]);
+        return { code: 200, message: '查询用户注册信息项成功', data };
     }
 }

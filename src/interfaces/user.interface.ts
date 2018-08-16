@@ -40,7 +40,7 @@ export interface CreateUserInput {
     /**
      * 拥有的角色ID数组
      */
-    roleIds: number[];
+    roleIds?: number[];
     /**
      * 所属的组织ID数组
      */

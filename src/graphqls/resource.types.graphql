@@ -9,10 +9,10 @@ type ResourcesResult {
     # 状态消息
     message: String
     # 返回数据
-    data: [Resource]
+    data: [ResourceData]
 }
 
-type Resource {
+type ResourceData {
     # 资源ID
     id: Int
     # 资源名称
@@ -20,10 +20,10 @@ type Resource {
     # 资源唯一标识
     identify: String
     # 资源拥有的权限
-    permissions: [Permission]
+    permissions: [PermissionData]
 }
 
-type Permission {
+type PermissionData {
     # 权限ID
     id: Int
     # 权限名称

@@ -2,7 +2,7 @@ import { forwardRef, HttpException, Inject, Injectable } from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
 
-import { AuthService } from '../auth/auth.service';
+import { AuthService } from '../authentication/authentication.service';
 import { Role } from '../entities/role.entity';
 import { UserInfo } from '../entities/user-info.entity';
 import { User } from '../entities/user.entity';
@@ -143,10 +143,10 @@ export class UserService {
     async findByRoleId(roleId: number) {
         const users = await this.entityManager.createQueryBuilder().relation(Role, 'users').of(roleId).loadMany<User>();
         const roleUserInfos: UserInfoData[] = [];
-        users.forEach(async user => {
+        for (const user of users) {
             const userInfo = await this.findUserInfo(user.username);
             roleUserInfos.push(userInfo);
-        });
+        }
         return roleUserInfos;
     }
 
@@ -169,13 +169,13 @@ export class UserService {
      * @param username 用户名
      */
     async findUserInfo(username: string): Promise<UserInfoData> {
-        const user = await this.userRepo.findOne({ where: { user: { username }, relations: ['roles', 'userInfos', 'userInfos.infoItem'] } });
+        const user = await this.userRepo.findOne({ where: { user: { username } }, relations: ['roles', 'userInfos', 'userInfos.infoItem'] });
         const userInfoData: UserInfoData = {
             userId: user.id,
             banned: user.banned,
             recycle: user.recycle,
             userRoles: user.roles,
-            userInfos: user.userInfos.map(userInfo => {
+            userInfos: (user.userInfos && user.userInfos.length > 0) ? user.userInfos.map(userInfo => {
                 return {
                     id: userInfo.id,
                     name: userInfo.infoItem.name,
@@ -184,7 +184,7 @@ export class UserService {
                     description: userInfo.infoItem.description,
                     type: userInfo.infoItem.type
                 };
-            })
+            }) : []
         };
         return userInfoData;
     }
@@ -241,10 +241,9 @@ export class UserService {
      * @param username 用户名
      * @param password 密码
      */
-    async register(username: string, password: string): Promise<void> {
-        await this.checkUsernameExist(username);
-        password = await this.cryptoUtil.encryptPassword(password);
-        this.userRepo.save(this.userRepo.create({ username, password }));
+    async register(createUserInput: CreateUserInput): Promise<void> {
+        createUserInput.roleIds = [1];
+        this.createUser(createUserInput);
     }
 
     /**
@@ -281,14 +280,14 @@ export class UserService {
     private async createOrUpdateUserInfos(user: User, infoKVs: { key: number, value: string }[], action: 'create' | 'update') {
         if (infoKVs.length !== 0) {
             if (action === 'create') {
-                infoKVs.forEach(async infoKV => {
+                infoKVs.forEach(infoKV => {
                     this.userInfoRepo.save(this.userInfoRepo.create({ value: infoKV.value, user, infoItem: { id: infoKV.key } }));
                 });
                 return;
             }
 
             // 更新用户信息项的值
-            infoKVs.forEach(async infoKV => {
+            infoKVs.forEach(infoKV => {
                 this.userInfoRepo.update(infoKV.key, { value: infoKV.value });
             });
         }

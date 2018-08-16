@@ -206,10 +206,10 @@ export class OrganizationService {
             throw new HttpException(`id为：${id}的组织不存在`, 406);
         }
         const organizationUserInfos: UserInfoData[] = [];
-        organization.users.forEach(async user => {
+        for (const user of organization.users) {
             const userInfo = await this.userService.findUserInfo(user.username);
             organizationUserInfos.push(userInfo);
-        });
+        }
         return organizationUserInfos;
     }
 }

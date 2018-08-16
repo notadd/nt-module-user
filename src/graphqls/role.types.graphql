@@ -1,6 +1,8 @@
 type Query {
     # 查询所有角色
     findRoles: RolesResult
+    # 查询角色信息
+    findOneRoleInfo(roleId: Int!): RoleInfoResult
 }
 
 type Mutation {
@@ -28,6 +30,17 @@ type Role {
     id: Int
     # 角色名称
     name: String
-    # 角色拥有的资源
-    permissions: [Permission]
+}
+
+type RoleInfoResult {
+    code: Int
+    message: String
+    data: RoleInfoData
+}
+
+type RoleInfoData {
+    id: Int
+    name: String
+    permissions: [PermissionData]
+    infoItems: [InfoItemData]
 }

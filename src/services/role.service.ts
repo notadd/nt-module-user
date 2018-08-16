@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { InfoItem } from '../entities/info-item.entity';
 import { Permission } from '../entities/permission.entity';
 import { Role } from '../entities/role.entity';
+import { RoleInfoData } from '../interfaces/role.interface';
 
 @Injectable()
 export class RoleService {
@@ -104,8 +105,29 @@ export class RoleService {
         }
     }
 
+    /**
+     * 查询所有角色
+     */
     async findRoles() {
         return this.roleRepo.find();
+    }
+
+    /**
+     * 查询指定角色的所有关联信息(角色基本信息、角色拥有的权限、角色拥有的信息项)
+     * @param roleId 角色ID
+     */
+    async findOneRoleInfo(roleId: number) {
+        const role = await this.roleRepo.findOne(roleId, { relations: ['permissions'] });
+        let roleInfoData: RoleInfoData;
+
+        if (!role) return roleInfoData;
+
+        roleInfoData = {
+            id: role.id,
+            name: role.name,
+            permissions: (role.permissions && role.permissions.length > 0) ? role.permissions : [],
+            infoItems: await this.findInfoGroupItemsByIds([roleId])
+        };
     }
 
     /**
@@ -116,8 +138,15 @@ export class RoleService {
     async findInfoGroupItemsByIds(ids: number[]) {
         let infoItemsArr: InfoItem[] = [];
         const roles = await this.roleRepo.findByIds(ids, { relations: ['infoGroup', 'infoGroup.infoItem'] });
+
+        if (!roles || roles.length === 0) {
+            return infoItemsArr;
+        }
+
         roles.forEach(role => {
-            role.infoGroup.infoItems.forEach(infoItem => infoItemsArr.push(infoItem));
+            if (role.infoGroup && role.infoGroup.infoItems && role.infoGroup.infoItems.length > 0) {
+                role.infoGroup.infoItems.forEach(infoItem => infoItemsArr.push(infoItem));
+            }
         });
 
         const temp = {};

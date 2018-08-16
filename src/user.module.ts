@@ -34,20 +34,7 @@ import { CryptoUtil } from './utils/crypto.util';
     imports: [
         GraphQLModule,
         TypeOrmModule.forFeature([Organization, User, Role, Resource, Permission, InfoGroup, InfoItem, UserInfo]),
-        TypeOrmModule.forRoot({
-            type: 'postgres',
-            host: 'localhost',
-            port: 5432,
-            username: 'postgres',
-            password: '123456',
-            database: 'postgres',
-            entities: ['./**/*.entity.ts'],
-            maxQueryExecutionTime: 1000,
-            synchronize: true,
-            // dropSchema: true,
-            logging: true,
-            logger: 'advanced-console'
-        })
+        TypeOrmModule.forRoot()
     ],
     controllers: [],
     providers: [

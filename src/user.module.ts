@@ -5,8 +5,8 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { InjectEntityManager, InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { EntityManager, In, Not, Repository } from 'typeorm';
 
-import { AuthService } from './auth/auth.service';
-import { AuthStrategy } from './auth/auth.strategy';
+import { AuthService } from './authentication/authentication.service';
+import { AuthStrategy } from './authentication/authentication.strategy';
 import { PERMISSION_DEFINITION, RESOURCE_DEFINITION } from './decorators';
 import { InfoGroup } from './entities/info-group.entity';
 import { InfoItem } from './entities/info-item.entity';

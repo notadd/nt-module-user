@@ -44,7 +44,7 @@ import { CryptoUtil } from './utils/crypto.util';
         InfoItemResolver, InfoItemService,
         CryptoUtil
     ],
-    exports: []
+    exports: [AuthService]
 })
 export class UserModule implements OnModuleInit {
     private readonly metadataScanner: MetadataScanner;

@@ -133,7 +133,7 @@ export class RoleService {
     /**
      * 查询角色所属信息组下的所有信息项
      *
-     * @param id 角色ID
+     * @param ids 角色ID数组
      */
     async findInfoGroupItemsByIds(ids: number[]) {
         let infoItemsArr: InfoItem[] = [];

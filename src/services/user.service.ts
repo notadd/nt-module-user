@@ -200,7 +200,7 @@ export class UserService {
      *
      * 显示用户信息时，直接使用用户 id 去查询 user_info 表中数据即可。
      */
-    async findOneWithInfoItemsByRole(roleIds: number[]) {
+    async findOneWithInfoItemsByRoleIds(roleIds: number[]) {
         return this.roleService.findInfoGroupItemsByIds(roleIds);
     }
 

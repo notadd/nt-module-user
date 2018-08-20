@@ -1,12 +1,10 @@
-import { Inject, Logger, Module, OnModuleInit } from '@nestjs/common';
+import { Global, Inject, Module, OnModuleInit } from '@nestjs/common';
 import { ModulesContainer } from '@nestjs/core/injector/modules-container';
 import { MetadataScanner } from '@nestjs/core/metadata-scanner';
-import { GraphQLModule } from '@nestjs/graphql';
 import { InjectEntityManager, InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { EntityManager, In, Not, Repository } from 'typeorm';
 
 import { AuthService } from './authentication/authentication.service';
-import { AuthStrategy } from './authentication/authentication.strategy';
 import { PERMISSION_DEFINITION, RESOURCE_DEFINITION } from './decorators';
 import { InfoGroup } from './entities/info-group.entity';
 import { InfoItem } from './entities/info-item.entity';
@@ -30,15 +28,14 @@ import { RoleService } from './services/role.service';
 import { UserService } from './services/user.service';
 import { CryptoUtil } from './utils/crypto.util';
 
+@Global()
 @Module({
     imports: [
-        GraphQLModule,
-        TypeOrmModule.forFeature([Organization, User, Role, Resource, Permission, InfoGroup, InfoItem, UserInfo]),
-        TypeOrmModule.forRoot()
+        TypeOrmModule.forFeature([Organization, User, Role, Resource, Permission, InfoGroup, InfoItem, UserInfo])
     ],
     controllers: [],
     providers: [
-        AuthService, AuthStrategy,
+        AuthService,
         OrganizationResolver, OrganizationService,
         UserResolver, UserService,
         RoleResolver, RoleService,
@@ -50,7 +47,6 @@ import { CryptoUtil } from './utils/crypto.util';
     exports: []
 })
 export class UserModule implements OnModuleInit {
-    private userModuleLogger: Logger;
     private readonly metadataScanner: MetadataScanner;
 
     constructor(
@@ -61,7 +57,6 @@ export class UserModule implements OnModuleInit {
         @InjectRepository(Role) private readonly roleRepo: Repository<Role>,
         @InjectRepository(InfoGroup) private readonly infoGroupRepo: Repository<InfoGroup>
     ) {
-        this.userModuleLogger = new Logger('UserModule');
         this.metadataScanner = new MetadataScanner();
     }
 

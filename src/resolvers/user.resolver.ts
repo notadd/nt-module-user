@@ -85,7 +85,7 @@ export class UserResolver {
 
     @Query('findRegisterUserInfoItem')
     async findRegisterUserInputInfo(): Promise<CommonResult> {
-        const data = await this.userService.findOneWithInfoItemsByRole([1]);
+        const data = await this.userService.findOneWithInfoItemsByRoleIds([1]);
         return { code: 200, message: '查询用户注册信息项成功', data };
     }
 }

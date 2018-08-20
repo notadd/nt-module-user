@@ -207,7 +207,7 @@ export class OrganizationService {
         }
         const organizationUserInfos: UserInfoData[] = [];
         for (const user of organization.users) {
-            const userInfo = await this.userService.findUserInfo(user.username);
+            const userInfo = await this.userService.findUserInfoById(user.id);
             organizationUserInfos.push(userInfo);
         }
         return organizationUserInfos;

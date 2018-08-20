@@ -3,8 +3,10 @@ type Query {
     login(username: String!, password: String!): LoginResponse
     # 查询当前登录的用户信息
     findCurrentUserInfo: UserInfoResult
+    # 查询用户信息
+    findUserInfoById(userId: Int!): UserInfoResult
     # 查询指定角色ID下的所有用户信息
-    findUserByRoleId(roleId: Int!): UserInfosResult
+    findUsersByRoleId(roleId: Int!): UserInfosResult
     # 查询用户注册信息项
     findRegisterUserInfoItem: RegisterUserInfoItemResult
 }
@@ -16,12 +18,8 @@ type Mutation {
     createUser(createUserInput: CreateUserInput): UserModuleCommonResult
     # 给用户添加角色
     addUserRole(userId: Int!, roleId: Int!): UserModuleCommonResult
-    # 给用户添加组织
-    addUserOrganization(userId: Int!, organizationId: Int!): UserModuleCommonResult
     # 删除用户角色
     deleteUserRole(userId: Int!, roleId: Int!): UserModuleCommonResult
-    # 删除用户组织
-    deleteUserOrganization(userId: Int!, organizationId: Int!): UserModuleCommonResult
     # 删除用户到回收站
     recycleUser(userId: Int!): UserModuleCommonResult
     # 删除回收站内的用户
@@ -109,6 +107,9 @@ type UserInfosResult {
 
 type UserInfoData {
     userId: Int
+    username: String
+    email: String
+    mobile: String
     banned: Boolean
     recycle: Boolean
     userRoles: [UserRole]

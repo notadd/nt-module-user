@@ -13,7 +13,7 @@ export class AuthenticationGurad implements CanActivate {
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
         // 登录和注册接口忽略验证
-        if (['login', 'register'].indexOf(context.getHandler().name) >= 0) {
+        if (['login', 'register'].includes(context.getHandler().name)) {
             return true;
         }
 
@@ -45,8 +45,8 @@ export class AuthenticationGurad implements CanActivate {
         });
         const handlerPerm = <Permission>Reflect.getMetadata(PERMISSION_DEFINITION, context.getClass().prototype, context.getHandler().name);
         if (handlerPerm && userPerm.includes(handlerPerm.identify)) {
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 }

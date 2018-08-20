@@ -1,5 +1,8 @@
 export interface UserInfoData {
     userId: number;
+    username: string;
+    email: string;
+    mobile: string;
     banned: boolean;
     recycle: boolean;
     userRoles: {

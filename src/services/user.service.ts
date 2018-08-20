@@ -54,16 +54,6 @@ export class UserService {
     }
 
     /**
-     * 给用户添加组织
-     *
-     * @param userId 用户ID
-     * @param organizationId 组织ID
-     */
-    async addUserOrganization(userId: number, organizationId: number) {
-        this.userRepo.createQueryBuilder('user').relation(User, 'organizations').of(userId).add(organizationId);
-    }
-
-    /**
      * 删除用户角色
      *
      * @param userId 用户ID
@@ -71,16 +61,6 @@ export class UserService {
      */
     async deleteUserRole(userId: number, roleId: number) {
         this.userRepo.createQueryBuilder('user').relation(User, 'roles').of(userId).remove(roleId);
-    }
-
-    /**
-     * 删除用户组织
-     *
-     * @param userId 用户ID
-     * @param organizationId 组织ID
-     */
-    async deleteUserOrganization(userId: number, organizationId: number) {
-        this.userRepo.createQueryBuilder('user').relation(User, 'organizations').of(userId).remove(organizationId);
     }
 
     /**
@@ -144,7 +124,7 @@ export class UserService {
         const users = await this.entityManager.createQueryBuilder().relation(Role, 'users').of(roleId).loadMany<User>();
         const roleUserInfos: UserInfoData[] = [];
         for (const user of users) {
-            const userInfo = await this.findUserInfo(user.username);
+            const userInfo = await this.findUserInfoById(user.id);
             roleUserInfos.push(userInfo);
         }
         return roleUserInfos;
@@ -164,14 +144,17 @@ export class UserService {
     }
 
     /**
-     * 通过用户名查询用户信息
+     * 通过用户ID查询用户信息
      *
-     * @param username 用户名
+     * @param id 用户ID
      */
-    async findUserInfo(username: string): Promise<UserInfoData> {
-        const user = await this.userRepo.findOne({ where: { username }, relations: ['roles', 'userInfos', 'userInfos.infoItem'] });
+    async findUserInfoById(id: number): Promise<UserInfoData> {
+        const user = await this.userRepo.findOne(id, { relations: ['roles', 'userInfos', 'userInfos.infoItem'] });
         const userInfoData: UserInfoData = {
             userId: user.id,
+            username: user.username,
+            email: user.email,
+            mobile: user.mobile,
             banned: user.banned,
             recycle: user.recycle,
             userRoles: user.roles,

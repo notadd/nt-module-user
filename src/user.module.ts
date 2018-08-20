@@ -79,7 +79,7 @@ export class UserModule implements OnModuleInit {
                 const isResolverOrController =
                     Reflect.getMetadataKeys(value.instance.constructor)
                         .filter(key => ['graphql:resolver_type', 'path']
-                            .indexOf(key) !== -1).length > 0;
+                            .includes(key)).length > 0;
 
                 if (isResolverOrController) {
                     // 获取 Resolver 或 Controller 类上 @Resource() 注解中的元数据

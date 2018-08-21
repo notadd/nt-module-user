@@ -1,4 +1,5 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { AuthenticationError } from 'apollo-server-core';
 import * as jwt from 'jsonwebtoken';
 
 import { User } from '../entities/user.entity';
@@ -27,7 +28,21 @@ export class AuthService {
     }
 
     // TODO: 如果用户模块启用了缓存选项，则在缓存中通过 username 查询权限集，否则查数据库中的权限集
-    async validateUser(payload: JwtPayload): Promise<User | undefined> {
-        return this.userService.findOneWithRolesAndPermissions(payload.username);
+    async validateUser(req: any): Promise<User> {
+        if (req.body && ['IntrospectionQuery', 'login', 'register'].includes(req.body.operationName)) {
+            return;
+        }
+        const token = (req.headers.authorization as string).split('Bearer ')[1];
+        try {
+            const decodedToken = <{ username: string }>jwt.verify(token, 'secretKey');
+            return this.userService.findOneWithRolesAndPermissions(decodedToken.username);
+        } catch (error) {
+            if (error instanceof jwt.JsonWebTokenError) {
+                throw new AuthenticationError('invalid access token error');
+            }
+            if (error instanceof jwt.TokenExpiredError) {
+                throw new AuthenticationError('access token has been expired');
+            }
+        }
     }
 }

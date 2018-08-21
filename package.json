@@ -8,7 +8,8 @@
         "debug": "node --inspect-brk -r ts-node/register stater/main.ts",
         "debug:watch": "nodemon --config nodemon-debug.json",
         "check": "tslint -p tsconfig.json -c tslint.json",
-        "fix": "tslint -p tsconfig.json -c tslint.json --fix"
+        "fix": "tslint -p tsconfig.json -c tslint.json --fix",
+        "build": "node --max_old_space_size=4096 ./node_modules/gulp/bin/gulp.js build"
     },
     "author": "notadd",
     "license": "Apache-2.0",
@@ -41,6 +42,13 @@
         "@types/node": "^10.5.2",
         "@types/passport": "^0.4.6",
         "@types/passport-jwt": "^3.0.1",
+        "gulp": "^3.9.1",
+        "gulp-rename": "^1.4.0",
+        "gulp-sequence": "^1.0.0",
+        "gulp-sourcemaps": "^2.6.4",
+        "gulp-tslint": "^8.1.3",
+        "gulp-typescript": "^5.0.0-alpha.3",
+        "lerna": "^3.1.2",
         "nodemon": "^1.18.3",
         "ts-node": "^7.0.0",
         "tsconfig-paths": "^3.4.2",

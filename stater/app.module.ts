@@ -73,8 +73,8 @@ export class AppModule {
                 settings: {
                     'editor.theme': 'light',
                     'editor.cursorShape': 'line'
-                },
-            },
+                }
+            }
         });
         server.applyMiddleware({ app });
     }

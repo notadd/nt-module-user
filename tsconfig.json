@@ -10,13 +10,14 @@
         "noLib": false,
         "lib": [
             "es2017",
+            "esnext.asynciterable"
         ],
         "noUnusedLocals": false,
         "removeComments": true,
         "strict": false,
         "strictPropertyInitialization": false,
         "target": "es2017",
-        "outDir": "dist"
+        "outDir": "package"
     },
     "include": [
         "src/*.ts",

@@ -32,15 +32,17 @@ export class UserService {
         createUserInput.password = await this.cryptoUtil.encryptPassword(createUserInput.password);
         const user = await this.userRepo.save(this.userRepo.create(createUserInput));
         // 将当前用户与角色进行关联，保存用户和角色的关系
-        if (createUserInput.roleIds && (createUserInput.roleIds.length !== 0)) {
+        if (createUserInput.roleIds && createUserInput.roleIds.length) {
             this.userRepo.createQueryBuilder('user').relation(User, 'roles').of(user).add(createUserInput.roleIds);
         }
         // 如果创建用户时，指定了组织，则将当前用户与组织进行关联，保存用户和组织的关系
-        if (createUserInput.organizationIds && (createUserInput.organizationIds.length !== 0)) {
+        if (createUserInput.organizationIds && createUserInput.organizationIds.length) {
             this.userRepo.createQueryBuilder('user').relation(User, 'organizations').of(user).add(createUserInput.organizationIds);
         }
-        // 声明将要保存的用户信息项和信息值，newUserInfoItemIds 为信息项ID数组，newUserInfos 为信息值对象数组
-        this.createOrUpdateUserInfos(user, createUserInput.infoKVs, 'create');
+        // 创建用户时，如果有信息项，则保存用户信息项的值
+        if (createUserInput.infoKVs && createUserInput.infoKVs.length) {
+            this.createOrUpdateUserInfos(user, createUserInput.infoKVs, 'create');
+        }
     }
 
     /**
@@ -106,11 +108,12 @@ export class UserService {
         }
         // 更新密码
         if (updateUserInput.password) {
-            this.userRepo.update(user.id, { password: updateUserInput.password });
+            const newPassword = await this.cryptoUtil.encryptPassword(updateUserInput.password);
+            this.userRepo.update(user.id, { password: newPassword });
         }
 
         // 更新用户信息项的值
-        if (updateUserInput.infoKVs && (updateUserInput.infoKVs.length !== 0)) {
+        if (updateUserInput.infoKVs && updateUserInput.infoKVs.length) {
             this.createOrUpdateUserInfos(user, updateUserInput.infoKVs, 'update');
         }
     }
@@ -210,16 +213,13 @@ export class UserService {
         //     });
         // });
 
-        // FIXME: 使用什么数据生成 accessToken？
         return this.authService.createToken({ username });
     }
 
     /**
      * 普通用户注册
      *
-     * TODO: 注册只提供普通用户最基本的信息写入，即用户名+密码
-     *
-     * 普通用户注册成功后，需要完善默认的普通用户组下的信息项信息
+     * 入参：用户名、密码、邮箱(可选)、手机号(可选)、普通用户信息项
      *
      * @param username 用户名
      * @param password 密码
@@ -261,7 +261,7 @@ export class UserService {
      * @param action 操作类型，创建或更新(create | update)
      */
     private async createOrUpdateUserInfos(user: User, infoKVs: { key: number, value: string }[], action: 'create' | 'update') {
-        if (infoKVs && infoKVs.length !== 0) {
+        if (infoKVs.length) {
             if (action === 'create') {
                 infoKVs.forEach(infoKV => {
                     this.userInfoRepo.save(this.userInfoRepo.create({ value: infoKV.value, user, infoItem: { id: infoKV.key } }));

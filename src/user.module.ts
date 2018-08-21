@@ -50,12 +50,14 @@ export class UserModule implements OnModuleInit {
     private readonly metadataScanner: MetadataScanner;
 
     constructor(
+        @Inject(UserService) private readonly userService: UserService,
         @Inject(ModulesContainer) private readonly modulesContainer: ModulesContainer,
         @InjectEntityManager() private readonly entityManager: EntityManager,
         @InjectRepository(Resource) private readonly resourceRepo: Repository<Resource>,
         @InjectRepository(Permission) private readonly permissionRepo: Repository<Permission>,
         @InjectRepository(Role) private readonly roleRepo: Repository<Role>,
-        @InjectRepository(InfoGroup) private readonly infoGroupRepo: Repository<InfoGroup>
+        @InjectRepository(InfoGroup) private readonly infoGroupRepo: Repository<InfoGroup>,
+        @InjectRepository(User) private readonly userRepo: Repository<User>
     ) {
         this.metadataScanner = new MetadataScanner();
     }
@@ -64,6 +66,7 @@ export class UserModule implements OnModuleInit {
         await this.loadResourcesAndPermissions();
         await this.createDefaultRole();
         await this.createDefaultInfoGroup();
+        await this.createSuperAdmin();
     }
 
     /**
@@ -174,5 +177,14 @@ export class UserModule implements OnModuleInit {
                 id: 1
             }
         }));
+    }
+
+    /**
+     * 创建系统默认超级管理员
+     */
+    private async createSuperAdmin() {
+        const sadmin = await this.userRepo.findOne({ where: { username: 'sadmin' } });
+        if (sadmin) return;
+        this.userService.createUser({ username: 'sadmin', password: 'sadmin' });
     }
 }

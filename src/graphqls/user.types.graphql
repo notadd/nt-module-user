@@ -26,6 +26,8 @@ type Mutation {
     deleteRecycledUser(userId: Int!): UserModuleCommonResult
     # 更新用户信息
     updateUserInfo(userId: Int!, updateUserInput: UpdateUserInput): UserModuleCommonResult
+    # 更新当前登录用户信息
+    updateCurrentUserInfo(updateUserInput: UpdateUserInput): UserModuleCommonResult
 }
 
 input RegisterUserInput {

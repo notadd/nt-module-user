@@ -1,15 +1,18 @@
 import { Mutation, Query, Resolver } from '@nestjs/graphql';
 
+import { Permission, Resource } from '../decorators';
 import { CommonResult } from '../interfaces/common-result.interface';
 import { RoleService } from './../services/role.service';
 
 @Resolver()
+@Resource({ name: '角色管理', identify: 'role:manage' })
 export class RoleResolver {
     constructor(
         private readonly roleService: RoleService
     ) { }
 
     @Mutation('createRole')
+    @Permission({ name: '创建角色', identify: 'role:createRole', action: 'create' })
     async createRole(req, body: { name: string }): Promise<CommonResult> {
         const { name } = body;
         await this.roleService.createRole(name);
@@ -17,6 +20,7 @@ export class RoleResolver {
     }
 
     @Mutation('deleteRole')
+    @Permission({ name: '删除角色', identify: 'role:deleteRole', action: 'delete' })
     async deleteRole(req, body: { id: number }): Promise<CommonResult> {
         const { id } = body;
         await this.roleService.deleteRole(id);
@@ -24,6 +28,7 @@ export class RoleResolver {
     }
 
     @Mutation('updateRole')
+    @Permission({ name: '更新角色', identify: 'role:updateRole', action: 'update' })
     async updateRole(req, body: { id: number, name: string }): Promise<CommonResult> {
         const { id, name } = body;
         await this.roleService.updateRole(id, name);
@@ -31,6 +36,7 @@ export class RoleResolver {
     }
 
     @Mutation('setPermissionsToRole')
+    @Permission({ name: '设置角色权限', identify: 'role:setPermissionsToRole', action: 'create' })
     async setPermissionsToRole(req, body: { roleId: number, permissionIds: number[] }): Promise<CommonResult> {
         const { roleId, permissionIds } = body;
         await this.roleService.setPermissions(roleId, permissionIds);
@@ -38,12 +44,14 @@ export class RoleResolver {
     }
 
     @Query('findRoles')
+    @Permission({ name: '查询所有角色', identify: 'role:findRoles', action: 'find' })
     async findRoles(): Promise<CommonResult> {
         const roleArr = await this.roleService.findRoles();
         return { code: 200, message: '查询所有角色成功', data: roleArr };
     }
 
     @Query('findOneRoleInfo')
+    @Permission({ name: '查询角色信息', identify: 'role:findOneRoleInfo', action: 'find' })
     async findOneRoleInfo(req, body: { roleId: number }): Promise<CommonResult> {
         const data = await this.roleService.findOneRoleInfo(body.roleId);
         return { code: 200, message: '查询角色信息成功', data };

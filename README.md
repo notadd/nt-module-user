@@ -18,6 +18,8 @@
 
 ## 使用说明
 
+用户模块的大部分接口都定义了权限，在初始化时，会生成一个超级管理员用户，账号为： `sadmin`，密码为： `sadmin`，可以自行登录后，使用 `accessToken` 调用 `updateCurrentUserInfo` (更新当前登录用户信息)，修改密码
+
 ### 导入用户模块
 
 在应用程序根模块中导入 `UserModule`
@@ -51,3 +53,70 @@
 权限的定义离不开资源的定义，二者是共存的状态，在使用权限功能时，先在类上定义资源，而后在需要权限控制的方法上定义权限。
 
 定义好资源和权限后，启动程序，资源和权限会被自动加载并存储到数据库
+
+### 配置授权，鉴权功能
+
+以下是 `apollo-server-express` 2.x 版本的授权、鉴权功能逻辑示例
+
+> app.module.ts
+
+```typescript
+import { Inject, Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
+import { GraphQLFactory, GraphQLModule } from '@nestjs/graphql';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ApolloServer } from 'apollo-server-express';
+
+import { AuthenticationGurad, AuthService, UserModule } from '@notadd/module-user';
+
+@Module({
+    imports: [
+        GraphQLModule,
+        TypeOrmModule.forRoot({
+            type: 'postgres',
+            host: 'localhost',
+            port: 5432,
+            username: 'postgres',
+            password: '123456',
+            database: 'module_user',
+            entities: ['./**/*.entity.ts'],
+            logger: 'simple-console',
+            logging: true,
+            synchronize: true,
+            dropSchema: false
+        }),
+        UserModule
+    ],
+    controllers: [],
+    providers: [
+        { provide: APP_GUARD, useClass: AuthenticationGurad },
+    ],
+    exports: []
+})
+export class AppModule {
+    constructor(
+        @Inject(GraphQLFactory) private readonly graphQLFactory: GraphQLFactory,
+        @Inject(AuthService) private readonly authService: AuthService
+    ) { }
+
+    configureGraphQL(app: any) {
+        const typeDefs = this.graphQLFactory.mergeTypesByPaths('./**/*.types.graphql');
+        const schema = this.graphQLFactory.createSchema({ typeDefs });
+
+        const server = new ApolloServer({
+            schema,
+            context: async ({ req }) => {
+                const user = await this.authService.validateUser(req);
+                return { user };
+            },
+            playground: {
+                settings: {
+                    'editor.theme': 'light',
+                    'editor.cursorShape': 'line'
+                }
+            }
+        });
+        server.applyMiddleware({ app });
+    }
+}
+```

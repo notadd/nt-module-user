@@ -112,8 +112,16 @@ export class UserModule implements OnModuleInit {
          * TODO:  根据注解定义，自动更新数据库中对应的 name identify action 信息
          */
 
+        // 扫描到的所有资源注解和所有权限注解
+        const scannedResourcesAndPermissions = [...metadataMap.values()].map(metadataValue => {
+            // 将权限与对应的资源绑定
+            metadataValue.permissions.forEach(v => v.resource = metadataValue.resource);
+            return { permissions: metadataValue.permissions, resource: metadataValue.resource };
+        });
+
         // 扫描到的所有资源注解
-        const scannedResources = [...metadataMap.values()].map(matadataValue => matadataValue.resource);
+        const scannedResources = scannedResourcesAndPermissions.map(v => v.resource);
+
         // 删除注解中移除的资源及其权限
         const resourceIdentifies = [...metadataMap.keys()].length === 0 ? ['__delete_all_resource__'] : [...metadataMap.keys()];
         const notExistResources = await this.resourceRepo.find({ where: { identify: Not(In(resourceIdentifies)) } });
@@ -125,13 +133,13 @@ export class UserModule implements OnModuleInit {
         if (newResourcess.length > 0) await this.entityManager.insert(Resource, this.resourceRepo.create(newResourcess));
 
         // 扫描到的所有权限注解
-        const scannedPermissions = <Permission[]>[].concat(...await Promise.all([...metadataMap.values()].map(async matadataValue => {
-            const resource = await this.resourceRepo.findOne({ where: { identify: matadataValue.resource.identify } });
-            matadataValue.permissions.forEach(permission => {
-                permission.resource = resource;
-            });
-            return matadataValue.permissions;
-        })));
+        const scannedPermissions = <Permission[]>[].concat(...scannedResourcesAndPermissions.map(v => v.permissions));
+        // 查询扫描到的所有权限注解所属的资源
+        const resource = await this.resourceRepo.find({ where: { identify: In(scannedPermissions.map(v => v.resource.identify)) } });
+        // 将数据库中的资源实体绑定给其下的所有权限
+        scannedPermissions.forEach(permission => {
+            permission.resource = resource.find(v => v.identify === permission.resource.identify);
+        });
         // 删除注解中移除的权限
         // tslint:disable-next-line:max-line-length
         const permissionIdentifies = scannedPermissions.map(v => v.identify).length === 0 ? ['__delete_all_permission__'] : scannedPermissions.map(v => v.identify);
@@ -154,7 +162,7 @@ export class UserModule implements OnModuleInit {
 
         if (defaultRole) return;
 
-        this.roleRepo.save(this.roleRepo.create({
+        await this.roleRepo.save(this.roleRepo.create({
             id: 1,
             name: '普通用户'
         }));
@@ -170,7 +178,7 @@ export class UserModule implements OnModuleInit {
 
         if (defaultInfoGroup) return;
 
-        this.infoGroupRepo.save(this.infoGroupRepo.create({
+        await this.infoGroupRepo.save(this.infoGroupRepo.create({
             id: 1,
             name: '普通用户信息组',
             role: {
@@ -185,6 +193,6 @@ export class UserModule implements OnModuleInit {
     private async createSuperAdmin() {
         const sadmin = await this.userRepo.findOne({ where: { username: 'sadmin' } });
         if (sadmin) return;
-        this.userService.createUser({ username: 'sadmin', password: 'sadmin' });
+        await this.userService.createUser({ username: 'sadmin', password: 'sadmin' });
     }
 }

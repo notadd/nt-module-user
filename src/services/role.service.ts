@@ -151,7 +151,7 @@ export class RoleService {
 
         const temp = {};
         infoItemsArr = infoItemsArr.reduce((item, next) => {
-            temp[next.name] ? '' : temp[next.name] = true && item.push(next);
+            temp[next.name] ? '' : temp[next.name] = item.push(next);
             return item;
         }, []);
 

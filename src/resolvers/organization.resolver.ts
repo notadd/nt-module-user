@@ -33,14 +33,6 @@ export class OrganizationResolver {
         return { code: 200, message: '获取组织下面的所有子组织成功', data: JSON.stringify(organization) };
     }
 
-    @Query('findUserInOrganization')
-    @Permission({ name: '查询组织下的子组织', identify: 'organization:findUserInOrganization', action: 'find' })
-    async findUserInOrganization(req, body: { id: number }) {
-        const { id } = body;
-        const userArr = await this.organizationService.findUserInOrganization(id);
-        return { code: 200, message: '获取成功', data: userArr };
-    }
-
     @Mutation('createOrganization')
     @Permission({ name: '创建组织', identify: 'organization:createOrganization', action: 'create' })
     async createOrganization(req, body: { name: string, parentId: number }) {

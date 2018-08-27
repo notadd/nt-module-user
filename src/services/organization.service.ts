@@ -4,14 +4,13 @@ import { Repository, TreeRepository } from 'typeorm';
 
 import { Organization } from '../entities/organization.entity';
 import { User } from '../entities/user.entity';
-import { UserInfoData } from '../interfaces/user.interface';
-import { UserService } from './user.service';
+import { EntityCheckService } from './entity-check.service';
 
 @Injectable()
 export class OrganizationService {
     constructor(
+        @Inject(EntityCheckService) private readonly entityCheckService: EntityCheckService,
         @InjectRepository(Organization) private readonly organizationReq: TreeRepository<Organization>,
-        @Inject(UserService) private readonly userService: UserService,
         @InjectRepository(User) private readonly userRep: Repository<User>
     ) { }
 
@@ -36,7 +35,7 @@ export class OrganizationService {
     async findChildren(id: number): Promise<Organization> {
         const exist = await this.organizationReq.findOne(id);
         if (!exist) {
-            throw new HttpException(`id为：${id}的组织不存在`, 406);
+            throw new HttpException(`id为：${id}的组织不存在`, 404);
         }
         const children = await this.organizationReq.findDescendantsTree(exist);
         return children;
@@ -52,20 +51,17 @@ export class OrganizationService {
         if (parentId !== undefined && parentId !== null) {
             parent = await this.organizationReq.findOne(parentId);
             if (!parent) {
-                throw new HttpException(`父组织Id为：${parentId}的组织不存在`, 406);
+                throw new HttpException(`父组织Id为：${parentId}的组织不存在`, 404);
             }
         }
 
-        const exist = await this.organizationReq.findOne({ name });
-        if (exist) {
-            throw new HttpException(`name为：${name}的组织已存在`, 406);
-        }
+        await this.entityCheckService.checkNameExist(Organization, name);
 
         const organization: Organization = this.organizationReq.create({ name, parent });
         try {
             await this.organizationReq.save(organization);
         } catch (err) {
-            throw new HttpException(`数据库错误：${err.toString()}`, 401);
+            throw new HttpException(`数据库错误：${err.toString()}`, 500);
         }
     }
 
@@ -78,21 +74,18 @@ export class OrganizationService {
     async updateOrganization(id: number, name: string, parentId: number): Promise<void> {
         const exist = await this.organizationReq.findOne(id);
         if (!exist) {
-            throw new HttpException(`id为：${id}的组织不存在`, 406);
+            throw new HttpException(`id为：${id}的组织不存在`, 404);
         }
 
         if (name !== exist.name) {
-            const exist: Organization | undefined = await this.organizationReq.findOne({ name });
-            if (exist) {
-                throw new HttpException(`name为：${name}的组织已存在`, 404);
-            }
+            await this.entityCheckService.checkNameExist(Organization, name);
         }
 
         let parent: Organization | undefined;
         if (parentId !== undefined && parentId !== null) {
             parent = await this.organizationReq.findOne(parentId);
             if (!parent) {
-                throw new HttpException(`指定父组织id=${parentId}不存在`, 402);
+                throw new HttpException(`指定父组织id=${parentId}不存在`, 404);
             }
         }
         try {
@@ -100,7 +93,7 @@ export class OrganizationService {
             exist.parent = parent as any;
             await this.organizationReq.save(exist);
         } catch (err) {
-            throw new HttpException(`数据库错误：${err.toString()}`, 401);
+            throw new HttpException(`数据库错误：${err.toString()}`, 500);
         }
     }
 
@@ -111,7 +104,7 @@ export class OrganizationService {
     async deleteOrganization(id: number): Promise<void> {
         const exist = await this.organizationReq.findOne(id);
         if (!exist) {
-            throw new HttpException(`id为：${id}的组织不存在`, 406);
+            throw new HttpException(`id为：${id}的组织不存在`, 404);
         }
 
         const children = await this.organizationReq.findDescendants(exist);
@@ -121,7 +114,7 @@ export class OrganizationService {
         try {
             await this.organizationReq.delete(id);
         } catch (error) {
-            throw new HttpException(`数据库错误：${error.toString()}`, 401);
+            throw new HttpException(`数据库错误：${error.toString()}`, 500);
         }
     }
 
@@ -133,7 +126,7 @@ export class OrganizationService {
     async addUsersToOrganization(id: number, userIds: number[]): Promise<void> {
         const exist = await this.organizationReq.findOne(id, { relations: ['users'] });
         if (!exist) {
-            throw new HttpException(`id为：${id}的组织不存在`, 406);
+            throw new HttpException(`id为：${id}的组织不存在`, 404);
         }
 
         const userArr = await this.userRep.findByIds(userIds);
@@ -142,7 +135,7 @@ export class OrganizationService {
                 return user.id === userId;
             });
             if (!find) {
-                throw new HttpException(`id为${userId}用户不存在`, 402);
+                throw new HttpException(`id为${userId}用户不存在`, 404);
             }
         });
 
@@ -151,14 +144,14 @@ export class OrganizationService {
                 return id === user.id;
             });
             if (find) {
-                throw new HttpException(`id为${user.id}用户已在组织下`, 402);
+                throw new HttpException(`id为${user.id}用户已在组织下`, 409);
             }
         });
         exist.users.push(...userArr);
         try {
             await this.organizationReq.save(exist);
         } catch (error) {
-            throw new HttpException(`数据库错误：${error.toString()}`, 401);
+            throw new HttpException(`数据库错误：${error.toString()}`, 500);
         }
     }
 
@@ -170,7 +163,7 @@ export class OrganizationService {
     async deleteUserFromOrganization(id: number, userIds: number[]): Promise<void> {
         const exist = await this.organizationReq.findOne(id, { relations: ['users'] });
         if (!exist) {
-            throw new HttpException(`id为：${id}的组织不存在`, 406);
+            throw new HttpException(`id为：${id}的组织不存在`, 404);
         }
 
         const userArr = await this.userRep.findByIds(userIds);
@@ -179,37 +172,20 @@ export class OrganizationService {
                 return user.id === userId;
             });
             if (!find) {
-                throw new HttpException(`id为${userId}用户不存在`, 402);
+                throw new HttpException(`id为${userId}用户不存在`, 404);
             }
             const index = exist.users.findIndex(user => {
                 return user.id === userId;
             });
             if (index < 0) {
-                throw new HttpException(`id为${userId}用户不存在在组织下`, 402);
+                throw new HttpException(`id为${userId}用户不存在组织下`, 404);
             }
             exist.users.splice(index, 1);
         });
         try {
             await this.organizationReq.save(exist);
         } catch (err) {
-            throw new HttpException(`数据库错误：${err.toString()}`, 401);
+            throw new HttpException(`数据库错误：${err.toString()}`, 500);
         }
-    }
-
-    /**
-     * 获取组织下面的用户
-     * @param id 组织ID
-     */
-    async findUserInOrganization(id: number): Promise<UserInfoData[]> {
-        const organization = await this.organizationReq.findOne(id, { relations: ['users'] });
-        if (!organization) {
-            throw new HttpException(`id为：${id}的组织不存在`, 406);
-        }
-        const organizationUserInfos: UserInfoData[] = [];
-        for (const user of organization.users) {
-            const userInfo = await this.userService.findUserInfoById(user.id);
-            organizationUserInfos.push(userInfo);
-        }
-        return organizationUserInfos;
     }
 }

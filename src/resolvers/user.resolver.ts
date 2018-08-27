@@ -3,7 +3,7 @@ import { Mutation, Query, Resolver } from '@nestjs/graphql';
 
 import { Permission, Resource } from '../decorators';
 import { CommonResult } from '../interfaces/common-result.interface';
-import { CreateUserInput, UpdateUserInput } from '../interfaces/user.interface';
+import { CreateUserInput, UpdateUserInput, UserInfoData } from '../interfaces/user.interface';
 import { UserService } from '../services/user.service';
 
 @Resolver()
@@ -68,10 +68,9 @@ export class UserResolver {
     }
 
     @Mutation('updateCurrentUserInfo')
-    @Permission({ name: '更新当前用户信息', identify: 'user:updateCurrentUserInfo', action: 'update' })
     async updateCurrentUserInfo(req, body: { updateUserInput: UpdateUserInput }, context): Promise<CommonResult> {
         await this.userService.updateUserInfo(context.user.id, body.updateUserInput);
-        return { code: 200, message: '更新当前用户信息成功' };
+        return { code: 200, message: '更新当前登录用户信息成功' };
     }
 
     @Query('findCurrentUserInfo')
@@ -80,22 +79,30 @@ export class UserResolver {
         return { code: 200, message: '查询当前登录用户信息成功', data };
     }
 
-    @Query('findUserInfoById')
-    async findUserInfoById(req, body: { userId: number }): Promise<CommonResult> {
-        const data = await this.userService.findUserInfoById(body.userId);
-        return { code: 200, message: '查询用户信息成功', data };
-    }
-
-    @Query('findUsersByRoleId')
-    @Permission({ name: '查询角色用户', identify: 'user:findUsersByRoleId', action: 'find' })
-    async findUserByRoleId(req, body: { roleId: number }): Promise<CommonResult> {
-        const data = await this.userService.findByRoleId(body.roleId);
-        return { code: 200, message: '查询用户成功', data };
-    }
-
     @Query('findRegisterUserInfoItem')
     async findRegisterUserInputInfo(): Promise<CommonResult> {
         const data = await this.userService.findOneWithInfoItemsByRoleIds([1]);
         return { code: 200, message: '查询用户注册信息项成功', data };
+    }
+
+    @Query('findUserInfoById')
+    @Permission({ name: '查询指定用户信息', identify: 'user:findUserInfoById', action: 'find' })
+    async findUserInfoById(req, body: { userId: number }): Promise<CommonResult> {
+        const data = await this.userService.findUserInfoById(body.userId) as UserInfoData;
+        return { code: 200, message: '查询用户信息成功', data };
+    }
+
+    @Query('findUsersInRole')
+    @Permission({ name: '查询角色下的用户', identify: 'user:findUsersInRole', action: 'find' })
+    async findUsersInRole(req, body: { roleId: number }) {
+        const data = await this.userService.findByRoleId(body.roleId);
+        return { code: 200, message: '获取角色下的用户成功', data };
+    }
+
+    @Query('findUsersInOrganization')
+    @Permission({ name: '查询组织下的用户', identify: 'user:findUsersInOrganization', action: 'find' })
+    async findUsersInOrganization(req, body: { organizationId: number }) {
+        const data = await this.userService.findByOrganizationId(body.organizationId);
+        return { code: 200, message: '获取组织下的用户成功', data };
     }
 }

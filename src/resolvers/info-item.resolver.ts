@@ -4,6 +4,7 @@ import { Mutation, Query, Resolver } from '@nestjs/graphql';
 import { Permission, Resource } from '../decorators';
 import { InfoItem } from '../entities/info-item.entity';
 import { CommonResult } from '../interfaces/common-result.interface';
+import { UpdateInfoItemInput } from '../interfaces/info-item.interface';
 import { InfoItemService } from '../services/info-item.service';
 
 @Resolver()
@@ -29,9 +30,8 @@ export class InfoItemResolver {
 
     @Mutation('updateInfoItem')
     @Permission({ name: '更新信息项', identify: 'infoItem:updateInfoItem', action: 'update' })
-    async updateInfoItem(req, body: { infoItemId: number, name: string, label: string, description: string, type: string }): Promise<CommonResult> {
-        const { infoItemId, name, label, description, type } = body;
-        await this.infoItemService.update(infoItemId, name, label, description, type);
+    async updateInfoItem(req, body: { updateInfoItemInput: UpdateInfoItemInput }): Promise<CommonResult> {
+        await this.infoItemService.update(body.updateInfoItemInput);
         return { code: 200, message: '更新信息项成功' };
     }
 

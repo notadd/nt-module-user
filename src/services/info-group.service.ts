@@ -1,15 +1,17 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { InfoGroup } from '../entities/info-group.entity';
 import { InfoItem } from '../entities/info-item.entity';
+import { EntityCheckService } from './entity-check.service';
 
 
 @Injectable()
 export class InfoGroupService {
     constructor(
-        @InjectRepository(InfoGroup) private readonly infoGroupRepo: Repository<InfoGroup>
+        @InjectRepository(InfoGroup) private readonly infoGroupRepo: Repository<InfoGroup>,
+        @Inject(EntityCheckService) private readonly entityCheckService: EntityCheckService
     ) { }
 
     /**
@@ -18,6 +20,10 @@ export class InfoGroupService {
      * @param infoGroup 信息组信息
      */
     async create(name: string, roleId: number) {
+        await this.entityCheckService.checkNameExist(InfoGroup, name);
+        if (await this.infoGroupRepo.findOne({ role: { id: roleId } })) {
+            throw new HttpException('该角色信息组已存在', 409);
+        }
         this.infoGroupRepo.save(this.infoGroupRepo.create({ name, role: { id: roleId } }));
     }
 
@@ -35,7 +41,7 @@ export class InfoGroupService {
             .loadMany<InfoItem>();
 
         const duplicateIds = infoItems.map(infoItem => infoItem.id).filter(infoItemId => infoItemIds.includes(infoItemId));
-        if (duplicateIds) throw new HttpException(`信息项 ID: ${duplicateIds} 已存在`, 409);
+        if (duplicateIds.length) throw new HttpException(`信息项 ID: ${duplicateIds} 已存在`, 409);
 
         this.infoGroupRepo.createQueryBuilder('infoGroup').relation(InfoGroup, 'infoItems').of(infoGroupId).add(infoItemIds);
     }
@@ -66,6 +72,7 @@ export class InfoGroupService {
      * @param name 信息组名称
      */
     async update(id: number, name: string, roleId: number) {
+        await this.entityCheckService.checkNameExist(InfoGroup, name);
         this.infoGroupRepo.update(id, { name, role: { id: roleId } });
     }
 

@@ -1,13 +1,16 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { InfoItem } from '../entities/info-item.entity';
+import { UpdateInfoItemInput } from '../interfaces/info-item.interface';
+import { EntityCheckService } from './entity-check.service';
 
 @Injectable()
 export class InfoItemService {
     constructor(
-        @InjectRepository(InfoItem) private readonly infoItemRepo: Repository<InfoItem>
+        @InjectRepository(InfoItem) private readonly infoItemRepo: Repository<InfoItem>,
+        @Inject(EntityCheckService) private readonly entityCheckService: EntityCheckService
     ) { }
 
     /**
@@ -16,6 +19,7 @@ export class InfoItemService {
      * @param infoItem 信息项信息
      */
     async create(infoItem: InfoItem) {
+        await this.entityCheckService.checkNameExist(InfoItem, infoItem.name);
         this.infoItemRepo.save(this.infoItemRepo.create(infoItem));
     }
 
@@ -35,22 +39,35 @@ export class InfoItemService {
      *
      * @param id 信息项ID
      * @param name 信息项名称
-     * @param label 信息项标签
      * @param description 信息项描述
      * @param type 信息项类型
      */
-    async update(id: number, name: string, label: string, description: string, type: string) {
-        const nameExist = await this.infoItemRepo.findOne({ where: { name } });
-        if (nameExist) {
-            throw new HttpException(`信息项名称：${name} 已存在`, 409);
+    async update(updateInfoItemInput: UpdateInfoItemInput) {
+        await this.entityCheckService.checkNameExist(InfoItem, updateInfoItemInput.name);
+        if (updateInfoItemInput.order) {
+            this.infoItemRepo.update(updateInfoItemInput.id, { order: updateInfoItemInput.order });
         }
-        this.infoItemRepo.update(id, { name, label, description, type });
+        if (updateInfoItemInput.type) {
+            this.infoItemRepo.update(updateInfoItemInput.id, { type: updateInfoItemInput.type });
+        }
+        if (updateInfoItemInput.name) {
+            this.infoItemRepo.update(updateInfoItemInput.id, { name: updateInfoItemInput.name });
+        }
+        if (updateInfoItemInput.description) {
+            this.infoItemRepo.update(updateInfoItemInput.id, { description: updateInfoItemInput.description });
+        }
+        if (updateInfoItemInput.registerDisplay) {
+            this.infoItemRepo.update(updateInfoItemInput.id, { registerDisplay: updateInfoItemInput.registerDisplay });
+        }
+        if (updateInfoItemInput.informationDisplay) {
+            this.infoItemRepo.update(updateInfoItemInput.id, { informationDisplay: updateInfoItemInput.informationDisplay });
+        }
     }
 
     /**
      * 查询所有信息项
      */
     async findAll() {
-        return this.infoItemRepo.find();
+        return this.infoItemRepo.find({ order: { order: 'ASC' } });
     }
 }

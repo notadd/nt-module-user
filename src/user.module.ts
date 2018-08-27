@@ -20,6 +20,7 @@ import { OrganizationResolver } from './resolvers/organization.resolver';
 import { ResourceResolver } from './resolvers/resource.resolver';
 import { RoleResolver } from './resolvers/role.resolver';
 import { UserResolver } from './resolvers/user.resolver';
+import { EntityCheckService } from './services/entity-check.service';
 import { InfoGroupService } from './services/info-group.service';
 import { InfoItemService } from './services/info-item.service';
 import { OrganizationService } from './services/organization.service';
@@ -36,6 +37,7 @@ import { CryptoUtil } from './utils/crypto.util';
     controllers: [],
     providers: [
         AuthService,
+        EntityCheckService,
         OrganizationResolver, OrganizationService,
         UserResolver, UserService,
         RoleResolver, RoleService,

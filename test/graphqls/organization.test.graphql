@@ -30,3 +30,5 @@ mutation createOrganization($name: String!, $parentId: Int) {
 	"name": "硬件部",
   "parentId": 1
 }
+
+# 获取根组织

@@ -10,7 +10,6 @@ export interface RoleInfoData {
     infoItems: {
         id: number;
         name: string;
-        label: string;
         description: string;
         type: string;
     }[];

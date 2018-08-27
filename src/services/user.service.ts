@@ -3,6 +3,7 @@ import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
 
 import { AuthService } from '../authentication/authentication.service';
+import { Organization } from '../entities/organization.entity';
 import { Role } from '../entities/role.entity';
 import { UserInfo } from '../entities/user-info.entity';
 import { User } from '../entities/user.entity';
@@ -125,12 +126,23 @@ export class UserService {
      */
     async findByRoleId(roleId: number) {
         const users = await this.entityManager.createQueryBuilder().relation(Role, 'users').of(roleId).loadMany<User>();
-        const roleUserInfos: UserInfoData[] = [];
-        for (const user of users) {
-            const userInfo = await this.findUserInfoById(user.id);
-            roleUserInfos.push(userInfo);
+        if (!users.length) {
+            throw new HttpException(`roleId为：${roleId}的角色不存在`, 406);
         }
-        return roleUserInfos;
+        return this.findUserInfoById(users.map(user => user.id)) as Promise<UserInfoData[]>;
+    }
+
+    /**
+     * 获取组织下面的用户
+     *
+     * @param id 组织ID
+     */
+    async findByOrganizationId(organizationId: number): Promise<UserInfoData[]> {
+        const users = await this.entityManager.createQueryBuilder().relation(Organization, 'users').of(organizationId).loadMany<User>();
+        if (!users.length) {
+            throw new HttpException(`organizationId为：${organizationId}的组织不存在`, 406);
+        }
+        return this.findUserInfoById(users.map(user => user.id)) as Promise<UserInfoData[]>;
     }
 
     /**
@@ -151,28 +163,32 @@ export class UserService {
      *
      * @param id 用户ID
      */
-    async findUserInfoById(id: number): Promise<UserInfoData> {
-        const user = await this.userRepo.findOne(id, { relations: ['roles', 'userInfos', 'userInfos.infoItem'] });
-        const userInfoData: UserInfoData = {
-            userId: user.id,
-            username: user.username,
-            email: user.email,
-            mobile: user.mobile,
-            banned: user.banned,
-            recycle: user.recycle,
-            userRoles: user.roles,
-            userInfos: (user.userInfos && user.userInfos.length > 0) ? user.userInfos.map(userInfo => {
-                return {
-                    id: userInfo.id,
-                    name: userInfo.infoItem.name,
-                    value: userInfo.value,
-                    label: userInfo.infoItem.label,
-                    description: userInfo.infoItem.description,
-                    type: userInfo.infoItem.type
-                };
-            }) : []
-        };
-        return userInfoData;
+    async findUserInfoById(id: number | number[]): Promise<UserInfoData | UserInfoData[]> {
+        const qb = this.userRepo.createQueryBuilder('user')
+            .leftJoinAndSelect('user.roles', 'roles')
+            .leftJoinAndSelect('user.organizations', 'organizations')
+            .leftJoinAndSelect('user.userInfos', 'userInfos')
+            .leftJoinAndSelect('userInfos.infoItem', 'infoItem');
+
+        if (id instanceof Array) {
+            const userInfoData: UserInfoData[] = [];
+            const users = await qb.whereInIds(id)
+                .andWhere('infoItems.registerDisplay = false')
+                .andWhere('infoItems.informationDisplay = true')
+                .orderBy('infoItem.order', 'ASC')
+                .getMany();
+            for (const user of users) {
+                (userInfoData as UserInfoData[]).push(this.refactorUserData(user));
+            }
+            return userInfoData;
+        } else {
+            const user = await qb.where('user.id = :id', { id })
+                .andWhere('infoItems.registerDisplay = false')
+                .andWhere('infoItems.informationDisplay = true')
+                .orderBy('infoItem.order', 'ASC')
+                .getOne();
+            return this.refactorUserData(user);
+        }
     }
 
     /**
@@ -187,7 +203,7 @@ export class UserService {
      * 显示用户信息时，直接使用用户 id 去查询 user_info 表中数据即可。
      */
     async findOneWithInfoItemsByRoleIds(roleIds: number[]) {
-        return this.roleService.findInfoGroupItemsByIds(roleIds);
+        return this.roleService.findInfoGroupItemsByIds(roleIds, true, false);
     }
 
     /**
@@ -274,5 +290,33 @@ export class UserService {
                 this.userInfoRepo.update(infoKV.key, { value: infoKV.value });
             });
         }
+    }
+
+    /**
+     * 重构用户对象
+     *
+     * @param user 用户对象
+     */
+    private refactorUserData(user: User) {
+        const userInfoData: UserInfoData = {
+            userId: user.id,
+            username: user.username,
+            email: user.email,
+            mobile: user.mobile,
+            banned: user.banned,
+            recycle: user.recycle,
+            userRoles: user.roles,
+            userOrganizations: user.organizations,
+            userInfos: (user.userInfos && user.userInfos.length > 0) ? user.userInfos.map(userInfo => {
+                return {
+                    id: userInfo.id,
+                    name: userInfo.infoItem.name,
+                    value: userInfo.value,
+                    description: userInfo.infoItem.description,
+                    type: userInfo.infoItem.type
+                };
+            }) : []
+        };
+        return userInfoData;
     }
 }

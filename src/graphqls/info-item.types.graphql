@@ -1,10 +1,10 @@
 type Mutation {
     # 新增信息项
-    createInfoItem(infoItemInput: InfoItemInput!): UserModuleCommonResult
+    createInfoItem(infoItemInput: InfoItemInput): UserModuleCommonResult
     # 删除指定ID的信息项
     deleteInfoItem(infoItemId: Int!): UserModuleCommonResult
     # 更新指定ID的信息项名称、标签、描述、类型
-    updateInfoItem(infoItemId: Int!, name: String!, label: String!, description: String!, type: String!): UserModuleCommonResult
+    updateInfoItem(updateInfoItemInput: UpdateInfoItemInput): UserModuleCommonResult
 }
 
 type Query {
@@ -14,10 +14,12 @@ type Query {
 
 # 新增信息项的请求体
 input InfoItemInput {
-    type: String
-    name: String
-    label: String
+    order: Int!
+    type: String!
+    name: String!
     description: String
+    registerDisplay: Boolean!
+    informationDisplay: Boolean!
 }
 
 # 查询信息项返回消息
@@ -31,12 +33,26 @@ type InfoItemResult {
 type InfoItemData {
     # 信息项ID
     id: Int
-    # 信息项名称
-    name: String
-    # 信息项标签
-    label: String
-    # 信息项描述
-    description: String
     # 信息项类型
     type: String
+    # 信息项排序
+    order: Int
+    # 信息项名称
+    name: String
+    # 信息项描述
+    description: String
+    # 注册页是否显示
+    registerDisplay: Boolean
+    # 资料页是否显示
+    informationDisplay: Boolean
+}
+
+input UpdateInfoItemInput {
+    id: Int
+    order: Int
+    type: String
+    name: String
+    description: String
+    registerDisplay: Boolean
+    informationDisplay: Boolean
 }

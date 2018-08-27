@@ -1,12 +1,10 @@
 type Query {
     # 获取根组织
-    findRootOrganizations: OrganizationsResult
+    findRootOrganizations: OrganizationsRootResult
     # 获取所有组织
-    findAllOrganizations: OrganizationJsonResult
+    findAllOrganizations: OrganizationsJsonResult
     # 获取组织下面的所有子组织
-    findChildrenOrganizations(id: Int!): OrganizationJsonResult
-    # 获取组织下面的用户
-    findUserInOrganization(id: Int!): OrganizationUserResult
+    findChildrenOrganizations(id: Int!): OrganizationsJsonResult
 }
 
 type Mutation {
@@ -22,7 +20,7 @@ type Mutation {
     deleteUserFromOrganization(id: Int!, userIds: [Int]): UserModuleCommonResult
 }
 
-type OrganizationsResult {
+type OrganizationsRootResult {
     # 状态码
     code: Int
     # 状态消息
@@ -35,23 +33,13 @@ type Organization {
     id: Int
     # 组织名称
     name: String
-    # 父组织
-    parent: Organization
-    # 子组织
-    children: [Organization]
 }
 
-type OrganizationJsonResult {
+type OrganizationsJsonResult {
     # 状态码
     code: Int
     # 状态消息
     message: String
     # 返回数据
-    data: String
-}
-
-type OrganizationUserResult {
-    code: Int
-    message: String
-    data: [UserInfoData]
+    data: JSON
 }

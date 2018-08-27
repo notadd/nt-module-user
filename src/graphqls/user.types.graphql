@@ -1,14 +1,16 @@
 type Query {
     # 用户登录
     login(username: String!, password: String!): LoginResponse
+    # 查询用户注册信息项
+    findRegisterUserInfoItem: RegisterUserInfoItemResult
     # 查询当前登录的用户信息
     findCurrentUserInfo: UserInfoResult
     # 查询用户信息
     findUserInfoById(userId: Int!): UserInfoResult
     # 查询指定角色ID下的所有用户信息
-    findUsersByRoleId(roleId: Int!): UserInfosResult
-    # 查询用户注册信息项
-    findRegisterUserInfoItem: RegisterUserInfoItemResult
+    findUsersInRole(roleId: Int!): UsersInfoResult
+    # 获取指定组织ID下的用户
+    findUsersInOrganization(organizationId: Int!): UsersInfoResult
 }
 
 type Mutation {
@@ -101,7 +103,7 @@ type UserInfoResult {
     data: UserInfoData
 }
 
-type UserInfosResult {
+type UsersInfoResult {
     code: Int
     message: String
     data: [UserInfoData]
@@ -127,7 +129,6 @@ type UserInfo {
     id: Int
     name: String
     value: String
-    label: String
     description: String
     type: String
 }

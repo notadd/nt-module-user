@@ -15,7 +15,9 @@ export class Role {
     /**
      * 角色名称
      */
-    @Column()
+    @Column({
+        unique: true
+    })
     name: string;
 
     /**

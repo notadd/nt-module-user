@@ -23,12 +23,6 @@ export class InfoItem {
     name: string;
 
     /**
-     * 信息项标签
-     */
-    @Column()
-    label: string;
-
-    /**
      * 信息项描述
      */
     @Column()
@@ -39,6 +33,21 @@ export class InfoItem {
      */
     @Column()
     type: string;
+
+    /**
+     * 注册页是否显示
+     */
+    @Column()
+    registerDisplay: boolean;
+
+    /**
+     * 资料页是否显示
+     */
+    @Column()
+    informationDisplay: boolean;
+
+    @Column()
+    order: number;
 
     /**
      * 用户信息项对应的值

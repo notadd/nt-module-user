@@ -1,0 +1,18 @@
+# 查询所有资源及其权限
+query findResources {
+  findResources {
+    code
+    message
+    data {
+      id
+      name
+      identify
+      permissions {
+        id
+        name
+        action
+        identify
+      }
+    }
+  }
+}

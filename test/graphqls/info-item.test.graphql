@@ -37,14 +37,18 @@ mutation createInfoItem($infoItemInput: InfoItemInput) {
 }
 
 # 查询所有信息项
-{
+query findAllInfoItem {
   findAllInfoItem {
     code
     message
     data {
+      id
       type
+      order
       name
       description
+      registerDisplay
+      informationDisplay
     }
   }
 }

@@ -9,6 +9,7 @@ mutation createOrganization($name: String!) {
 	"name": "本初网络"
 }
 
+# 创建组织指定了父组织
 mutation createOrganization($name: String!, $parentId: Int) {
   createOrganization(name: $name, parentId: $parentId) {
     code
@@ -20,6 +21,7 @@ mutation createOrganization($name: String!, $parentId: Int) {
   "parentId": 1
 }
 
+# 创建组织指定了父组织
 mutation createOrganization($name: String!, $parentId: Int) {
   createOrganization(name: $name, parentId: $parentId) {
     code
@@ -27,8 +29,51 @@ mutation createOrganization($name: String!, $parentId: Int) {
   }
 }
 {
-	"name": "硬件部",
-  "parentId": 1
+	"name": "NodeJS",
+  "parentId": 2
 }
 
 # 获取根组织
+query findRootOrganizations {
+  findRootOrganizations {
+    code
+    message
+    data {
+      id
+      name
+    }
+  }
+}
+
+# 获取所有组织
+query findAllOrganizations {
+  findAllOrganizations {
+    code
+    message
+    data
+  }
+}
+
+# 获取组织下面的所有子组织
+query findChildrenOrganizations($id: Int!) {
+  findChildrenOrganizations(id: $id) {
+    code
+    message
+    data
+  }
+}
+{
+  "id": 2
+}
+
+# 给组织添加用户
+mutation addUsersToOrganization($id: Int!, $userIds: [Int]!) {
+  addUsersToOrganization(id: $id, userIds: $userIds) {
+    code
+    message
+  }
+}
+{
+  "id": 2,
+  "userIds": [1]
+}

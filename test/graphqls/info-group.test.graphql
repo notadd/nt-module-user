@@ -23,7 +23,7 @@ mutation addInfoItemToInfoGroup($infoGroupId: Int!, $infoItemIds: [Int]!) {
 }
 
 # 查询所有信息组
-{
+query findAllInfoGroup {
   findAllInfoGroup {
     code
     message
@@ -34,8 +34,8 @@ mutation addInfoItemToInfoGroup($infoGroupId: Int!, $infoItemIds: [Int]!) {
 }
 
 # 查询指定信息组下的所有信息项
-{
-  findInfoItemsByGroupId(groupId: 1) {
+query findInfoItemsByGroupId($groupId: Int!) {
+  findInfoItemsByGroupId(groupId: $groupId) {
     code
     message
     data {
@@ -48,5 +48,8 @@ mutation addInfoItemToInfoGroup($infoGroupId: Int!, $infoItemIds: [Int]!) {
       informationDisplay
     }
   }
+}
+{
+  "groupId": 1
 }
 

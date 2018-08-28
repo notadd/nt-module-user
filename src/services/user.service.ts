@@ -3,6 +3,7 @@ import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
 
 import { AuthService } from '../authentication/authentication.service';
+import { InfoItem } from '../entities/info-item.entity';
 import { Organization } from '../entities/organization.entity';
 import { Role } from '../entities/role.entity';
 import { UserInfo } from '../entities/user-info.entity';
@@ -18,6 +19,7 @@ export class UserService {
         @InjectEntityManager() private readonly entityManager: EntityManager,
         @InjectRepository(User) private readonly userRepo: Repository<User>,
         @InjectRepository(UserInfo) private readonly userInfoRepo: Repository<UserInfo>,
+        @InjectRepository(InfoItem) private readonly infoItemRepo: Repository<InfoItem>,
         @Inject(CryptoUtil) private readonly cryptoUtil: CryptoUtil,
         @Inject(forwardRef(() => AuthService)) private readonly authService: AuthService,
         @Inject(RoleService) private readonly roleService: RoleService
@@ -112,7 +114,20 @@ export class UserService {
             const newPassword = await this.cryptoUtil.encryptPassword(updateUserInput.password);
             this.userRepo.update(user.id, { password: newPassword });
         }
-
+        // 更新角色
+        if (updateUserInput.roleIds && updateUserInput.roleIds.length) {
+            updateUserInput.roleIds.forEach(roleId => {
+                this.userRepo.createQueryBuilder('user').relation(User, 'roles').of(user).remove(roleId.before);
+                this.userRepo.createQueryBuilder('user').relation(User, 'roles').of(user).add(roleId.after);
+            });
+        }
+        // 更新组织
+        if (updateUserInput.organizationIds && updateUserInput.organizationIds.length) {
+            updateUserInput.organizationIds.forEach(organizationId => {
+                this.userRepo.createQueryBuilder('user').relation(User, 'organizations').of(user).remove(organizationId.before);
+                this.userRepo.createQueryBuilder('user').relation(User, 'organizations').of(user).add(organizationId.after);
+            });
+        }
         // 更新用户信息项的值
         if (updateUserInput.infoKVs && updateUserInput.infoKVs.length) {
             this.createOrUpdateUserInfos(user, updateUserInput.infoKVs, 'update');
@@ -127,7 +142,7 @@ export class UserService {
     async findByRoleId(roleId: number) {
         const users = await this.entityManager.createQueryBuilder().relation(Role, 'users').of(roleId).loadMany<User>();
         if (!users.length) {
-            throw new HttpException(`roleId为：${roleId}的角色不存在`, 406);
+            throw new HttpException('没有用户属于这个角色', 404);
         }
         return this.findUserInfoById(users.map(user => user.id)) as Promise<UserInfoData[]>;
     }
@@ -140,7 +155,7 @@ export class UserService {
     async findByOrganizationId(organizationId: number): Promise<UserInfoData[]> {
         const users = await this.entityManager.createQueryBuilder().relation(Organization, 'users').of(organizationId).loadMany<User>();
         if (!users.length) {
-            throw new HttpException(`organizationId为：${organizationId}的组织不存在`, 406);
+            throw new HttpException('没有用户属于这个组织', 404);
         }
         return this.findUserInfoById(users.map(user => user.id)) as Promise<UserInfoData[]>;
     }
@@ -170,24 +185,25 @@ export class UserService {
             .leftJoinAndSelect('user.userInfos', 'userInfos')
             .leftJoinAndSelect('userInfos.infoItem', 'infoItem');
 
+        const infoItem = await this.infoItemRepo.createQueryBuilder('infoItem')
+            .leftJoin('infoItem.infoGroups', 'infoGroups')
+            .leftJoin('infoGroups.role', 'role')
+            .leftJoin('role.users', 'users')
+            .where('users.id = :id', { id })
+            .orderBy('infoItem.order', 'ASC')
+            .getMany();
+
         if (id instanceof Array) {
             const userInfoData: UserInfoData[] = [];
-            const users = await qb.whereInIds(id)
-                .andWhere('infoItems.registerDisplay = false')
-                .andWhere('infoItems.informationDisplay = true')
-                .orderBy('infoItem.order', 'ASC')
-                .getMany();
+            const users = await qb.whereInIds(id).getMany();
+
             for (const user of users) {
-                (userInfoData as UserInfoData[]).push(this.refactorUserData(user));
+                (userInfoData as UserInfoData[]).push(this.refactorUserData(user, infoItem));
             }
             return userInfoData;
         } else {
-            const user = await qb.where('user.id = :id', { id })
-                .andWhere('infoItems.registerDisplay = false')
-                .andWhere('infoItems.informationDisplay = true')
-                .orderBy('infoItem.order', 'ASC')
-                .getOne();
-            return this.refactorUserData(user);
+            const user = await qb.where('user.id = :id', { id }).getOne();
+            return this.refactorUserData(user, infoItem);
         }
     }
 
@@ -203,7 +219,7 @@ export class UserService {
      * 显示用户信息时，直接使用用户 id 去查询 user_info 表中数据即可。
      */
     async findOneWithInfoItemsByRoleIds(roleIds: number[]) {
-        return this.roleService.findInfoGroupItemsByIds(roleIds, true, false);
+        return this.roleService.findInfoGroupItemsByIds(roleIds);
     }
 
     /**
@@ -276,7 +292,7 @@ export class UserService {
      * @param infoKVs 信息项键值对，key是信息项的ID(infoItem.id)，值是信息项的值(userInfo.value)
      * @param action 操作类型，创建或更新(create | update)
      */
-    private async createOrUpdateUserInfos(user: User, infoKVs: { key: number, value: string }[], action: 'create' | 'update') {
+    private async createOrUpdateUserInfos(user: User, infoKVs: { key: number, value: string, relationId?: number }[], action: 'create' | 'update') {
         if (infoKVs.length) {
             if (action === 'create') {
                 infoKVs.forEach(infoKV => {
@@ -287,6 +303,9 @@ export class UserService {
 
             // 更新用户信息项的值
             infoKVs.forEach(infoKV => {
+                if (!infoKV.key) {
+                    this.userInfoRepo.save(this.userInfoRepo.create({ value: infoKV.value, user, infoItem: { id: infoKV.relationId } }));
+                }
                 this.userInfoRepo.update(infoKV.key, { value: infoKV.value });
             });
         }
@@ -297,7 +316,7 @@ export class UserService {
      *
      * @param user 用户对象
      */
-    private refactorUserData(user: User) {
+    private refactorUserData(user: User, infoItems: InfoItem[]) {
         const userInfoData: UserInfoData = {
             userId: user.id,
             username: user.username,
@@ -307,13 +326,26 @@ export class UserService {
             recycle: user.recycle,
             userRoles: user.roles,
             userOrganizations: user.organizations,
-            userInfos: (user.userInfos && user.userInfos.length > 0) ? user.userInfos.map(userInfo => {
+            userInfos: infoItems.length ? infoItems.map(infoItem => {
+                const userInfo = user.userInfos.find(userInfo => userInfo.infoItem.id === infoItem.id);
+                /**
+                 * 以下逻辑会将信息项与信息项的值进行匹配
+                 *
+                 * id:
+                 * 如果用户信息项都没有完善，即 userInfos 为空，则当前 userInfo 的 id 为 undefined，否则是 userInfo.id
+                 *
+                 * value:
+                 * 如果用户信息项都没有完善，即 userInfos 为空，则当前 userInfo的 value 为 undefined，否则是 userInfo.value
+                 *
+                 * 当且仅当 userInfo 的 id 为 undefined 时，信息项的修改逻辑变为：判断传入的 infoKVs 的 key 是否为 undefined，如果是则新增信息项的值，否则做正常更新操作
+                 */
                 return {
-                    id: userInfo.id,
-                    name: userInfo.infoItem.name,
-                    value: userInfo.value,
-                    description: userInfo.infoItem.description,
-                    type: userInfo.infoItem.type
+                    id: user.userInfos.length ? (userInfo ? userInfo.id : undefined) : undefined,
+                    name: infoItem.name,
+                    value: user.userInfos.length ? (userInfo ? userInfo.value : undefined) : undefined,
+                    description: infoItem.description,
+                    type: infoItem.type,
+                    relationId: infoItem.id
                 };
             }) : []
         };

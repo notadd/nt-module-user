@@ -68,8 +68,8 @@ export class UserResolver {
     }
 
     @Mutation('updateCurrentUserInfo')
-    async updateCurrentUserInfo(req, body: { updateUserInput: UpdateUserInput }, context): Promise<CommonResult> {
-        await this.userService.updateUserInfo(context.user.id, body.updateUserInput);
+    async updateCurrentUserInfo(req, body: { updateCurrentUserInput: UpdateUserInput }, context): Promise<CommonResult> {
+        await this.userService.updateUserInfo(context.user.id, body.updateCurrentUserInput);
         return { code: 200, message: '更新当前登录用户信息成功' };
     }
 
@@ -94,14 +94,14 @@ export class UserResolver {
 
     @Query('findUsersInRole')
     @Permission({ name: '查询角色下的用户', identify: 'user:findUsersInRole', action: 'find' })
-    async findUsersInRole(req, body: { roleId: number }) {
+    async findUsersInRole(req, body: { roleId: number }): Promise<CommonResult> {
         const data = await this.userService.findByRoleId(body.roleId);
         return { code: 200, message: '获取角色下的用户成功', data };
     }
 
     @Query('findUsersInOrganization')
     @Permission({ name: '查询组织下的用户', identify: 'user:findUsersInOrganization', action: 'find' })
-    async findUsersInOrganization(req, body: { organizationId: number }) {
+    async findUsersInOrganization(req, body: { organizationId: number }): Promise<CommonResult> {
         const data = await this.userService.findByOrganizationId(body.organizationId);
         return { code: 200, message: '获取组织下的用户成功', data };
     }

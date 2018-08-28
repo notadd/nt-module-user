@@ -110,7 +110,7 @@ export class RoleService {
             id: role.id,
             name: role.name,
             permissions: (role.permissions && role.permissions.length > 0) ? role.permissions : [],
-            infoItems: await this.findInfoGroupItemsByIds([roleId], true, true)
+            infoItems: await this.findInfoGroupItemsByIds([roleId])
         };
         return roleInfoData;
     }
@@ -122,15 +122,13 @@ export class RoleService {
      * @param registerDisplay 是否是注册页数据
      * @param informationDisplay 是否是资料页数据
      */
-    async findInfoGroupItemsByIds(ids: number[], registerDisplay: boolean, informationDisplay: boolean) {
+    async findInfoGroupItemsByIds(ids: number[]) {
         let infoItemsArr: InfoItem[] = [];
         const roles = await this.roleRepo.createQueryBuilder('role')
             .leftJoinAndSelect('infoGroup', 'infoGroup')
             .leftJoinAndSelect('infoGroup.infoItems', 'infoItems')
             .whereInIds(ids)
-            .andWhere('infoItems.registerDisplay = :registerDisplay', { registerDisplay })
-            .andWhere('infoItems.informationDisplay = :informationDisplay', { informationDisplay })
-            .orderBy('infoItem.order', 'ASC')
+            .orderBy('infoItems.order', 'ASC')
             .getMany();
 
         if (!roles || roles.length === 0) {

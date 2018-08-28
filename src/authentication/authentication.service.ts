@@ -22,7 +22,7 @@ export class AuthService {
          *
          * TODO: 签名秘钥，由安装用户模块的应用管理，在 import 时作为参数传递
          */
-        const accessToken = jwt.sign(payload, 'secretKey', { expiresIn: 7200 });
+        const accessToken = jwt.sign(payload, 'secretKey', { expiresIn: '1d' });
 
         return { accessToken, expiresIn: 7200 };
     }

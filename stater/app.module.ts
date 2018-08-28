@@ -3,6 +3,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { GraphQLFactory, GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ApolloServer } from 'apollo-server-express';
+import * as GraphQLJSON from 'graphql-type-json';
 
 import { AuthenticationGurad, AuthService, UserModule } from '../src';
 
@@ -38,7 +39,7 @@ export class AppModule {
 
     configureGraphQL(app: any) {
         const typeDefs = this.graphQLFactory.mergeTypesByPaths(__dirname + '/../src/**/*.types.graphql');
-        const schema = this.graphQLFactory.createSchema({ typeDefs });
+        const schema = this.graphQLFactory.createSchema({ typeDefs, resolvers: { JSON: GraphQLJSON } });
 
         const server = new ApolloServer({
             schema,

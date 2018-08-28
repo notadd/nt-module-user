@@ -5,3 +5,6 @@ type UserModuleCommonResult {
     # 返回消息
     message: String
 }
+
+# JSON 格式数据
+scalar JSON

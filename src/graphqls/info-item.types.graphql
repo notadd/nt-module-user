@@ -48,11 +48,18 @@ type InfoItemData {
 }
 
 input UpdateInfoItemInput {
+    # 信息项ID
     id: Int
+    # 信息项排序
     order: Int
+    # 信息项类型
     type: String
+    # 信息项名称
     name: String
+    # 信息项描述
     description: String
+    # 信息项注册也是否显示
     registerDisplay: Boolean
+    # 信息项资料页是否显示
     informationDisplay: Boolean
 }

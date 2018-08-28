@@ -39,8 +39,12 @@ type RoleInfoResult {
 }
 
 type RoleInfoData {
+    # 角色ID
     id: Int
+    # 角色名称
     name: String
+    # 角色拥有的权限
     permissions: [PermissionData]
+    # 角色拥有的信息项
     infoItems: [InfoItemData]
 }

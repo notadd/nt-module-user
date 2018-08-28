@@ -15,9 +15,9 @@ type Mutation {
     # 删除组织
     deleteOrganization(id: Int!): UserModuleCommonResult
     # 给组织添加用户
-    addUsersToOrganization(id: Int!, userIds: [Int]): UserModuleCommonResult
+    addUsersToOrganization(id: Int!, userIds: [Int]!): UserModuleCommonResult
     # 删除组织下的用户
-    deleteUserFromOrganization(id: Int!, userIds: [Int]): UserModuleCommonResult
+    deleteUserFromOrganization(id: Int!, userIds: [Int]!): UserModuleCommonResult
 }
 
 type OrganizationsRootResult {

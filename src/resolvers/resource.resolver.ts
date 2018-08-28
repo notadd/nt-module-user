@@ -1,6 +1,7 @@
 import { Query, Resolver } from '@nestjs/graphql';
 
 import { Permission, Resource } from '../decorators';
+import { CommonResult } from '../interfaces/common-result.interface';
 import { ResourceService } from '../services/resource.service';
 
 @Resolver()
@@ -12,8 +13,8 @@ export class ResourceResolver {
 
     @Query('findResources')
     @Permission({ name: '查询资源', identify: 'resource:findResources', action: 'find' })
-    async findResources(req, body) {
-        const resourceArr = await this.resourceService.findResources();
-        return { code: 200, message: '获取成功', data: resourceArr };
+    async findResources(req, body): Promise<CommonResult> {
+        const data = await this.resourceService.findResources();
+        return { code: 200, message: '获取成功', data };
     }
 }

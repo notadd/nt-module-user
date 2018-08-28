@@ -50,14 +50,14 @@ export class InfoGroupResolver {
     @Query('findAllInfoGroup')
     @Permission({ name: '查询所有信息组', identify: 'infoGroup:findAllInfoGroup', action: 'find' })
     async findAllInfoGroup(): Promise<CommonResult> {
-        const infoGroups = await this.infoGroupService.findAll();
-        return { code: 200, message: '查询所有信息组成功', data: infoGroups };
+        const data = await this.infoGroupService.findAll();
+        return { code: 200, message: '查询所有信息组成功', data };
     }
 
     @Query('findInfoItemsByGroupId')
     @Permission({ name: '查询信息组中的信息项', identify: 'infoGroup:findInfoItemsByGroupId', action: 'find' })
     async findInfoItemsByGroupId(req, body: { groupId: number }): Promise<CommonResult> {
-        const infoItems = await this.infoGroupService.findItemsById(body.groupId);
-        return { code: 200, message: '查询信息项成功', data: infoItems };
+        const data = await this.infoGroupService.findItemsById(body.groupId);
+        return { code: 200, message: '查询信息项成功', data };
     }
 }

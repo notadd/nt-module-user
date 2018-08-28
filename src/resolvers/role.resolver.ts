@@ -14,40 +14,36 @@ export class RoleResolver {
     @Mutation('createRole')
     @Permission({ name: '创建角色', identify: 'role:createRole', action: 'create' })
     async createRole(req, body: { name: string }): Promise<CommonResult> {
-        const { name } = body;
-        await this.roleService.createRole(name);
+        await this.roleService.createRole(body.name);
         return { code: 200, message: '创建角色成功' };
     }
 
     @Mutation('deleteRole')
     @Permission({ name: '删除角色', identify: 'role:deleteRole', action: 'delete' })
     async deleteRole(req, body: { id: number }): Promise<CommonResult> {
-        const { id } = body;
-        await this.roleService.deleteRole(id);
+        await this.roleService.deleteRole(body.id);
         return { code: 200, message: '删除角色成功' };
     }
 
     @Mutation('updateRole')
     @Permission({ name: '更新角色', identify: 'role:updateRole', action: 'update' })
     async updateRole(req, body: { id: number, name: string }): Promise<CommonResult> {
-        const { id, name } = body;
-        await this.roleService.updateRole(id, name);
+        await this.roleService.updateRole(body.id, body.name);
         return { code: 200, message: '更新角色成功' };
     }
 
     @Mutation('setPermissionsToRole')
     @Permission({ name: '设置角色权限', identify: 'role:setPermissionsToRole', action: 'create' })
     async setPermissionsToRole(req, body: { roleId: number, permissionIds: number[] }): Promise<CommonResult> {
-        const { roleId, permissionIds } = body;
-        await this.roleService.setPermissions(roleId, permissionIds);
+        await this.roleService.setPermissions(body.roleId, body.permissionIds);
         return { code: 200, message: '设置权限成功' };
     }
 
     @Query('findRoles')
     @Permission({ name: '查询所有角色', identify: 'role:findRoles', action: 'find' })
     async findRoles(): Promise<CommonResult> {
-        const roleArr = await this.roleService.findRoles();
-        return { code: 200, message: '查询所有角色成功', data: roleArr };
+        const data = await this.roleService.findRoles();
+        return { code: 200, message: '查询所有角色成功', data };
     }
 
     @Query('findOneRoleInfo')

@@ -38,7 +38,7 @@ export class InfoItemResolver {
     @Query('findAllInfoItem')
     @Permission({ name: '查所有信息项', identify: 'infoItem:findAllInfoItem', action: 'find' })
     async findAllInfoItem(): Promise<CommonResult> {
-        const infoItems = await this.infoItemService.findAll();
-        return { code: 200, message: '查所有信息项成功', data: infoItems };
+        const data = await this.infoItemService.findAll();
+        return { code: 200, message: '查所有信息项成功', data };
     }
 }

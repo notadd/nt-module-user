@@ -3,15 +3,15 @@ type Query {
     findRootOrganizations: OrganizationsRootResult
     # 获取所有组织
     findAllOrganizations: OrganizationsJsonResult
-    # 获取组织下面的所有子组织
+    # 获取指定组织下的所有子组织
     findChildrenOrganizations(id: Int!): OrganizationsJsonResult
 }
 
 type Mutation {
-    # 创建组织
+    # 创建组织，parentId 为空时，代表创建根组织
     createOrganization(name: String!, parentId: Int): UserModuleCommonResult
     # 更新组织
-    updateOrganization(id: Int!, name: String!, parentId: Int): UserModuleCommonResult
+    updateOrganization(id: Int!, name: String!, parentId: Int!): UserModuleCommonResult
     # 删除组织
     deleteOrganization(id: Int!): UserModuleCommonResult
     # 给组织添加用户

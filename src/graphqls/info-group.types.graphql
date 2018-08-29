@@ -1,3 +1,10 @@
+type Query {
+    # 查询所有信息组
+    findAllInfoGroup: InfoGroupResult
+    # 查询指定信息组ID下的所有信息项
+    findInfoItemsByGroupId(groupId: Int!): InfoItemResult
+}
+
 type Mutation {
     # 新增信息组
     createInfoGroup(name: String!, roleId: Int!): UserModuleCommonResult
@@ -9,13 +16,6 @@ type Mutation {
     addInfoItemToInfoGroup(infoGroupId: Int!, infoItemIds: [Int]!): UserModuleCommonResult
     # 删除指定信息组的指定信息项
     deleteIntoItemFromInfoGroup(infoGroupId: Int!, infoItemIds: [Int]!): UserModuleCommonResult
-}
-
-type Query {
-    # 查询所有信息组
-    findAllInfoGroup: InfoGroupResult
-    # 查询指定信息组ID下的所有信息项
-    findInfoItemsByGroupId(groupId: Int!): InfoItemResult
 }
 
 # 查询信息组返回消息

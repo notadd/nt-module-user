@@ -1,3 +1,8 @@
+type Query {
+    # 查询所有信息项
+    findAllInfoItem: InfoItemResult
+}
+
 type Mutation {
     # 新增信息项
     createInfoItem(infoItemInput: InfoItemInput): UserModuleCommonResult
@@ -7,18 +12,19 @@ type Mutation {
     updateInfoItem(updateInfoItemInput: UpdateInfoItemInput): UserModuleCommonResult
 }
 
-type Query {
-    # 查询所有信息项
-    findAllInfoItem: InfoItemResult
-}
-
 # 新增信息项的请求体
 input InfoItemInput {
+    # 信息项排序
     order: Int!
+    # 信息项类型
     type: String!
+    # 信息项名称
     name: String!
+    # 信息项描述
     description: String
+    # 是否在注册页显示
     registerDisplay: Boolean!
+    # 是否在资料页显示
     informationDisplay: Boolean!
 }
 

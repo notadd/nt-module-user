@@ -84,24 +84,72 @@ mutation addUserOrganization($userId: Int!, $organizationId: Int!) {
 	"organizationId": 2
 }
 
-# 更新用户信息
-mutation {
-  updateUserInfo(userId: 1, updateUserInput: {
-    email: "666666@qq.com",
-    mobile: "18166666666",
-    infoKVs: [
-      {
-        key: 1,
-        value: "小猪佩奇"
-      },
-      {
-        key: 3,
-        value: "3"
-      }
-    ]
-  }) {
+# 更新指定用户信息
+mutation updateUserInfo($userId: Int!, $updateUserInput: UpdateUserInput) {
+  updateUserInfo(userId: $userId, updateUserInput: $updateUserInput) {
     code
     message
+  }
+}
+{
+  "userId": 1,
+  "updateUserInput": {
+    "infoKVs": [
+      {
+      "key": null,
+      "value": "段泽尧",
+      "relationId": 1
+      },
+      {
+      "key": null,
+      "value": "男",
+      "relationId": 2
+      },
+      {
+      "key": null,
+      "value": "23",
+      "relationId": 4
+      },
+      {
+      "key": null,
+      "value": "西安",
+      "relationId": 3
+      }
+    ]
+  }
+}
+
+# 更新当前登录用户信息
+mutation updateCurrentUserInfo($updateCurrentUserInput: UpdateCurrentUserInput) {
+  updateCurrentUserInfo(updateCurrentUserInput: $updateCurrentUserInput) {
+    code
+    message
+  }
+}
+{
+  "updateCurrentUserInput": {
+    "infoKVs": [
+      {
+      "key": null,
+      "value": "dzzzzzy",
+      "relationId": 1
+      },
+      {
+      "key": null,
+      "value": "男",
+      "relationId": 2
+      },
+      {
+      "key": null,
+      "value": "23",
+      "relationId": 4
+      },
+      {
+      "key": null,
+      "value": "西安",
+      "relationId": 3
+      }
+    ]
   }
 }
 
@@ -127,13 +175,55 @@ query findCurrentUserInfo {
       }
       userInfos {
         id
-        name
+        order
+        relationId
         type
+        name
         value
         description
+        registerDisplay
+        informationDisplay
       }
     }
   }
+}
+
+# 通过ID查询用户信息
+query findUserInfoById($userId: Int!) {
+  findUserInfoById(userId: $userId) {
+    code
+    message
+    data {
+      userId
+      username
+      email
+      mobile
+      banned
+      recycle
+      userRoles {
+        id
+        name
+      }
+      userOrganizations {
+        id
+        name
+      }
+      userInfos {
+        id
+        order
+        relationId
+        type
+        name
+        value
+        description
+        registerDisplay
+        informationDisplay
+      }
+    }
+  }
+}
+{
+  "userId": 1
 }
 
 # 获取指定组织ID下的用户
@@ -158,10 +248,14 @@ query findUsersInOrganization($organizationId: Int!) {
       }
       userInfos {
         id
-        name
+        order
+        relationId
         type
+        name
         value
         description
+        registerDisplay
+        informationDisplay
       }
     }
   }

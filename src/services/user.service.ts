@@ -179,30 +179,28 @@ export class UserService {
      * @param id 用户ID
      */
     async findUserInfoById(id: number | number[]): Promise<UserInfoData | UserInfoData[]> {
-        const qb = this.userRepo.createQueryBuilder('user')
+        const userQb = this.userRepo.createQueryBuilder('user')
             .leftJoinAndSelect('user.roles', 'roles')
             .leftJoinAndSelect('user.organizations', 'organizations')
             .leftJoinAndSelect('user.userInfos', 'userInfos')
             .leftJoinAndSelect('userInfos.infoItem', 'infoItem');
 
-        const infoItem = await this.infoItemRepo.createQueryBuilder('infoItem')
+        const infoItemQb = await this.infoItemRepo.createQueryBuilder('infoItem')
             .leftJoin('infoItem.infoGroups', 'infoGroups')
             .leftJoin('infoGroups.role', 'role')
-            .leftJoin('role.users', 'users')
-            .where('users.id = :id', { id })
-            .orderBy('infoItem.order', 'ASC')
-            .getMany();
+            .leftJoin('role.users', 'users');
 
         if (id instanceof Array) {
             const userInfoData: UserInfoData[] = [];
-            const users = await qb.whereInIds(id).getMany();
-
+            const users = await userQb.whereInIds(id).getMany();
+            const infoItems = await infoItemQb.where('users.id IN (:...id)', { id }).orderBy('infoItem.order', 'ASC').getMany();
             for (const user of users) {
-                (userInfoData as UserInfoData[]).push(this.refactorUserData(user, infoItem));
+                (userInfoData as UserInfoData[]).push(this.refactorUserData(user, infoItems));
             }
             return userInfoData;
         } else {
-            const user = await qb.where('user.id = :id', { id }).getOne();
+            const user = await userQb.where('user.id = :id', { id }).getOne();
+            const infoItem = await infoItemQb.where('users.id = :id', { id }).orderBy('infoItem.order', 'ASC').getMany();
             return this.refactorUserData(user, infoItem);
         }
     }
@@ -295,18 +293,19 @@ export class UserService {
     private async createOrUpdateUserInfos(user: User, infoKVs: { key: number, value: string, relationId?: number }[], action: 'create' | 'update') {
         if (infoKVs.length) {
             if (action === 'create') {
-                infoKVs.forEach(infoKV => {
-                    this.userInfoRepo.save(this.userInfoRepo.create({ value: infoKV.value, user, infoItem: { id: infoKV.key } }));
+                infoKVs.forEach(async infoKV => {
+                    await this.userInfoRepo.save(this.userInfoRepo.create({ value: infoKV.value, user, infoItem: { id: infoKV.key } }));
                 });
                 return;
             }
 
             // 更新用户信息项的值
-            infoKVs.forEach(infoKV => {
-                if (!infoKV.key) {
-                    this.userInfoRepo.save(this.userInfoRepo.create({ value: infoKV.value, user, infoItem: { id: infoKV.relationId } }));
+            infoKVs.forEach(async infoKV => {
+                if (infoKV.key) {
+                    this.userInfoRepo.update(infoKV.key, { value: infoKV.value });
+                } else {
+                    await this.userInfoRepo.save(this.userInfoRepo.create({ value: infoKV.value, user, infoItem: { id: infoKV.relationId } }));
                 }
-                this.userInfoRepo.update(infoKV.key, { value: infoKV.value });
             });
         }
     }
@@ -341,11 +340,14 @@ export class UserService {
                  */
                 return {
                     id: user.userInfos.length ? (userInfo ? userInfo.id : undefined) : undefined,
+                    order: infoItem.order,
+                    relationId: infoItem.id,
+                    type: infoItem.type,
                     name: infoItem.name,
                     value: user.userInfos.length ? (userInfo ? userInfo.value : undefined) : undefined,
                     description: infoItem.description,
-                    type: infoItem.type,
-                    relationId: infoItem.id
+                    registerDisplay: infoItem.registerDisplay,
+                    informationDisplay: infoItem.informationDisplay
                 };
             }) : []
         };

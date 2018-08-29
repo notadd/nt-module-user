@@ -24,7 +24,7 @@ export class AuthService {
          */
         const accessToken = jwt.sign(payload, 'secretKey', { expiresIn: '1d' });
 
-        return { accessToken, expiresIn: 7200 };
+        return { accessToken, expiresIn: 60 * 60 * 24 };
     }
 
     // TODO: 如果用户模块启用了缓存选项，则在缓存中通过 username 查询权限集，否则查数据库中的权限集
@@ -32,16 +32,27 @@ export class AuthService {
         if (req.body && ['IntrospectionQuery', 'login', 'register'].includes(req.body.operationName)) {
             return;
         }
-        const token = (req.headers.authorization as string).split('Bearer ')[1];
+
+        if (!req.headers.authorization) {
+            throw new AuthenticationError('请求头缺少授权参数，参数名应为：authorization 或 Authorization');
+        }
+
+        let token = req.headers.authorization as string;
+        if (['Bearer ', 'bearer '].includes(token.slice(0, 7))) {
+            token = token.slice(7);
+        } else {
+            throw new AuthenticationError(`授权码前缀不正确，前缀应为：'Bearer '`);
+        }
+
         try {
             const decodedToken = <{ username: string }>jwt.verify(token, 'secretKey');
             return this.userService.findOneWithRolesAndPermissions(decodedToken.username);
         } catch (error) {
             if (error instanceof jwt.JsonWebTokenError) {
-                throw new AuthenticationError('invalid access token error');
+                throw new AuthenticationError('授权码不正确');
             }
             if (error instanceof jwt.TokenExpiredError) {
-                throw new AuthenticationError('access token has been expired');
+                throw new AuthenticationError('授权码已过期');
             }
         }
     }

@@ -48,7 +48,7 @@ export class OrganizationService {
      */
     async createOrganization(name: string, parentId: number): Promise<void> {
         let parent: Organization | undefined;
-        if (parentId !== undefined && parentId !== null) {
+        if (parentId) {
             parent = await this.organizationReq.findOne(parentId);
             if (!parent) {
                 throw new HttpException(`父组织Id为：${parentId}的组织不存在`, 404);
@@ -82,7 +82,7 @@ export class OrganizationService {
         }
 
         let parent: Organization | undefined;
-        if (parentId !== undefined && parentId !== null) {
+        if (parentId) {
             parent = await this.organizationReq.findOne(parentId);
             if (!parent) {
                 throw new HttpException(`指定父组织id=${parentId}不存在`, 404);

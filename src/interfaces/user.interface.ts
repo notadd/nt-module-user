@@ -15,11 +15,14 @@ export interface UserInfoData {
     }[];
     userInfos: {
         id: number;
+        order: number;
+        relationId: number;
+        type: string;
         name: string;
         value: string;
         description: string;
-        type: string;
-        relationId: number;
+        registerDisplay: boolean;
+        informationDisplay: boolean;
     }[];
 }
 

@@ -129,7 +129,7 @@ type LoginResponse {
 type AccessToken {
     # 授权令牌数据
     accessToken: String
-    # 授权令牌有效时间，单位为秒
+    # 授权令牌有效期，单位为秒
     expiresIn: Int
 }
 
@@ -173,16 +173,22 @@ type UserInfoData {
 type UserInfo {
     # 用户信息项ID，当且仅当为 null 时，代表更新用户操作中这个信息项的值是将要被创建的，此时需要将 relationId 传入 UpdateInfoKV 对象中，且此时 UpdateInfoKV 对象中的 key 需传入 null
     id: Int
+    # 信息项排序
+    order: Int
+    # 信息项关联ID
+    relationId: Int
+    # 信息项类型
+    type: String
     # 信息项名称
     name: String
     # 信息项的值
     value: String
     # 信息项描述
     description: String
-    # 信息项类型
-    type: String
-    # 信息项关联ID
-    relationId: Int
+    # 注册页是否显示
+    registerDisplay: Boolean
+    # 资料页是否显示
+    informationDisplay: Boolean
 }
 
 # 普通注册时的信息项数据

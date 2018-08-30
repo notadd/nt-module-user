@@ -60,8 +60,8 @@ export class UserResolver {
         return { code: 200, message: '删除回收站内的用户成功' };
     }
 
-    @Mutation('updateUserInfo')
-    @Permission({ name: '更新用户信息', identify: 'user:updateUserInfo', action: 'update' })
+    @Mutation('updateUserInfoById')
+    @Permission({ name: '更新指定用户信息', identify: 'user:updateUserInfoById', action: 'update' })
     async updateUserInfo(req, body: { userId: number, updateUserInput: UpdateUserInput }): Promise<CommonResult> {
         await this.userService.updateUserInfo(body.userId, body.updateUserInput);
         return { code: 200, message: '更新用户信息成功' };
@@ -71,6 +71,13 @@ export class UserResolver {
     async updateCurrentUserInfo(req, body: { updateCurrentUserInput: UpdateUserInput }, context): Promise<CommonResult> {
         await this.userService.updateUserInfo(context.user.id, body.updateCurrentUserInput);
         return { code: 200, message: '更新当前登录用户信息成功' };
+    }
+
+    @Query('findUserInfoById')
+    @Permission({ name: '查询指定用户信息', identify: 'user:findUserInfoById', action: 'find' })
+    async findUserInfoById(req, body: { userId: number }): Promise<CommonResult> {
+        const data = await this.userService.findUserInfoById(body.userId) as UserInfoData;
+        return { code: 200, message: '查询用户信息成功', data };
     }
 
     @Query('findCurrentUserInfo')
@@ -83,13 +90,6 @@ export class UserResolver {
     async findRegisterUserInputInfo(): Promise<CommonResult> {
         const data = await this.userService.findOneWithInfoItemsByRoleIds([1]);
         return { code: 200, message: '查询用户注册信息项成功', data };
-    }
-
-    @Query('findUserInfoById')
-    @Permission({ name: '查询指定用户信息', identify: 'user:findUserInfoById', action: 'find' })
-    async findUserInfoById(req, body: { userId: number }): Promise<CommonResult> {
-        const data = await this.userService.findUserInfoById(body.userId) as UserInfoData;
-        return { code: 200, message: '查询用户信息成功', data };
     }
 
     @Query('findUsersInRole')

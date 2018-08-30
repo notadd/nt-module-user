@@ -1,10 +1,10 @@
-# 用户模块通用响应体
+# User module universal response body
 type UserModuleCommonResult {
-    # 状态码
+    # status code
     code: Int
-    # 返回消息
+    # response message
     message: String
 }
 
-# JSON 格式数据
+# JSON data
 scalar JSON

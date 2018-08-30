@@ -1,35 +1,24 @@
 type Query {
-    # 查询所有资源权限
+    # Query all resource and it's permissions
     findResources: ResourcesResult
 }
 
 type ResourcesResult {
-    # 状态码
     code: Int
-    # 状态消息
     message: String
-    # 返回数据
     data: [ResourceData]
 }
 
 type ResourceData {
-    # 资源ID
     id: Int
-    # 资源名称
     name: String
-    # 资源唯一标识
     identify: String
-    # 资源拥有的权限
     permissions: [PermissionData]
 }
 
 type PermissionData {
-    # 权限ID
     id: Int
-    # 权限名称
     name: String
-    # 对应的操作
     action: String
-    # 权限唯一标识
     identify: String
 }

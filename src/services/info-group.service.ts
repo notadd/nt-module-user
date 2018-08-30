@@ -15,23 +15,24 @@ export class InfoGroupService {
     ) { }
 
     /**
-     * 创建信息组
+     * Create a information group
      *
-     * @param infoGroup 信息组信息
+     * @param name The name of information group
+     * @param roleId The roleId of information group
      */
     async create(name: string, roleId: number) {
         await this.entityCheckService.checkNameExist(InfoGroup, name);
         if (await this.infoGroupRepo.findOne({ role: { id: roleId } })) {
-            throw new HttpException('该角色信息组已存在', 409);
+            throw new HttpException('The role information group already exists', 409);
         }
         this.infoGroupRepo.save(this.infoGroupRepo.create({ name, role: { id: roleId } }));
     }
 
     /**
-     * 向指定信息组添加指定信息项
+     * Add some specified information items to the specified information group
      *
-     * @param infoGroupId 信息组ID
-     * @param infoItemIds 信息项ID
+     * @param infoGroupId The specified information group's id
+     * @param infoItemIds The specified information item's id array
      */
     async addInfoItem(infoGroupId: number, infoItemIds: number[]) {
         const infoItems = await this.infoGroupRepo
@@ -41,35 +42,35 @@ export class InfoGroupService {
             .loadMany<InfoItem>();
 
         const duplicateIds = infoItems.map(infoItem => infoItem.id).filter(infoItemId => infoItemIds.includes(infoItemId));
-        if (duplicateIds.length) throw new HttpException(`信息项 ID: ${duplicateIds} 已存在`, 409);
+        if (duplicateIds.length) throw new HttpException(`Information item's id: ${duplicateIds} already exists`, 409);
 
         this.infoGroupRepo.createQueryBuilder('infoGroup').relation(InfoGroup, 'infoItems').of(infoGroupId).add(infoItemIds);
     }
 
     /**
-     * 删除信息组
+     * Delete the specified information group
      *
-     * @param id 信息组ID
+     * @param id The information group's id
      */
     async delete(id: number) {
         this.infoGroupRepo.delete(id);
     }
 
     /**
-     * 移除指定信息组的指定信息项
+     * Remove specified information items from the specified information group
      *
-     * @param infoGroupId 信息组ID
-     * @param infoItemIds 信息项ID
+     * @param infoGroupId The specified information group's id
+     * @param infoItemIds The specified information item's id array
      */
     async deleteIntoItem(infoGroupId: number, infoItemIds: number[]) {
         this.infoGroupRepo.createQueryBuilder('infoGroup').relation(InfoGroup, 'infoItems').of(infoGroupId).remove(infoItemIds);
     }
 
     /**
-     * 更新信息组
+     * Update the specified information group
      *
-     * @param id 信息组ID
-     * @param name 信息组名称
+     * @param id The specified information group's id
+     * @param name The name to be update
      */
     async update(id: number, name: string, roleId: number) {
         await this.entityCheckService.checkNameExist(InfoGroup, name);
@@ -77,16 +78,16 @@ export class InfoGroupService {
     }
 
     /**
-     * 查询所有信息组
+     * Query all groups
      */
     async findAll() {
         return this.infoGroupRepo.find();
     }
 
     /**
-     * 查询当前信息组ID下的所有信息项
+     * Query all information items under the current information group ID
      *
-     * @param id 信息组ID
+     * @param id The specified information group's id
      */
     async findItemsById(id: number) {
         return this.infoGroupRepo.createQueryBuilder('infoGroup').relation(InfoGroup, 'infoItems').of(id).loadMany();

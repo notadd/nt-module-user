@@ -14,9 +14,9 @@ export class InfoItemService {
     ) { }
 
     /**
-     * 创建信息项
+     * Create an item of information
      *
-     * @param infoItem 信息项信息
+     * @param infoItem The information item object
      */
     async create(infoItem: InfoItem) {
         await this.entityCheckService.checkNameExist(InfoItem, infoItem.name);
@@ -24,9 +24,9 @@ export class InfoItemService {
     }
 
     /**
-     * 删除信息项
+     * Delete information item
      *
-     * @param id 信息项ID
+     * @param id The information item's id
      */
     async delete(id: number) {
         const infoItem = await this.infoItemRepo.findOne(id, { relations: ['userInfos', 'infoGroups'] });
@@ -35,12 +35,12 @@ export class InfoItemService {
     }
 
     /**
-     * 更新信息项的指定信息
+     * Update the specified information
      *
-     * @param id 信息项ID
-     * @param name 信息项名称
-     * @param description 信息项描述
-     * @param type 信息项类型
+     * @param id The information item's id
+     * @param name The information item's name
+     * @param description The information item's description
+     * @param type The information item's type
      */
     async update(updateInfoItemInput: UpdateInfoItemInput) {
         await this.entityCheckService.checkNameExist(InfoItem, updateInfoItemInput.name);
@@ -65,7 +65,7 @@ export class InfoItemService {
     }
 
     /**
-     * 查询所有信息项
+     * Query all information items
      */
     async findAll() {
         return this.infoItemRepo.find({ order: { order: 'ASC' } });

@@ -15,43 +15,45 @@ export class OrganizationService {
     ) { }
 
     /**
-     * 获取根组织
+     * Query root organizations
      */
     async findRoots(): Promise<Organization[]> {
         return this.organizationReq.findRoots();
     }
 
     /**
-     * 获取所有组织
+     * Query all organizations tree node
      */
     async findAllTrees(): Promise<Organization[]> {
         return this.organizationReq.findTrees();
     }
 
     /**
-     * 获取组织下面的所有部门
-     * @param id 组织ID
+     * Query all suborganizations under the specified organization
+     *
+     * @param id The specified organizaiton id
      */
     async findChildren(id: number): Promise<Organization> {
         const exist = await this.organizationReq.findOne(id);
         if (!exist) {
-            throw new HttpException(`id为：${id}的组织不存在`, 404);
+            throw new HttpException(`The organization id of '${id}' does not exist`, 404);
         }
         const children = await this.organizationReq.findDescendantsTree(exist);
         return children;
     }
 
     /**
-     * 添加组织
-     * @param name 组织名称
-     * @param parentId 父组织ID
+     * Create a organization
+     *
+     * @param name The organization's name
+     * @param parentId The organization's parent id
      */
     async createOrganization(name: string, parentId: number): Promise<void> {
         let parent: Organization | undefined;
         if (parentId) {
             parent = await this.organizationReq.findOne(parentId);
             if (!parent) {
-                throw new HttpException(`父组织Id为：${parentId}的组织不存在`, 404);
+                throw new HttpException(`The organization's parent id of '${parentId}' does not exist`, 404);
             }
         }
 
@@ -61,20 +63,21 @@ export class OrganizationService {
         try {
             await this.organizationReq.save(organization);
         } catch (err) {
-            throw new HttpException(`数据库错误：${err.toString()}`, 500);
+            throw new HttpException(`Database error: ${err.toString()}`, 500);
         }
     }
 
     /**
-     * 更新组织
-     * @param id 组织ID
-     * @param name 组织名称
-     * @param parentId 父组织ID
+     * Update organization
+     *
+     * @param id The specified organizaiton id
+     * @param name The organization's name
+     * @param parentId The organization's parent id
      */
     async updateOrganization(id: number, name: string, parentId: number): Promise<void> {
         const exist = await this.organizationReq.findOne(id);
         if (!exist) {
-            throw new HttpException(`id为：${id}的组织不存在`, 404);
+            throw new HttpException(`The organization id of '${id}' does not exist`, 404);
         }
 
         if (name !== exist.name) {
@@ -85,7 +88,7 @@ export class OrganizationService {
         if (parentId) {
             parent = await this.organizationReq.findOne(parentId);
             if (!parent) {
-                throw new HttpException(`指定父组织id=${parentId}不存在`, 404);
+                throw new HttpException(`The organization's parent id of '${parentId}' does not exist`, 404);
             }
         }
         try {
@@ -93,40 +96,42 @@ export class OrganizationService {
             exist.parent = parent as any;
             await this.organizationReq.save(exist);
         } catch (err) {
-            throw new HttpException(`数据库错误：${err.toString()}`, 500);
+            throw new HttpException(`Database error: ${err.toString()}`, 500);
         }
     }
 
     /**
-     * 删除组织机构
-     * @param id
+     * Delete organization
+     *
+     * @param id The specified organizaiton id
      */
     async deleteOrganization(id: number): Promise<void> {
         const exist = await this.organizationReq.findOne(id);
         if (!exist) {
-            throw new HttpException(`id为：${id}的组织不存在`, 404);
+            throw new HttpException(`The organization id of '${id}' does not exist`, 404);
         }
 
         const children = await this.organizationReq.findDescendants(exist);
         if (children) {
-            throw new HttpException(`存在子组织不能删除`, 406);
+            throw new HttpException('Cannot delete the organization that have child organizations', 406);
         }
         try {
             await this.organizationReq.delete(id);
         } catch (error) {
-            throw new HttpException(`数据库错误：${error.toString()}`, 500);
+            throw new HttpException(`Database error: ${error.toString()}`, 500);
         }
     }
 
     /**
-     * 给部门添加用户
-     * @param id 部门ID
-     * @param userIds 用户ID
+     * Add users to the organization
+     *
+     * @param id The specified organizaiton id
+     * @param userIds The specified users id to be add
      */
     async addUsersToOrganization(id: number, userIds: number[]): Promise<void> {
         const exist = await this.organizationReq.findOne(id, { relations: ['users'] });
         if (!exist) {
-            throw new HttpException(`id为：${id}的组织不存在`, 404);
+            throw new HttpException(`The organization id of '${id}' does not exist`, 404);
         }
 
         const userArr = await this.userRep.findByIds(userIds);
@@ -135,7 +140,7 @@ export class OrganizationService {
                 return user.id === userId;
             });
             if (!find) {
-                throw new HttpException(`id为${userId}用户不存在`, 404);
+                throw new HttpException(`The user id of '${userId}' does not exist`, 404);
             }
         });
 
@@ -144,26 +149,27 @@ export class OrganizationService {
                 return id === user.id;
             });
             if (find) {
-                throw new HttpException(`id为${user.id}用户已在组织下`, 409);
+                throw new HttpException(`User with id of ${user.id} is already under organization`, 409);
             }
         });
         exist.users.push(...userArr);
         try {
             await this.organizationReq.save(exist);
         } catch (error) {
-            throw new HttpException(`数据库错误：${error.toString()}`, 500);
+            throw new HttpException(`Database error: ${error.toString()}`, 500);
         }
     }
 
     /**
-     * 删除组织下的用户
-     * @param id 组织ID
-     * @param userIds 用户ID
+     * Delete users under the organization
+     *
+     * @param id The specified organizaiton id
+     * @param userIds The specified users id
      */
     async deleteUserFromOrganization(id: number, userIds: number[]): Promise<void> {
         const exist = await this.organizationReq.findOne(id, { relations: ['users'] });
         if (!exist) {
-            throw new HttpException(`id为：${id}的组织不存在`, 404);
+            throw new HttpException(`The organization id of '${id}' does not exist`, 404);
         }
 
         const userArr = await this.userRep.findByIds(userIds);
@@ -172,20 +178,20 @@ export class OrganizationService {
                 return user.id === userId;
             });
             if (!find) {
-                throw new HttpException(`id为${userId}用户不存在`, 404);
+                throw new HttpException(`The user id of '${userId}' does not exist`, 404);
             }
             const index = exist.users.findIndex(user => {
                 return user.id === userId;
             });
             if (index < 0) {
-                throw new HttpException(`id为${userId}用户不存在组织下`, 404);
+                throw new HttpException(`The user id of '${userId}' does not appear in this organization`, 404);
             }
             exist.users.splice(index, 1);
         });
         try {
             await this.organizationReq.save(exist);
         } catch (err) {
-            throw new HttpException(`数据库错误：${err.toString()}`, 500);
+            throw new HttpException(`Database error: ${err.toString()}`, 500);
         }
     }
 }

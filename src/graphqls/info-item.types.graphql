@@ -1,71 +1,68 @@
 type Query {
-    # 查询所有信息项
+    # Query all information items
     findAllInfoItem: InfoItemResult
 }
 
 type Mutation {
-    # 新增信息项
+    # Create a new information item
     createInfoItem(infoItemInput: InfoItemInput): UserModuleCommonResult
-    # 删除指定ID的信息项
+    # Delete the information item of the specified ID
     deleteInfoItem(infoItemId: Int!): UserModuleCommonResult
-    # 更新指定ID的信息项名称、标签、描述、类型
+    # Update the item name, label, description, and type of the specified ID
     updateInfoItem(updateInfoItemInput: UpdateInfoItemInput): UserModuleCommonResult
 }
 
-# 新增信息项的请求体
 input InfoItemInput {
-    # 信息项排序
+    # Information item's ordering
     order: Int!
-    # 信息项类型
+    # Information item's type
     type: String!
-    # 信息项名称
+    # Information item's name
     name: String!
-    # 信息项描述
+    # Information item's description
     description: String
-    # 是否在注册页显示
+    # Whether the information item is displayed on the registration page
     registerDisplay: Boolean!
-    # 是否在资料页显示
+    # Whether the information item is displayed on the profile page
     informationDisplay: Boolean!
 }
 
-# 查询信息项返回消息
 type InfoItemResult {
     code: Int
     message: String
     data: [InfoItemData]
 }
 
-# 信息项数据
 type InfoItemData {
-    # 信息项ID
+    # Information item's id
     id: Int
-    # 信息项类型
+    # Information item's type
     type: String
-    # 信息项排序
+    # Information item's ordering
     order: Int
-    # 信息项名称
+    # Information item's name
     name: String
-    # 信息项描述
+    # Information item's description
     description: String
-    # 注册页是否显示
+    # Whether the information item is displayed on the registration page
     registerDisplay: Boolean
-    # 资料页是否显示
+    # Whether the information item is displayed on the profile page
     informationDisplay: Boolean
 }
 
 input UpdateInfoItemInput {
-    # 信息项ID
+    # Information item's id
     id: Int
-    # 信息项排序
-    order: Int
-    # 信息项类型
+    # Information item's type
     type: String
-    # 信息项名称
+    # Information item's ordering
+    order: Int
+    # Information item's name
     name: String
-    # 信息项描述
+    # Information item's description
     description: String
-    # 信息项注册也是否显示
+    # Whether the information item is displayed on the registration page
     registerDisplay: Boolean
-    # 信息项资料页是否显示
+    # Whether the information item is displayed on the profile page
     informationDisplay: Boolean
 }

@@ -1,32 +1,29 @@
 type Query {
-    # 查询所有信息组
+    # Query all groups
     findAllInfoGroup: InfoGroupResult
-    # 查询指定信息组ID下的所有信息项
+    # Query all information items under the specified group ID
     findInfoItemsByGroupId(groupId: Int!): InfoItemResult
 }
 
 type Mutation {
-    # 新增信息组
+    # Create a new information group
     createInfoGroup(name: String!, roleId: Int!): UserModuleCommonResult
-    # 删除指定ID的信息组
+    # Delete the information group of the specified ID
     deleteInfoGroup(groupId: Int!): UserModuleCommonResult
-    # 更新指定ID的信息组名称或所属角色
+    # Update the information group, this can update group's name or the role which this belongs to
     updateInfoGroup(groupId: Int!, name: String, roleId: Int): UserModuleCommonResult
-    # 向指定信息组添加指定信息项
+    # Add a specified information item to the specified information group
     addInfoItemToInfoGroup(infoGroupId: Int!, infoItemIds: [Int]!): UserModuleCommonResult
-    # 删除指定信息组的指定信息项
+    # Delete the specified information item of the specified information group
     deleteIntoItemFromInfoGroup(infoGroupId: Int!, infoItemIds: [Int]!): UserModuleCommonResult
 }
 
-# 查询信息组返回消息
 type InfoGroupResult {
     code: Int
     message: String
     data: [InfoGroupData]
 }
 
-# 信息组数据
 type InfoGroupData {
-    # 信息组名称
     name: String
 }

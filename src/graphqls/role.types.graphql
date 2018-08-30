@@ -1,34 +1,29 @@
 type Query {
-    # 查询所有角色
+    # Query all roles
     findRoles: RolesResult
-    # 查询角色信息
+    # Query a specified role's details
     findOneRoleInfo(roleId: Int!): RoleInfoResult
 }
 
 type Mutation {
-    # 添加角色
+    # Create a role
     createRole(name: String!): UserModuleCommonResult
-    # 更新角色
+    # Update the specified role's name
     updateRole(id: Int!, name: String!): UserModuleCommonResult
-    # 删除角色
+    # Delete the specified role
     deleteRole(id: Int!): UserModuleCommonResult
-    # 给角色设置权限
+    # Set permissions for a specified role
     setPermissionsToRole(roleId: Int!, permissionIds: [Int]!): UserModuleCommonResult
 }
 
 type RolesResult {
-    # 状态码
     code: Int
-    # 状态消息
     message: String
-    # 返回数据
     data: [Role]
 }
 
 type Role {
-    # 角色ID
     id: Int
-    # 角色名称
     name: String
 }
 
@@ -39,12 +34,8 @@ type RoleInfoResult {
 }
 
 type RoleInfoData {
-    # 角色ID
     id: Int
-    # 角色名称
     name: String
-    # 角色拥有的权限
     permissions: [PermissionData]
-    # 角色拥有的信息项
     infoItems: [InfoItemData]
 }

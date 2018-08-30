@@ -13,35 +13,27 @@ export class AuthenticationService {
     ) { }
 
     async createToken(payload: JwtPayload): Promise<JwtReply> {
-        /**
-         * TODO: 令牌有效期问题：
-         *
-         * 使用刷新令牌机制，即第一次创建 accessToken 时，返回 accessToken 和 refreshToken，
-         * 当 accessToken 过期时用 refreshToken 刷新获取新的 accessToken，
-         * 当 refreToken 过期时，需要重新登录获取 accessToken 和 refreshToken。
-         *
-         * TODO: 签名秘钥，由安装用户模块的应用管理，在 import 时作为参数传递
-         */
         const accessToken = jwt.sign(payload, 'secretKey', { expiresIn: '1d' });
-
         return { accessToken, expiresIn: 60 * 60 * 24 };
     }
 
-    // TODO: 如果用户模块启用了缓存选项，则在缓存中通过 username 查询权限集，否则查数据库中的权限集
     async validateUser(req: any): Promise<User> {
+        /**
+         * Authentication whitelist
+         */
         if (req.body && ['IntrospectionQuery', 'login', 'register'].includes(req.body.operationName)) {
             return;
         }
 
         let token = req.headers.authentication as string;
         if (!token) {
-            throw new AuthenticationError('请求头缺少授权参数，参数名应为：authentication 或 Authentication');
+            throw new AuthenticationError(`Request header lacks authentication parameters，it should be: 'authentication' or 'Authentication'`);
         }
 
         if (['Bearer ', 'bearer '].includes(token.slice(0, 7))) {
             token = token.slice(7);
         } else {
-            throw new AuthenticationError(`授权码前缀不正确，前缀应为：'Bearer '`);
+            throw new AuthenticationError(`The authentication code prefix is incorrect. it should be: 'Bearer ' or 'bearer '`);
         }
 
         try {
@@ -49,10 +41,10 @@ export class AuthenticationService {
             return this.userService.findOneWithRolesAndPermissions(decodedToken.username);
         } catch (error) {
             if (error instanceof jwt.JsonWebTokenError) {
-                throw new AuthenticationError('授权码不正确');
+                throw new AuthenticationError('The authentication code is incorrect');
             }
             if (error instanceof jwt.TokenExpiredError) {
-                throw new AuthenticationError('授权码已过期');
+                throw new AuthenticationError('The authentication code has expired');
             }
         }
     }

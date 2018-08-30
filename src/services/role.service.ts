@@ -17,8 +17,9 @@ export class RoleService {
     ) { }
 
     /**
-     * 添加角色
-     * @param name
+     * Create a role
+     *
+     * @param name The role's name
      */
     async createRole(name: string) {
         await this.entityCheckService.checkNameExist(Role, name);
@@ -26,14 +27,15 @@ export class RoleService {
     }
 
     /**
-     * 修改角色
-     * @param id
-     * @param name
+     * Update the specified role's name
+     *
+     * @param id The specified role's id
+     * @param name The name to be update
      */
     async updateRole(id: number, name: string) {
         const role = await this.roleRepo.findOne(id);
         if (!role) {
-            throw new HttpException(`id为${id}的角色不存在`, 404);
+            throw new HttpException(`The role id of '${id}' does not exist`, 404);
         }
 
         if (name !== role.name) {
@@ -45,32 +47,34 @@ export class RoleService {
     }
 
     /**
-     * 删除角色
-     * @param id
+     * Delete role
+     *
+     * @param id The specified role's id
      */
     async deleteRole(id: number) {
         const role = await this.roleRepo.findOne(id, { relations: ['permissions'] });
         if (!role) {
-            throw new HttpException(`id为${id}的角色不存在`, 404);
+            throw new HttpException(`The role id of '${id}' does not exist`, 404);
         }
 
         try {
             this.roleRepo.createQueryBuilder('role').relation(Role, 'permissions').of(role).remove(role.permissions);
             await this.roleRepo.remove(role);
         } catch (err) {
-            throw new HttpException(`数据库错误：${err.toString()}`, 500);
+            throw new HttpException(`Database error: ${err.toString()}`, 500);
         }
     }
 
     /**
-     * 给角色设置权限
-     * @param id 角色ID
-     * @param permissionIds 权限ID数组
+     * Set permissions for a role
+     *
+     * @param id The specified role's id
+     * @param permissionIds The specified permission's id to be set
      */
     async setPermissions(id: number, permissionIds: number[]) {
         const role = await this.roleRepo.findOne(id);
         if (!role) {
-            throw new HttpException(`id为${id}的角色不存在`, 404);
+            throw new HttpException(`The role id of '${id}' does not exist`, 404);
         }
 
         const permissionArr = await this.permissionRepo.findByIds(permissionIds);
@@ -80,7 +84,7 @@ export class RoleService {
             });
 
             if (!exist) {
-                throw new HttpException(`id为${permissionId}的权限不存在`, 404);
+                throw new HttpException(`The permission id of '${permissionId}' does not exist`, 404);
             }
         });
 
@@ -89,21 +93,22 @@ export class RoleService {
     }
 
     /**
-     * 查询所有角色
+     * Query all roles
      */
     async findRoles() {
         return this.roleRepo.find();
     }
 
     /**
-     * 查询指定角色的所有关联信息(角色基本信息、角色拥有的权限、角色拥有的信息项)
-     * @param roleId 角色ID
+     * Query all associated information for a specified role
+     *
+     * @param roleId The specified role's id
      */
     async findOneRoleInfo(roleId: number) {
         const role = await this.roleRepo.findOne(roleId, { relations: ['permissions'] });
 
         if (!role) {
-            throw new HttpException('指定角色不存在', 404);
+            throw new HttpException(`The role id of '${roleId}' does not exist`, 404);
         }
 
         const roleInfoData: RoleInfoData = {
@@ -116,11 +121,9 @@ export class RoleService {
     }
 
     /**
-     * 查询角色所属信息组下的所有信息项
+     * Query all information items under the information group to which the role belongs
      *
-     * @param ids 角色ID数组
-     * @param registerDisplay 是否是注册页数据
-     * @param informationDisplay 是否是资料页数据
+     * @param ids Role ID array
      */
     async findInfoGroupItemsByIds(ids: number[]) {
         let infoItemsArr: InfoItem[] = [];

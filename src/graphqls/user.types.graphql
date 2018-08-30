@@ -1,201 +1,151 @@
 type Query {
-    # 普通用户登录
+    # Ordinary user login
     login(username: String!, password: String!): LoginResponse
-    # 查询普通用户注册时所需填写的信息项
+    # Query the information items required for ordinary users to register
     findRegisterUserInfoItem: RegisterUserInfoItemResult
-    # 查询当前登录的用户信息
+    # Query the currently logged in user information
     findCurrentUserInfo: UserInfoResult
-    # 通过ID查询用户信息
+    # Query user information by ID
     findUserInfoById(userId: Int!): UserInfoResult
-    # 查询指定角色ID下的所有用户信息
+    # Query all user information under the specified role ID
     findUsersInRole(roleId: Int!): UsersInfoResult
-    # 获取指定组织ID下的用户
+    # Query all user information under the specified organization ID
     findUsersInOrganization(organizationId: Int!): UsersInfoResult
 }
 
 type Mutation {
-    # 普通用户注册
+    # Ordinary user registration
     register(registerUserInput: RegisterUserInput): UserModuleCommonResult
-    # 创建用户
+    # Create user
     createUser(createUserInput: CreateUserInput): UserModuleCommonResult
-    # 给用户添加角色
+    # Add a role to the user
     addUserRole(userId: Int!, roleId: Int!): UserModuleCommonResult
-    # 删除用户角色
+    # Delete a role from the user
     deleteUserRole(userId: Int!, roleId: Int!): UserModuleCommonResult
-    # 删除用户到回收站
+    # Delete user to recycle bin
     recycleUser(userId: Int!): UserModuleCommonResult
-    # 删除回收站内的用户
+    # Delete user in the recycle bin
     deleteRecycledUser(userId: Int!): UserModuleCommonResult
-    # 通过ID更新指定用户信息
+    # Specify user information by ID update
     updateUserInfoById(userId: Int!, updateUserInput: UpdateUserInput): UserModuleCommonResult
-    # 更新当前登录用户信息
+    # Update current login user information
     updateCurrentUserInfo(updateCurrentUserInput: UpdateCurrentUserInput): UserModuleCommonResult
 }
 
-# 普通用户注册的接口参数
 input RegisterUserInput {
-     # 用户名
     username: String!
-    # 邮箱
     email: String
-    # 手机号
     mobile: String
-    # 登录密码
     password: String!
-    # 信息项键值对，key是信息项的ID(infoItem.id)，值是信息项的值(userInfo.value)
+    # Information item key-value pair, key is the ID of the information item (infoItem.id), and the value is the value of the information item (userInfo.value)
     infoKVs: [RegisterOrCreateInfoKV]
 }
 
-# 创建用户的接口参数(由管理员身份进行调用)
 input CreateUserInput {
-    # 用户名
     username: String!
-    # 邮箱
     email: String
-    # 手机号
     mobile: String
-    # 登录密码
     password: String!
-    # 信息项键值对，key是信息项的ID(infoItem.id)，值是信息项的值(userInfo.value)
+    # Information item key-value pair, key is the ID of the information item (infoItem.id), and the value is the value of the information item (userInfo.value)
     infoKVs: [RegisterOrCreateInfoKV]
-    # 拥有的角色ID
     roleIds: [Int]
-    # 所属组织ID
     organizationIds: [Int]
 }
 
-# 更新用户的接口参数(由管理员身份进行调用)
 input UpdateUserInput {
-    # 邮箱
     email: String
-    # 手机号
     mobile: String
-    # 登录密码
     password: String
-    # 信息项值键值对，key是用户信息项的ID(userInfo.id)，value是信息项的值(userInfo.value)
+    # Information item value key-value pair, key is the ID of the user information item (userInfo.id), and value is the value of the information item (userInfo.value)
     infoKVs: [UpdateInfoKV]
-    # 拥有的角色ID对象数组，每项都必须包含更新之前的角色ID(before)，和更新之后的角色ID(after)
+    # An array of role ID objects owned, each item must contain the role ID (before) before the update, and the role ID (after) after the update
     roleIds: [RoleOrOrganizationIdData]
-    # 拥有的组织ID对象数组，每项都必须包含更新之前的组织ID(before)，和更新之后的组织ID(after)
+    # An array of organization ID objects, each of which must contain the organization ID (before) before the update, and the organization ID (after) after the update
     organizationIds: [RoleOrOrganizationIdData]
 }
 
-# 更新当前用户的接口参数(任何处于登录状态的用户都可进行调用)
 input UpdateCurrentUserInput {
-    # 邮箱
     email: String
-    # 手机号
     mobile: String
-    # 登录密码
     password: String
-    # 信息项值键值对，key是用户信息项的ID(userInfo.id)，value是信息项的值(userInfo.value)
+    # Information item value key-value pair, key is the ID of the user information item (userInfo.id), and value is the value of the information item (userInfo.value)
     infoKVs: [UpdateInfoKV]
 }
 
-# 注册用户、创建用户接口的信息键值对数据类型，具体说明参照各接口参数定义
 input RegisterOrCreateInfoKV {
-    # 信息项的ID
+    # Information item ID
     key: Int
-    # 信息项值
+    # Information item value
     value: String
 }
 
-# 更新用户接口的信息键值对数据类型，具体说明参照各接口参数定义
 input UpdateInfoKV {
-    # 信息项值的ID
+    # ID of the item value(userInfo.id)
     key: Int
-    # 信息项值
+    # Information item value(userInfo.value)
     value: String
-    # 信息项关联ID
+    # Information item ID(infoItem.id)
     relationId: Int
 }
 
-# 更新用户角色或组织时，传入的参数数据
 input RoleOrOrganizationIdData {
-    # 更新之前的ID
+    # Update previous ID
     before: Int
-    # 更新之后的ID
+    # Updated ID
     after: Int
 }
 
-# 用户登录返回结果
 type LoginResponse {
     code: Int
     message: String
     data: AccessToken
 }
 
-# 授权令牌信息
 type AccessToken {
-    # 授权令牌数据
     accessToken: String
-    # 授权令牌有效期，单位为秒
     expiresIn: Int
 }
 
-# 单个用户信息返回结果
 type UserInfoResult {
     code: Int
     message: String
     data: UserInfoData
 }
 
-# 多个用户信息返回结果
 type UsersInfoResult {
     code: Int
     message: String
     data: [UserInfoData]
 }
 
-# 用户信息数据
 type UserInfoData {
-    # 用户ID
     userId: Int
-    # 用户登录名
     username: String
-    # 用户邮箱
     email: String
-    # 用户手机
     mobile: String
-    # 是否封禁
     banned: Boolean
-    # 是否回收
     recycle: Boolean
-    # 创建时间
     createTime: String
-    # 更新时间
     updateTime: String
-    # 用户角色
     userRoles: [Role]
-    # 用户所属组织
     userOrganizations: [Organization]
-    # 用户信息项数据
     userInfos: [UserInfo]
 }
 
-# 用户信息项数据
 type UserInfo {
-    # 用户信息项ID，当且仅当为 null 时，代表更新用户操作中这个信息项的值是将要被创建的，此时需要将 relationId 传入 UpdateInfoKV 对象中，且此时 UpdateInfoKV 对象中的 key 需传入 null
+    # The user information item ID, if and only if it is null, represents that the value of this information item in the update user operation is to be created. In this case, the relationId needs to be passed into the UpdateInfoKV object, and the key in the UpdateInfoKV object needs to be transmitted null
     id: Int
-    # 信息项排序
     order: Int
-    # 信息项关联ID
+    # Information item ID(infoItem.id)
     relationId: Int
-    # 信息项类型
     type: String
-    # 信息项名称
     name: String
-    # 信息项的值
     value: String
-    # 信息项描述
     description: String
-    # 注册页是否显示
     registerDisplay: Boolean
-    # 资料页是否显示
     informationDisplay: Boolean
 }
 
-# 普通注册时的信息项数据
 type RegisterUserInfoItemResult {
     code: Int
     message: String

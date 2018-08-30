@@ -1,45 +1,38 @@
 type Query {
-    # 获取根组织
+    # Query the roots node of organizations
     findRootOrganizations: OrganizationsRootResult
-    # 获取所有组织
+    # Query all organizations
     findAllOrganizations: OrganizationsJsonResult
-    # 获取指定组织下的所有子组织
+    # Query all suborganizations under the specified organization
     findChildrenOrganizations(id: Int!): OrganizationsJsonResult
 }
 
 type Mutation {
-    # 创建组织，parentId 为空时，代表创建根组织
+    # Create an organization, when the parentId is empty, it means creating a root organization
     createOrganization(name: String!, parentId: Int): UserModuleCommonResult
-    # 更新组织
+    # Update organization
     updateOrganization(id: Int!, name: String!, parentId: Int!): UserModuleCommonResult
-    # 删除组织
+    # Delete organization
     deleteOrganization(id: Int!): UserModuleCommonResult
-    # 给组织添加用户
+    # Add users to the specified organization
     addUsersToOrganization(id: Int!, userIds: [Int]!): UserModuleCommonResult
-    # 删除组织下的用户
+    # Delete users from the specified organization
     deleteUserFromOrganization(id: Int!, userIds: [Int]!): UserModuleCommonResult
 }
 
 type OrganizationsRootResult {
-    # 状态码
     code: Int
-    # 状态消息
     message: String
-    # 返回数据
     data: [Organization]
 }
 
 type Organization {
     id: Int
-    # 组织名称
     name: String
 }
 
 type OrganizationsJsonResult {
-    # 状态码
     code: Int
-    # 状态消息
     message: String
-    # 返回数据
     data: JSON
 }

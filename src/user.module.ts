@@ -72,32 +72,34 @@ export class UserModule implements OnModuleInit {
     }
 
     /**
-     * 加载资源、权限注解，并将其保存到数据库中
+     * Load resources, permission annotations, and save them to the database
      */
     private async loadResourcesAndPermissions() {
         const metadataMap: Map<string, { resource: Resource, permissions: Permission[] }> = new Map();
-        // 遍历 Module
+        // Iterate Modules from module container
         this.modulesContainer.forEach(value => {
-            // 遍历 Module 中的 components
+            // Iterate the components from each module
             value.components.forEach(value => {
-                // 判断当前 component 是否是 Resolver 或 Controller
+                // Determine if the current component is a Resolver or Controller
                 const isResolverOrController =
                     Reflect.getMetadataKeys(value.instance.constructor)
                         .filter(key => ['graphql:resolver_type', 'path']
                             .includes(key)).length > 0;
 
                 if (isResolverOrController) {
-                    // 获取 Resolver 或 Controller 类上 @Resource() 注解中的元数据
+                    // Get the metadata in the @Resource() annotation on the Resolver or Controller class
                     const resource: Resource = Reflect.getMetadata(RESOURCE_DEFINITION, value.instance.constructor);
-                    // 获取 Resolver 或 Controller 类的原型对象
+                    // Get the prototype object of the Resolver or Controller class
                     const prototype = Object.getPrototypeOf(value.instance);
                     if (prototype) {
-                        // 获取 Resolver 或 Controller 类中的方法名，回调函数中的 name 是当前类中的方法名
+                        // Get the method name in the Resolver or Controller class,
+                        // the name in the callback function is the method name in the current class
                         const permissions: Permission[] = this.metadataScanner.scanFromPrototype(value.instance, prototype, name => {
-                            // 获取 Resolver 或 Controller 类中方法上的 @Permission() 注解中的元数据
+                            // Get the metadata in the @Permission() annotation on the method in the Resolver or Controller class
                             return Reflect.getMetadata(PERMISSION_DEFINITION, value.instance, name);
                         });
-                        // 如果元数据存在，则添加到资源集合中，此时会根据 resource.indetify 自动去重
+                        // If the metadata exists, it will be added to the resource collection,
+                        // and it will be automatically deduplicated according to resource.indetify
                         if (resource) metadataMap.set(resource.identify, { resource, permissions });
                     }
                 }
@@ -107,57 +109,55 @@ export class UserModule implements OnModuleInit {
         /**
          * LOOK ME:
          *
-         * 以下是资源、权限的新增和删除逻辑
+         * The following are the create and delete logic for resources and permissions.
          *
-         * 当权限唯一标识 identify 更改时，被更改的权限与对应的所有角色的关系也将被删除
+         * When the permission uniquely identifies the change,
+         * the relationship between the changed permission and the corresponding role will also be deleted.
          *
-         * TODO:  根据注解定义，自动更新数据库中对应的 name identify action 信息
          */
 
-        // 扫描到的所有资源注解和所有权限注解
+        // All resource annotations and all permission annotations that were scanned
         const scannedResourcesAndPermissions = [...metadataMap.values()].map(metadataValue => {
-            // 将权限与对应的资源绑定
+            // Bind permissions to the corresponding resource
             metadataValue.permissions.forEach(v => v.resource = metadataValue.resource);
             return { permissions: metadataValue.permissions, resource: metadataValue.resource };
         });
 
-        // 扫描到的所有资源注解
+        // All resource annotations that were scanned
         const scannedResources = scannedResourcesAndPermissions.map(v => v.resource);
 
-        // 删除注解中移除的资源及其权限
+        // Remove the resources and their permissions which were removed from the annotation
         const resourceIdentifies = [...metadataMap.keys()].length === 0 ? ['__delete_all_resource__'] : [...metadataMap.keys()];
         const notExistResources = await this.resourceRepo.find({ where: { identify: Not(In(resourceIdentifies)) } });
         if (notExistResources.length > 0) await this.resourceRepo.delete(notExistResources.map(v => v.id));
-        // 过滤出新增的资源
+        // Filter out the new resources
         const existResources = await this.resourceRepo.find({ order: { id: 'ASC' } });
         const newResourcess = scannedResources.filter(sr => !existResources.map(v => v.identify).includes(sr.identify));
-        // 保存新增的资源
+        // Save the new resources
         if (newResourcess.length > 0) await this.entityManager.insert(Resource, this.resourceRepo.create(newResourcess));
 
-        // 扫描到的所有权限注解
+        // All permission annotations that were scanned
         const scannedPermissions = <Permission[]>[].concat(...scannedResourcesAndPermissions.map(v => v.permissions));
-        // 查询扫描到的所有权限注解所属的资源
+        // Query the resources of all the permission annotations scanned
         const resource = await this.resourceRepo.find({ where: { identify: In(scannedPermissions.map(v => v.resource.identify)) } });
         // 将数据库中的资源实体绑定给其下的所有权限
         scannedPermissions.forEach(permission => {
             permission.resource = resource.find(v => v.identify === permission.resource.identify);
         });
-        // 删除注解中移除的权限
+        // Remove the permissions that were removed from annotations
         // tslint:disable-next-line:max-line-length
         const permissionIdentifies = scannedPermissions.map(v => v.identify).length === 0 ? ['__delete_all_permission__'] : scannedPermissions.map(v => v.identify);
         const notExistPermissions = await this.permissionRepo.find({ where: { identify: Not(In(permissionIdentifies)) } });
         if (notExistPermissions.length > 0) await this.permissionRepo.delete(notExistPermissions.map(v => v.id));
-        // 过滤出新增的权限并保存
+        // Filter out the new permissions
         const existPermissions = await this.permissionRepo.find({ order: { id: 'ASC' } });
         const newPermissions = scannedPermissions.filter(sr => !existPermissions.map(v => v.identify).includes(sr.identify));
-        // 保存新增的权限
+        // Save the new permissions
         if (newPermissions.length > 0) await this.entityManager.insert(Permission, this.permissionRepo.create(newPermissions));
     }
 
     /**
-     * 创建默认普通用户角色
-     *
-     * 默认的普通用户角色ID始终为1
+     * Create a default ordinary user role
      */
     private async createDefaultRole() {
         const defaultRole = await this.roleRepo.findOne(1);
@@ -171,9 +171,7 @@ export class UserModule implements OnModuleInit {
     }
 
     /**
-     * 创建默认信息组
-     *
-     * 默认的信息组为普通用户角色的信息组，其ID始终为1
+     * Create a default information group
      */
     private async createDefaultInfoGroup() {
         const defaultInfoGroup = await this.infoGroupRepo.findOne(1);
@@ -190,7 +188,7 @@ export class UserModule implements OnModuleInit {
     }
 
     /**
-     * 创建系统默认超级管理员
+     * Create a system super administrator
      */
     private async createSuperAdmin() {
         const sadmin = await this.userRepo.findOne({ where: { username: 'sadmin' } });

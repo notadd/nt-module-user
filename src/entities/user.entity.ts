@@ -1,3 +1,4 @@
+import * as moment from 'moment';
 import {
     Column,
     CreateDateColumn,
@@ -96,9 +97,27 @@ export class User {
     @JoinTable()
     organizations: Organization[];
 
-    @CreateDateColumn()
-    createTime: Date;
+    @CreateDateColumn({
+        transformer: {
+            from: (date: Date) => {
+                return moment(date).format('YYYY-MM-DD HH:mm:ss');
+            },
+            to: () => {
+                return new Date();
+            }
+        }
+    })
+    createTime: string;
 
-    @UpdateDateColumn()
-    updateTime: Date;
+    @UpdateDateColumn({
+        transformer: {
+            from: (date: Date) => {
+                return moment(date).format('YYYY-MM-DD HH:mm:ss');
+            },
+            to: () => {
+                return new Date();
+            }
+        }
+    })
+    updateTime: string;
 }

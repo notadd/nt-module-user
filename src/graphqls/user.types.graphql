@@ -161,6 +161,10 @@ type UserInfoData {
     banned: Boolean
     # 是否回收
     recycle: Boolean
+    # 创建时间
+    createTime: String
+    # 更新时间
+    updateTime: String
     # 用户角色
     userRoles: [Role]
     # 用户所属组织

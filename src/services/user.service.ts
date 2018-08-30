@@ -323,6 +323,8 @@ export class UserService {
             mobile: user.mobile,
             banned: user.banned,
             recycle: user.recycle,
+            createTime: user.createTime,
+            updateTime: user.updateTime,
             userRoles: user.roles,
             userOrganizations: user.organizations,
             userInfos: infoItems.length ? infoItems.map(infoItem => {

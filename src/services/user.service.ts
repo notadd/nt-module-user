@@ -2,7 +2,7 @@ import { forwardRef, HttpException, Inject, Injectable } from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
 
-import { AuthService } from '../authentication/authentication.service';
+import { AuthenticationService } from '../auth/authtication.service';
 import { InfoItem } from '../entities/info-item.entity';
 import { Organization } from '../entities/organization.entity';
 import { Role } from '../entities/role.entity';
@@ -21,7 +21,7 @@ export class UserService {
         @InjectRepository(UserInfo) private readonly userInfoRepo: Repository<UserInfo>,
         @InjectRepository(InfoItem) private readonly infoItemRepo: Repository<InfoItem>,
         @Inject(CryptoUtil) private readonly cryptoUtil: CryptoUtil,
-        @Inject(forwardRef(() => AuthService)) private readonly authService: AuthService,
+        @Inject(forwardRef(() => AuthenticationService)) private readonly authService: AuthenticationService,
         @Inject(RoleService) private readonly roleService: RoleService
     ) { }
 

@@ -5,7 +5,7 @@ import { Permission } from '../entities/permission.entity';
 import { User } from '../entities/user.entity';
 
 @Injectable()
-export class AuthenticationGurad implements CanActivate {
+export class AuthorizationGurad implements CanActivate {
     async canActivate(context: ExecutionContext): Promise<boolean> {
         // 登录和注册接口忽略验证
         if (['login', 'register'].includes(context.getHandler().name)) {

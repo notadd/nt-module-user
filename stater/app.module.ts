@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ApolloServer } from 'apollo-server-express';
 import * as GraphQLJSON from 'graphql-type-json';
 
-import { AuthenticationGurad, AuthService, UserModule } from '../src';
+import { AuthenticationService, AuthorizationGurad, UserModule } from '../src';
 
 @Module({
     imports: [
@@ -19,7 +19,7 @@ import { AuthenticationGurad, AuthService, UserModule } from '../src';
             database: 'module_user',
             entities: [__dirname + '/../src/**/*.entity.ts'],
             logger: 'simple-console',
-            logging: true,
+            logging: false,
             synchronize: true,
             dropSchema: false
         }),
@@ -27,14 +27,14 @@ import { AuthenticationGurad, AuthService, UserModule } from '../src';
     ],
     controllers: [],
     providers: [
-        { provide: APP_GUARD, useClass: AuthenticationGurad },
+        { provide: APP_GUARD, useClass: AuthorizationGurad },
     ],
     exports: []
 })
 export class AppModule {
     constructor(
         @Inject(GraphQLFactory) private readonly graphQLFactory: GraphQLFactory,
-        @Inject(AuthService) private readonly authService: AuthService
+        @Inject(AuthenticationService) private readonly authService: AuthenticationService
     ) { }
 
     configureGraphQL(app: any) {

@@ -7,7 +7,7 @@ import { JwtPayload, JwtReply } from '../interfaces/jwt.interface';
 import { UserService } from '../services/user.service';
 
 @Injectable()
-export class AuthService {
+export class AuthenticationService {
     constructor(
         @Inject(forwardRef(() => UserService)) private readonly userService: UserService
     ) { }
@@ -33,11 +33,11 @@ export class AuthService {
             return;
         }
 
-        if (!req.headers.authorization) {
-            throw new AuthenticationError('请求头缺少授权参数，参数名应为：authorization 或 Authorization');
+        let token = req.headers.authentication as string;
+        if (!token) {
+            throw new AuthenticationError('请求头缺少授权参数，参数名应为：authentication 或 Authentication');
         }
 
-        let token = req.headers.authorization as string;
         if (['Bearer ', 'bearer '].includes(token.slice(0, 7))) {
             token = token.slice(7);
         } else {

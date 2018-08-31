@@ -77,26 +77,26 @@ export class UserModule implements OnModuleInit {
     private async loadResourcesAndPermissions() {
         const metadataMap: Map<string, { resource: Resource, permissions: Permission[] }> = new Map();
         // Iterate Modules from module container
-        this.modulesContainer.forEach(value => {
+        this.modulesContainer.forEach(module => {
             // Iterate the components from each module
-            value.components.forEach(value => {
+            module.components.forEach(component => {
                 // Determine if the current component is a Resolver or Controller
                 const isResolverOrController =
-                    Reflect.getMetadataKeys(value.instance.constructor)
+                    Reflect.getMetadataKeys(component.instance.constructor)
                         .filter(key => ['graphql:resolver_type', 'path']
                             .includes(key)).length > 0;
 
                 if (isResolverOrController) {
                     // Get the metadata in the @Resource() annotation on the Resolver or Controller class
-                    const resource: Resource = Reflect.getMetadata(RESOURCE_DEFINITION, value.instance.constructor);
+                    const resource: Resource = Reflect.getMetadata(RESOURCE_DEFINITION, component.instance.constructor);
                     // Get the prototype object of the Resolver or Controller class
-                    const prototype = Object.getPrototypeOf(value.instance);
+                    const prototype = Object.getPrototypeOf(component.instance);
                     if (prototype) {
                         // Get the method name in the Resolver or Controller class,
                         // the name in the callback function is the method name in the current class
-                        const permissions: Permission[] = this.metadataScanner.scanFromPrototype(value.instance, prototype, name => {
+                        const permissions: Permission[] = this.metadataScanner.scanFromPrototype(component.instance, prototype, name => {
                             // Get the metadata in the @Permission() annotation on the method in the Resolver or Controller class
-                            return Reflect.getMetadata(PERMISSION_DEFINITION, value.instance, name);
+                            return Reflect.getMetadata(PERMISSION_DEFINITION, component.instance, name);
                         });
                         // If the metadata exists, it will be added to the resource collection,
                         // and it will be automatically deduplicated according to resource.indetify
@@ -140,7 +140,7 @@ export class UserModule implements OnModuleInit {
         const scannedPermissions = <Permission[]>[].concat(...scannedResourcesAndPermissions.map(v => v.permissions));
         // Query the resources of all the permission annotations scanned
         const resource = await this.resourceRepo.find({ where: { identify: In(scannedPermissions.map(v => v.resource.identify)) } });
-        // 将数据库中的资源实体绑定给其下的所有权限
+        // Bind resources to permissions
         scannedPermissions.forEach(permission => {
             permission.resource = resource.find(v => v.identify === permission.resource.identify);
         });
@@ -151,7 +151,7 @@ export class UserModule implements OnModuleInit {
         if (notExistPermissions.length > 0) await this.permissionRepo.delete(notExistPermissions.map(v => v.id));
         // Filter out the new permissions
         const existPermissions = await this.permissionRepo.find({ order: { id: 'ASC' } });
-        const newPermissions = scannedPermissions.filter(sr => !existPermissions.map(v => v.identify).includes(sr.identify));
+        const newPermissions = scannedPermissions.filter(sp => !existPermissions.map(v => v.identify).includes(sp.identify));
         // Save the new permissions
         if (newPermissions.length > 0) await this.entityManager.insert(Permission, this.permissionRepo.create(newPermissions));
     }
@@ -166,7 +166,7 @@ export class UserModule implements OnModuleInit {
 
         await this.roleRepo.save(this.roleRepo.create({
             id: 1,
-            name: '普通用户'
+            name: 'ordinary user'
         }));
     }
 
@@ -180,7 +180,7 @@ export class UserModule implements OnModuleInit {
 
         await this.infoGroupRepo.save(this.infoGroupRepo.create({
             id: 1,
-            name: '普通用户信息组',
+            name: 'ordinary user information group',
             role: {
                 id: 1
             }

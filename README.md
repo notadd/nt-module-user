@@ -122,7 +122,7 @@ User modules provide rich and flexible interfaces to various upper-layer busines
 
 - `findResources` queries all resource permissions and returns all resource and permission data defined by the current business system
 
-### Character
+### Roles
 
 **Query**:
 
@@ -136,7 +136,7 @@ User modules provide rich and flexible interfaces to various upper-layer busines
 - `deleteRole(id: Int!)` deletes the role of the specified id
 - `setPermissionsToRole(roleId: Int!, permissionIds: [Int]!)` Set permissions for the role
 
-### Information Group
+### Information Groups
 
 **Query**:
 
@@ -151,7 +151,7 @@ User modules provide rich and flexible interfaces to various upper-layer busines
 - `addInfoItemToInfoGroup(infoGroupId: Int!, infoItemIds: [Int]!)` Adds the specified information item to the specified information group
 - `deleteIntoItemFromInfoGroup(infoGroupId: Int!, infoItemIds: [Int]!)` Delete the specified information item of the specified information group
 
-### Information Item
+### Information Items
 
 **Query**:
 
@@ -163,7 +163,7 @@ User modules provide rich and flexible interfaces to various upper-layer busines
 - `deleteInfoItem(infoItemId: Int!)` Delete the information item of the specified ID
 - `updateInfoItem(updateInfoItemInput: UpdateInfoItemInput)` Updates the information item name, label, description, and type of the specified ID
 
-### Organization
+### Organizations
 
 **Query**:
 
@@ -179,7 +179,7 @@ User modules provide rich and flexible interfaces to various upper-layer busines
 - `addUsersToOrganization(id: Int!, userIds: [Int]!)` Add users to the organization
 - `deleteUserFromOrganization(id: Int!, userIds: [Int]!)` Delete the user under the organization
 
-### 用户
+### Users
 
 **Query**:
 

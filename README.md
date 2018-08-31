@@ -1,62 +1,64 @@
-# Notadd 用户模块
+# Notadd User Module
 
-## 文档
+[中文文档](./README_zh.md)
 
-- [设计文档](./doc/design.md)
+## Document
 
-## 功能
+- [Design Document](./doc/design.md)
 
-- [x] 注册
-- [x] 登录授权
-- [x] 鉴权
-- [x] 组织管理
-- [x] 用户管理
-- [x] 角色管理
-- [x] 信息组管理
-- [x] 信息项管理
+## Features
+
+- [x] registration
+- [x] login authorization
+- [x] Authentication
+- [x] Organization Management
+- [x] User Management
+- [x] role management
+- [x] Information Group Management
+- [x] Information Item Management
 - [ ] ......
 
-## 使用说明
+## Instructions for use
 
-用户模块的大部分接口都定义了权限，在初始化时，会生成一个超级管理员用户，账号为： `sadmin`，密码为： `sadmin`，可以自行登录后，使用 `accessToken` 调用 `updateCurrentUserInfo` (更新当前登录用户信息)，修改密码。
+Most of the interfaces of the user module define permissions. When initializing, a super administrator user will be generated. The account number is: `sadmin`, and the password is: `sadmin`. After logging in, use `accessToken` to call `updateCurrentUserInfo`. (Update the current login user information) and change the password.
 
-### 导入用户模块
+### Import User Module
 
-在应用程序根模块中导入 `UserModule`
+Import `UserModule` in the application root module
 
-### 资源定义
+### Resource Definition
 
-`@Resouce`，是用户对某一实体资源进行业务操作的统称。
+`@Resouce` is a general term for users to perform business operations on an entity resource.
 
-在 `Resolver` 或 `Controller` 类上设置定义资源的注解，用于定义当前资源，如：
+Set annotations for defining resources on the `Resolver` or `Controller` class to define the current resource, such as:
 
-`@Resource({ name: '文章管理', identify: 'artical:manage' })`
+`@Resource({ name: 'article management', identify: 'artical:manage' })`
 
-`name`: 资源的名称，用于定义权限的父级名称，命名方式为: `资源+行为`，如：`应用内文章管理的相关api => '文章管理'`
+`name`: The name of the resource, which is used to define the parent name of the permission. The naming method is: `resource+behavior`, such as: `related article management related api => 'article management'
 
-`identity`: 资源的唯一标识，命名方式为 `模块名:类名` 或 `name` 的拆分英文，如： `'文章管理' => 'artical:manage'`
+`identity`: The unique identifier of the resource, such as: `'article management' => 'artical:manage'`
 
-### 权限定义
+### Permission Definition
 
-`@Permission`，是用户对当前实体资源进行某一具体操作的定义。
+`@Permission` is a definition of a specific operation performed by the user on the current entity resource.
 
-在 `Resolver`、`Controller` 方法上设置定义操作的注解，用户定义对当前资源的操作权限，如：
+Set annotations for defining operations on the `Resolver` and `Controller` methods. The user defines the operation permissions on the current resource, such as:
 
-`@Permission({ name: '添加文章', identify: 'artical:create', action: 'create', personal: true })`
+`@Permission({ name: 'Add article', identify: 'artical:create', action: 'create', personal: true })`
 
-`name`: 权限的名称，用于定义具体的权限名称，命名方式为：`操作+资源`，如：`在文章资源中添加文章 => '添加文章'`
+`name`: The name of the permission, used to define the specific permission name, named: `operation + resource`, such as: `Add article in the article resource => 'Add article'
 
-`identify`: 权限的唯一标识，命名方式为：`资源:方法`，如：`'添加文章' => 'artical:createArtical'`
+`identify`: The unique identifier of the permission, named: `resource: method`, such as: `'Add article' => 'artical:createArtical'`
 
-`action`: 权限操作类型，只能是 `create、delete、update、find` 中的一个
+`action`: permission operation type, can only be one of `create, delete, update, find`
 
-权限的定义离不开资源的定义，二者是共存的状态，在使用权限功能时，先在类上定义资源，而后在需要权限控制的方法上定义权限。
+The definition of permissions is inseparable from the definition of resources. The two are coexisting states. When using the permission function, the resources are defined on the class first, and then the permissions are defined on the methods that require permission control.
 
-定义好资源和权限后，启动程序，资源和权限会被自动加载并存储到数据库。
+Once the resources and permissions are defined, the launcher, resources, and permissions are automatically loaded and stored in the database.
 
-### 配置授权，鉴权功能
+### Configure authorization, authentication function
 
-以下是 `apollo-server-express` 2.x 版本的授权、鉴权功能逻辑示例
+The following is an example of the authorization and authentication function logic for the `apollo-server-express` 2.x version.
 
 > app.module.ts
 
@@ -110,91 +112,91 @@ export class AppModule {
 }
 ```
 
-## 接口逻辑说明
+## API Logic Description
 
-用户模块向各类上层业务系统提供了丰富且灵活的接口，以下介绍常用的接口逻辑
+User modules provide rich and flexible interfaces to various upper-layer business systems. The following describes common interface logic.
 
-### 资源
+### Resources
 
-**Query**：
+**Query**:
 
-- `findResources` 查询所有资源权限，返回当前业务系统定义的所有资源和权限数据
+- `findResources` queries all resource permissions and returns all resource and permission data defined by the current business system
 
-### 角色
+### Character
 
-**Query**：
+**Query**:
 
-- `findRoles` 查询所有角色，返回所有角色的 id 和 name
-- `findOneRoleInfo(roleId: Int!)` 查询角色信息，返回指定 id 的角色详细信息，包含角色拥有的权限及其拥有的信息项
+- `findRoles` queries all roles, returns the id and name of all roles
+- `findOneRoleInfo(roleId: Int!)` Query role information, return the role details of the specified id, including the permissions owned by the role and the information items they own
 
-**Mutation**：
+**Mutation**:
 
-- `createRole(name: String!)` 添加角色
-- `updateRole(id: Int!, name: String!)` 更新角色名称
-- `deleteRole(id: Int!)` 删除指定 id 的角色
-- `setPermissionsToRole(roleId: Int!, permissionIds: [Int]!)` 给角色设置权限
+- `createRole(name: String!)` Add a role
+- `updateRole(id: Int!, name: String!)` Update the role name
+- `deleteRole(id: Int!)` deletes the role of the specified id
+- `setPermissionsToRole(roleId: Int!, permissionIds: [Int]!)` Set permissions for the role
 
-### 信息组
+### Information Group
 
-**Query**：
+**Query**:
 
-- `findAllInfoGroup` 查询所有信息组
-- `findInfoItemsByGroupId(groupId: Int!)` 查询指定信息组下的所有信息项
+- `findAllInfoGroup` Query all information groups
+- `findInfoItemsByGroupId(groupId: Int!)` Query all information items under the specified information group
 
-**Mutation**：
+**Mutation**:
 
-- `createInfoGroup(name: String!, roleId: Int!)` 新增信息组
-- `deleteInfoGroup(groupId: Int!)` 删除指定ID的信息组
-- `updateInfoGroup(groupId: Int!, name: String, roleId: Int)` 更新指定ID的信息组名称或所属角色
-- `addInfoItemToInfoGroup(infoGroupId: Int!, infoItemIds: [Int]!)` 向指定信息组添加指定信息项
-- `deleteIntoItemFromInfoGroup(infoGroupId: Int!, infoItemIds: [Int]!)` 删除指定信息组的指定信息项
+- `createInfoGroup(name: String!, roleId: Int!)` New information group
+- `deleteInfoGroup(groupId: Int!)` Delete the information group of the specified ID
+- `updateInfoGroup(groupId: Int!, name: String, roleId: Int)` Update the group name or the assigned role of the specified ID
+- `addInfoItemToInfoGroup(infoGroupId: Int!, infoItemIds: [Int]!)` Adds the specified information item to the specified information group
+- `deleteIntoItemFromInfoGroup(infoGroupId: Int!, infoItemIds: [Int]!)` Delete the specified information item of the specified information group
 
-### 信息项
+### Information Item
 
-**Query**：
+**Query**:
 
-- `findAllInfoItem` 查询所有信息项
+- `findAllInfoItem` Query all information items
 
-**Mutation**：
+**Mutation**:
 
-- `createInfoItem(infoItemInput: InfoItemInput)` 新增信息项
-- `deleteInfoItem(infoItemId: Int!)` 删除指定ID的信息项
-- `updateInfoItem(updateInfoItemInput: UpdateInfoItemInput)` 更新指定ID的信息项名称、标签、描述、类型
+- `createInfoItem(infoItemInput: InfoItemInput)` new information item
+- `deleteInfoItem(infoItemId: Int!)` Delete the information item of the specified ID
+- `updateInfoItem(updateInfoItemInput: UpdateInfoItemInput)` Updates the information item name, label, description, and type of the specified ID
 
-### 组织
+### Organization
 
-**Query**：
+**Query**:
 
-- `findRootOrganizations` 获取根组织
-- `findAllOrganizations` 获取所有组织
-- `findChildrenOrganizations(id: Int!)` 获取指定组织下的所有子组织
+- `findRootOrganizations` Get the root organization
+- `findAllOrganizations` Get all organizations
+- `findChildrenOrganizations(id: Int!)` Get all suborganizations under the specified organization
 
-**Mutation**：
+**Mutation**:
 
-- `createOrganization(name: String!, parentId: Int)` 创建组织，parentId 为空时，代表创建根组织
-- `updateOrganization(id: Int!, name: String!, parentId: Int!)` 更新组织
-- `deleteOrganization(id: Int!)` 删除组织
-- `addUsersToOrganization(id: Int!, userIds: [Int]!)` 给组织添加用户
-- `deleteUserFromOrganization(id: Int!, userIds: [Int]!)` 删除组织下的用户
+- `createOrganization(name: String!, parentId: Int)` creates an organization, when the parentId is empty, it represents the creation of the root organization
+- `updateOrganization(id: Int!, name: String!, parentId: Int!)` Update organization
+- `deleteOrganization(id: Int!)` delete organization
+- `addUsersToOrganization(id: Int!, userIds: [Int]!)` Add users to the organization
+- `deleteUserFromOrganization(id: Int!, userIds: [Int]!)` Delete the user under the organization
 
 ### 用户
 
-**Query**：
+**Query**:
 
-- `login(username: String!, password: String!)` 普通用户登录
-- `findRegisterUserInfoItem` 查询普通用户注册时所需填写的信息项
-- `findCurrentUserInfo` 查询当前登录的用户信息
-- `findUserInfoById(userId: Int!)` 通过ID查询用户信息
-- `findUsersInRole(roleId: Int!)` 查询指定角色ID下的所有用户信息
-- `findUsersInOrganization(organizationId: Int!)` 获取指定组织ID下的用户
+- `login(username: String!, password: String!)` Ordinary user login
+- `findRegisterUserInfoItem` Query the information items required for normal user registration
+- `findCurrentUserInfo` Query the currently logged in user information
+- `findUserInfoById(userId: Int!)` Query user information by ID
+- `findUsersInRole(roleId: Int!)` Query all user information under the specified role ID
+- `findUsersInOrganization(organizationId: Int!)` Get the user under the specified organization ID
 
-**Mutation**：
+**Mutation**:
 
-- `register(registerUserInput: RegisterUserInput)` 普通用户注册，参数 infoKVs 中的 key 是信息项的ID(infoItem.id)，值是信息项的值(userInfo.value)
-- `createUser(createUserInput: CreateUserInput)` 创建用户，参数 infoKVs 中的 key 是信息项的ID(infoItem.id)，值是信息项的值(userInfo.value)
-- `addUserRole(userId: Int!, roleId: Int!)` 给用户添加角色
-- `deleteUserRole(userId: Int!, roleId: Int!)` 删除用户角色
-- `recycleUser(userId: Int!)` 删除用户到回收站
-- `deleteRecycledUser(userId: Int!)` 删除回收站内的用户
-- `updateUserInfo(userId: Int!, updateUserInput: UpdateUserInput)` 更新用户信息，参数 infoKVs 中的 key是用户信息项值的ID(userInfo.id)，value是信息项的值(userInfo.value)，relationId 是信息项的ID，当返回的 key 为 null 时，也需要传入 null
-- `updateCurrentUserInfo(updateCurrentUserInput: UpdateCurrentUserInput)` 更新当前登录用户信息，参数 infoKVs 中的 key是用户信息项值的ID(userInfo.id)，value是信息项的值(userInfo.value)，relationId 是信息项的ID，当返回的 key 为 null 时，也需要传入 null
+- `register(registerUserInput: RegisterUserInput)` Normal user registration, the key in the parameter infoKVs is the ID of the information item (infoItem.id), and the value is the value of the information item (userInfo.value)
+- `createUser(createUserInput: CreateUserInput)` creates the user, the key in the parameter infoKVs is the ID of the information item (infoItem.id), and the value is the value of the information item (userInfo.value)
+- `addUserRole(userId: Int!, roleId: Int!)` Add a role to the user
+- `deleteUserRole(userId: Int!, roleId: Int!)` Delete user role
+- `recycleUser(userId: Int!)` delete user to recycle bin
+- `deleteRecycledUser(userId: Int!)` deletes users in the recycle bin
+- `updateUserInfo(userId: Int!, updateUserInput: UpdateUserInput)` Update user information, the key in the parameter infoKVs is the ID of the user information item value (userInfo.id), the value is the value of the information item (userInfo.value), and the relationId is The ID of the information item. When the returned key is null, you also need to pass in null.
+- `updateCurrentUserInfo(updateCurrentUserInput: UpdateCurrentUserInput)` Updates the current login user information. The key in the infocVs parameter is the ID of the user information item value (userInfo.id), the value is the value of the information item (userInfo.value), and the relationId is the information item. ID, when the returned key is null, you also need to pass in null

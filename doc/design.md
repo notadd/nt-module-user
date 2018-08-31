@@ -1,22 +1,18 @@
-# 用户模块设计文档
+# User Module Design Document
 
-## 实现逻辑概述
+## Implementation logic overview
 
-登录授权时，可将用户名、用户的非安全信息等加密到 access_token 中。
+When logging in to the authorization, the user name, the user's non-secure information, etc. can be encrypted into the access_token.
 
-鉴权时，access_token 解密后拿到用户名，通过用户名查询当前用户的所有权限，在方法调用前，使用守卫对当前用户的权限和方法上的权限注解进行比对，一致时允许调用，否则返回403。
+When authenticating, the access_token decrypts the user name, and queries the current user's permissions through the user name. Before the method is called, the guard uses the authority to compare the current user's permission with the method's permission annotation. If it is consistent, it is allowed to be called. Otherwise, it is returned. 403.
 
-对于私有资源的请求，需要额外判断当前用户ID和私有资源中的用户ID是否一致。
+### Authorization process
 
-### 授权流程
+Log in with the username and password, the authorization service will verify, and the JWT signed access_token, expires_in will be returned after successful authentication.
 
-通过用户名和密码登录，授权服务会验证，验证成功后返回 JWT 签名后的 access_token、refresh_token、expires_in
+`access_token`: token, calculation method: jwt.sign(username, options?))
 
-`access_token`：令牌，计算方法：jwt.sign(username, options?))
-
-`refresh_token`：刷新令牌，当 access_token 失效时，用 refresh_token 进行刷新，计算方法：sha256(username+new Date())
-
-`expires_in`：令牌失效时间，当前时间+2小时
+`expires_in`: token validity period, 24h
 
 ```none
 +-----------+                                     +-------------+
@@ -27,14 +23,14 @@
 |  Client   |                                     |   Service   |  |   JWT
 |           |       3-Response Authorization      |             |<-+
 |           |<------------------------------------| Private Key |
-|           |    access_token / refresh_token     |             |
-|           |             expires_in              |             |
+|           |       access_token  expires_in      |             |
+|           |                                     |             |
 +-----------+                                     +-------------+
 ```
 
-### 鉴权流程
+### Authentication process
 
-请求时，在请求头设置 Authorization: bearer Access Token，资源服务对 Access Token 进行验证（解密），成功后拿到用户名，通过用户名查询当前用户的所有权限，在方法调用前，使用守卫对当前用户的权限和方法上的权限注解进行比对，如果一致，则代表本次请求的用户拥有对当前资源操作的权限，否则拒绝请求
+When requesting, set Authentication: Bearer xxxxxx in the request header, the resource service authenticates (decrypts) the Access Token, and after successful, obtains the username, queries all permissions of the current user by username, and uses the guard to the current user before the method is called. The permissions are compared with the permission annotations on the method. If they are consistent, the user representing the request has permission to operate on the current resource, otherwise the request is denied.
 
 ```none
 +-----------+                                    +------------+
@@ -49,14 +45,8 @@
 +-----------+                                    +------------+
 ```
 
-#### 注解加载机制
+#### Annotation loading mechanism
 
-程序加载模块时，将把类和方法上的注解值保存到数据库，超级管理员登录后台后，即可创建用户，角色，然后给角色分配权限或具体的操作，最终把角色分配给用户
+When the program loads the module, the annotation values on the class and method will be saved to the database. After the super administrator logs in to the background, the user, role, and then assign permissions or specific operations to the role, and finally assign the role to the user.
 
-用户在注册时，管理员可以定义默认的角色及其所拥有的权限
-
-##### 参考文献
-
-https://cnodejs.org/topic/551802d3687c387d2f5b2906
-
-https://cnodejs.org/topic/5604dd63272b724e5efefc96
+When a user registers, the administrator can define the default role and the permissions it has.

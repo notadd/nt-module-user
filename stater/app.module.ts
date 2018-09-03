@@ -1,10 +1,9 @@
 import { Module } from '@nestjs/common';
-import { APP_GUARD } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { GraphQLConfigService } from 'src/services/graphql-config.service';
 
-import { AuthorizationGurad, UserModule } from '../src';
+import { UserModule } from '../src';
+import { GraphQLConfigService } from '../src/services/graphql-config.service';
 
 @Module({
     imports: [
@@ -27,9 +26,7 @@ import { AuthorizationGurad, UserModule } from '../src';
         UserModule
     ],
     controllers: [],
-    providers: [
-        { provide: APP_GUARD, useClass: AuthorizationGurad },
-    ],
+    providers: [],
     exports: []
 })
 export class AppModule { }

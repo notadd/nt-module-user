@@ -1,10 +1,13 @@
+import { UseGuards } from '@nestjs/common';
 import { Mutation, Query, Resolver } from '@nestjs/graphql';
 
+import { AuthorizationGurad } from '../auth/authorization.gurad';
 import { Permission, Resource } from '../decorators';
 import { CommonResult } from '../interfaces/common-result.interface';
 import { OrganizationService } from './../services/organization.service';
 
 @Resolver()
+@UseGuards(AuthorizationGurad)
 @Resource({ name: '组织管理', identify: 'organization:manage' })
 export class OrganizationResolver {
     constructor(

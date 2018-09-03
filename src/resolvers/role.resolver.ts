@@ -1,10 +1,13 @@
+import { UseGuards } from '@nestjs/common';
 import { Mutation, Query, Resolver } from '@nestjs/graphql';
 
+import { AuthorizationGurad } from '../auth/authorization.gurad';
 import { Permission, Resource } from '../decorators';
 import { CommonResult } from '../interfaces/common-result.interface';
 import { RoleService } from './../services/role.service';
 
 @Resolver()
+@UseGuards(AuthorizationGurad)
 @Resource({ name: '角色管理', identify: 'role:manage' })
 export class RoleResolver {
     constructor(

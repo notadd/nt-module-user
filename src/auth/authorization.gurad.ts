@@ -1,4 +1,5 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { GqlExecutionContext } from '@nestjs/graphql';
 
 import { PERMISSION_DEFINITION } from '../decorators';
 import { Permission } from '../entities/permission.entity';
@@ -14,12 +15,9 @@ export class AuthorizationGurad implements CanActivate {
             return true;
         }
 
-        let user: User;
-        context.getArgs().forEach(arg => {
-            if (arg && arg.user) {
-                user = arg.user;
-            }
-        });
+        const gqlCtx = GqlExecutionContext.create(context);
+
+        const user: User = gqlCtx.getContext().user;
 
         if (user.username === 'sadmin') {
             return true;

@@ -1,6 +1,7 @@
-import { Inject } from '@nestjs/common';
+import { Inject, UseGuards } from '@nestjs/common';
 import { Mutation, Query, Resolver } from '@nestjs/graphql';
 
+import { AuthorizationGurad } from '../auth/authorization.gurad';
 import { Permission, Resource } from '../decorators';
 import { InfoItem } from '../entities/info-item.entity';
 import { CommonResult } from '../interfaces/common-result.interface';
@@ -8,6 +9,7 @@ import { UpdateInfoItemInput } from '../interfaces/info-item.interface';
 import { InfoItemService } from '../services/info-item.service';
 
 @Resolver()
+@UseGuards(AuthorizationGurad)
 @Resource({ name: '信息项管理', identify: 'infoItem:manage' })
 export class InfoItemResolver {
     constructor(

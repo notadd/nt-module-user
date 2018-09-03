@@ -1,10 +1,13 @@
+import { UseGuards } from '@nestjs/common';
 import { Query, Resolver } from '@nestjs/graphql';
 
+import { AuthorizationGurad } from '../auth/authorization.gurad';
 import { Permission, Resource } from '../decorators';
 import { CommonResult } from '../interfaces/common-result.interface';
 import { ResourceService } from '../services/resource.service';
 
 @Resolver()
+@UseGuards(AuthorizationGurad)
 @Resource({ name: '资源管理', identify: 'resource:manage' })
 export class ResourceResolver {
     constructor(

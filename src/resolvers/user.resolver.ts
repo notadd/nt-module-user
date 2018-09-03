@@ -1,12 +1,14 @@
-import { Inject } from '@nestjs/common';
+import { Inject, UseGuards } from '@nestjs/common';
 import { Mutation, Query, Resolver } from '@nestjs/graphql';
 
+import { AuthorizationGurad } from '../auth/authorization.gurad';
 import { Permission, Resource } from '../decorators';
 import { CommonResult } from '../interfaces/common-result.interface';
 import { CreateUserInput, UpdateUserInput, UserInfoData } from '../interfaces/user.interface';
 import { UserService } from '../services/user.service';
 
 @Resolver()
+@UseGuards(AuthorizationGurad)
 @Resource({ name: '用户管理', identify: 'user:manage' })
 export class UserResolver {
     constructor(

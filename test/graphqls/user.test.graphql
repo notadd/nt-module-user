@@ -1,13 +1,15 @@
 # 用户注册
-mutation register($username: String!, $password: String!){
-	register(username: $username, password: $password) {
+mutation register($registerUserInput: RegisterUserInput){
+	register(registerUserInput: $registerUserInput) {
 		code
 		message
 	}
 }
 {
-	"username": "dzy",
-	"password": "123qwe"
+	"registerUserInput": {
+    "username": "test",
+		"password": "test"
+  }
 }
 
 # 用户登录

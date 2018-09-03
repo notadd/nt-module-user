@@ -58,42 +58,62 @@
 
 以下是 `apollo-server-express` 2.x 版本的授权、鉴权功能逻辑示例
 
+> 在 `Resolver` 或 `Controller` 类上，配置 Guard
+
+```typescript
+@Resolver()
+@UseGuards(AuthorizationGurad)
+@Resource({ name: 'article management', identify: 'artical:manage' })
+export class ArticleResolver { }
+
+@Controller()
+@UseGuards(AuthorizationGurad)
+@Resource({ name: 'article management', identify: 'artical:manage' })
+export class ArticleController { }
+```
+
 > app.module.ts
 
 ```typescript
-import { Inject, Module } from '@nestjs/common';
-import { APP_GUARD } from '@nestjs/core';
-import { GraphQLFactory, GraphQLModule } from '@nestjs/graphql';
+import { Module } from '@nestjs/common';
+import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ApolloServer } from 'apollo-server-express';
-import * as GraphQLJSON from 'graphql-type-json';
 
-import { AuthenticationGurad, AuthService, UserModule } from '@notadd/module-user';
+import { UserModule } from '@notadd/module-user';
 
 @Module({
     imports: [
-        GraphQLModule,
+        GraphQLModule.forRootAsync({
+           useClass: GraphQLConfigService
+        }),
         TypeOrmModule.forRoot(),
         UserModule
     ],
     controllers: [],
-    providers: [
-        { provide: APP_GUARD, useClass: AuthenticationGurad },
-    ],
+    providers: [],
     exports: []
 })
-export class AppModule {
+export class AppModule { }
+```
+
+> graphql-config.service.ts
+
+```typescript
+import { Inject, Injectable } from '@nestjs/common';
+import { GqlModuleOptions, GqlOptionsFactory } from '@nestjs/graphql';
+import * as GraphQLJSON from 'graphql-type-json';
+import { AuthenticationService } from '@notadd/module-user';
+
+@Injectable()
+export class GraphQLConfigService implements GqlOptionsFactory {
     constructor(
-        @Inject(GraphQLFactory) private readonly graphQLFactory: GraphQLFactory,
-        @Inject(AuthService) private readonly authService: AuthService
-    ) { }
+        @Inject(AuthenticationService) private readonly authService: AuthenticationService
+    ) {}
 
-    configureGraphQL(app: any) {
-        const typeDefs = this.graphQLFactory.mergeTypesByPaths('**/*.types.graphql');
-        const schema = this.graphQLFactory.createSchema({ typeDefs, resolvers: { JSON: GraphQLJSON } });
-
-        const server = new ApolloServer({
-            schema,
+    createGqlOptions(): GqlModuleOptions {
+        return {
+            typePaths: ['./**/*.types.graphql'],
+            resolvers: { JSON: GraphQLJSON },
             context: async ({ req }) => {
                 const user = await this.authService.validateUser(req);
                 return { user };
@@ -104,8 +124,7 @@ export class AppModule {
                     'editor.cursorShape': 'line'
                 }
             }
-        });
-        server.applyMiddleware({ app });
+        };
     }
 }
 ```

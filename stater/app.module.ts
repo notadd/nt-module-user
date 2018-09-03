@@ -1,15 +1,16 @@
-import { Inject, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
-import { GraphQLFactory, GraphQLModule } from '@nestjs/graphql';
+import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ApolloServer } from 'apollo-server-express';
-import * as GraphQLJSON from 'graphql-type-json';
+import { GraphQLConfigService } from 'src/services/graphql-config.service';
 
-import { AuthenticationService, AuthorizationGurad, UserModule } from '../src';
+import { AuthorizationGurad, UserModule } from '../src';
 
 @Module({
     imports: [
-        GraphQLModule,
+        GraphQLModule.forRootAsync({
+           useClass: GraphQLConfigService
+        }),
         TypeOrmModule.forRoot({
             type: 'postgres',
             host: 'localhost',
@@ -31,29 +32,4 @@ import { AuthenticationService, AuthorizationGurad, UserModule } from '../src';
     ],
     exports: []
 })
-export class AppModule {
-    constructor(
-        @Inject(GraphQLFactory) private readonly graphQLFactory: GraphQLFactory,
-        @Inject(AuthenticationService) private readonly authService: AuthenticationService
-    ) { }
-
-    configureGraphQL(app: any) {
-        const typeDefs = this.graphQLFactory.mergeTypesByPaths(__dirname + '/../src/**/*.types.graphql');
-        const schema = this.graphQLFactory.createSchema({ typeDefs, resolvers: { JSON: GraphQLJSON } });
-
-        const server = new ApolloServer({
-            schema,
-            context: async ({ req }) => {
-                const user = await this.authService.validateUser(req);
-                return { user };
-            },
-            playground: {
-                settings: {
-                    'editor.theme': 'light',
-                    'editor.cursorShape': 'line'
-                }
-            }
-        });
-        server.applyMiddleware({ app });
-    }
-}
+export class AppModule { }

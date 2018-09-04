@@ -20,7 +20,6 @@
         "outDir": "package"
     },
     "include": [
-        "src/*.ts",
         "src/**/*.ts",
         "stater/*.ts"
     ],

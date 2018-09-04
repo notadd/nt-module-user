@@ -1,10 +1,12 @@
 import { Global, Inject, Module, OnModuleInit } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { ModulesContainer } from '@nestjs/core/injector/modules-container';
 import { MetadataScanner } from '@nestjs/core/metadata-scanner';
 import { InjectEntityManager, InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { EntityManager, In, Not, Repository } from 'typeorm';
 
-import { AuthenticationService } from './auth/authtication.service';
+import { AuthorizationGurad } from './auth/auth.gurad';
+import { AuthService } from './auth/auth.service';
 import { PERMISSION_DEFINITION, RESOURCE_DEFINITION } from './decorators';
 import { InfoGroup } from './entities/info-group.entity';
 import { InfoItem } from './entities/info-item.entity';
@@ -36,7 +38,8 @@ import { CryptoUtil } from './utils/crypto.util';
     ],
     controllers: [],
     providers: [
-        AuthenticationService,
+        { provide: APP_GUARD, useClass: AuthorizationGurad },
+        AuthService,
         EntityCheckService,
         OrganizationResolver, OrganizationService,
         UserResolver, UserService,
@@ -46,7 +49,7 @@ import { CryptoUtil } from './utils/crypto.util';
         InfoItemResolver, InfoItemService,
         CryptoUtil
     ],
-    exports: [AuthenticationService]
+    exports: [AuthService]
 })
 export class UserModule implements OnModuleInit {
     private readonly metadataScanner: MetadataScanner;

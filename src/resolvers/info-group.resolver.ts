@@ -1,13 +1,11 @@
-import { Inject, UseGuards } from '@nestjs/common';
+import { Inject } from '@nestjs/common';
 import { Mutation, Query, Resolver } from '@nestjs/graphql';
 
-import { AuthorizationGurad } from '../auth/authorization.gurad';
 import { Permission, Resource } from '../decorators';
 import { CommonResult } from '../interfaces/common-result.interface';
 import { InfoGroupService } from '../services/info-group.service';
 
 @Resolver()
-@UseGuards(AuthorizationGurad)
 @Resource({ name: '信息组管理', identify: 'infoGroup:manage' })
 export class InfoGroupResolver {
     constructor(

@@ -60,19 +60,7 @@ Once the resources and permissions are defined, the launcher, resources, and per
 
 The following is an example of the authorization and authentication function logic for the `apollo-server-express` 2.x version.
 
-> In your `Resolver` or `Controller` class
-
-```typescript
-@Resolver()
-@UseGuards(AuthorizationGurad)
-@Resource({ name: 'article management', identify: 'artical:manage' })
-export class ArticleResolver { }
-
-@Controller()
-@UseGuards(AuthorizationGurad)
-@Resource({ name: 'article management', identify: 'artical:manage' })
-export class ArticleController { }
-```
+#### Authorization function can be automatically configured by simply importing `UserModule`
 
 > app.module.ts
 
@@ -98,6 +86,10 @@ import { UserModule } from '@notadd/module-user';
 export class AppModule { }
 ```
 
+#### Authentication function, using the `validateUser` method of the `AuthenticationService` class in the graphql context, and passing the authenticated user to the context
+
+`GraphQLJSON` is used to handle the `JSON` scalar type in graphql, you need to install `graphql-type-json` additionally, and then configure it into the resolvers option.
+
 > graphql-config.service.ts
 
 ```typescript
@@ -119,12 +111,6 @@ export class GraphQLConfigService implements GqlOptionsFactory {
             context: async ({ req }) => {
                 const user = await this.authService.validateUser(req);
                 return { user };
-            },
-            playground: {
-                settings: {
-                    'editor.theme': 'light',
-                    'editor.cursorShape': 'line'
-                }
             }
         };
     }

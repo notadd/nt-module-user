@@ -58,19 +58,7 @@
 
 以下是 `apollo-server-express` 2.x 版本的授权、鉴权功能逻辑示例
 
-> 在 `Resolver` 或 `Controller` 类上，配置 Guard
-
-```typescript
-@Resolver()
-@UseGuards(AuthorizationGurad)
-@Resource({ name: 'article management', identify: 'artical:manage' })
-export class ArticleResolver { }
-
-@Controller()
-@UseGuards(AuthorizationGurad)
-@Resource({ name: 'article management', identify: 'artical:manage' })
-export class ArticleController { }
-```
+#### 授权功能只需导入 `UserModule` 即可自动配置
 
 > app.module.ts
 
@@ -96,6 +84,10 @@ import { UserModule } from '@notadd/module-user';
 export class AppModule { }
 ```
 
+#### 鉴权功能，在 graphql 上下文中 使用 `AuthenticationService` 类的 `validateUser` 方法，并将通过身份验证的用户传递给上下文
+
+`GraphQLJSON` 是用于处理 graphql 中的 `JSON` 标量类型，需要额外安装 `graphql-type-json`，然后将其配置到 resolvers 选项中
+
 > graphql-config.service.ts
 
 ```typescript
@@ -117,12 +109,6 @@ export class GraphQLConfigService implements GqlOptionsFactory {
             context: async ({ req }) => {
                 const user = await this.authService.validateUser(req);
                 return { user };
-            },
-            playground: {
-                settings: {
-                    'editor.theme': 'light',
-                    'editor.cursorShape': 'line'
-                }
             }
         };
     }

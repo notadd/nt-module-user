@@ -9,7 +9,7 @@ import { User } from '../entities/user.entity';
 export class AuthorizationGurad implements CanActivate {
     async canActivate(context: ExecutionContext): Promise<boolean> {
         /**
-         * Authorization whitelist
+         * whitelist
          */
         if (['login', 'register'].includes(context.getHandler().name)) {
             return true;

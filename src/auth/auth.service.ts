@@ -7,7 +7,7 @@ import { JwtPayload, JwtReply } from '../interfaces/jwt.interface';
 import { UserService } from '../services/user.service';
 
 @Injectable()
-export class AuthenticationService {
+export class AuthService {
     constructor(
         @Inject(forwardRef(() => UserService)) private readonly userService: UserService
     ) { }
@@ -19,21 +19,21 @@ export class AuthenticationService {
 
     async validateUser(req: any): Promise<User> {
         /**
-         * Authentication whitelist
+         * whitelist
          */
         if (req.body && ['IntrospectionQuery', 'login', 'register'].includes(req.body.operationName)) {
             return;
         }
 
-        let token = req.headers.authentication as string;
+        let token = req.headers.authorization as string;
         if (!token) {
-            throw new AuthenticationError(`Request header lacks authentication parameters，it should be: 'authentication' or 'Authentication'`);
+            throw new AuthenticationError(`Request header lacks authorization parameters，it should be: 'Authorization' or 'authorization'`);
         }
 
         if (['Bearer ', 'bearer '].includes(token.slice(0, 7))) {
             token = token.slice(7);
         } else {
-            throw new AuthenticationError(`The authentication code prefix is incorrect. it should be: 'Bearer ' or 'bearer '`);
+            throw new AuthenticationError(`The authorization code prefix is incorrect. it should be: 'Bearer ' or 'bearer '`);
         }
 
         try {
@@ -41,10 +41,10 @@ export class AuthenticationService {
             return this.userService.findOneWithRolesAndPermissions(decodedToken.username);
         } catch (error) {
             if (error instanceof jwt.JsonWebTokenError) {
-                throw new AuthenticationError('The authentication code is incorrect');
+                throw new AuthenticationError('The authorization code is incorrect');
             }
             if (error instanceof jwt.TokenExpiredError) {
-                throw new AuthenticationError('The authentication code has expired');
+                throw new AuthenticationError('The authorization code has expired');
             }
         }
     }

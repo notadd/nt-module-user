@@ -6,7 +6,7 @@ import { Permission } from '../entities/permission.entity';
 import { User } from '../entities/user.entity';
 
 @Injectable()
-export class AuthorizationGurad implements CanActivate {
+export class AuthGurad implements CanActivate {
     async canActivate(context: ExecutionContext): Promise<boolean> {
         /**
          * whitelist

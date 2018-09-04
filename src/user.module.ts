@@ -5,7 +5,7 @@ import { MetadataScanner } from '@nestjs/core/metadata-scanner';
 import { InjectEntityManager, InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { EntityManager, In, Not, Repository } from 'typeorm';
 
-import { AuthorizationGurad } from './auth/auth.gurad';
+import { AuthGurad } from './auth/auth.gurad';
 import { AuthService } from './auth/auth.service';
 import { PERMISSION_DEFINITION, RESOURCE_DEFINITION } from './decorators';
 import { InfoGroup } from './entities/info-group.entity';
@@ -38,7 +38,7 @@ import { CryptoUtil } from './utils/crypto.util';
     ],
     controllers: [],
     providers: [
-        { provide: APP_GUARD, useClass: AuthorizationGurad },
+        { provide: APP_GUARD, useClass: AuthGurad },
         AuthService,
         EntityCheckService,
         OrganizationResolver, OrganizationService,

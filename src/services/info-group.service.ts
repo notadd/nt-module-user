@@ -6,7 +6,6 @@ import { InfoGroup } from '../entities/info-group.entity';
 import { InfoItem } from '../entities/info-item.entity';
 import { EntityCheckService } from './entity-check.service';
 
-
 @Injectable()
 export class InfoGroupService {
     constructor(

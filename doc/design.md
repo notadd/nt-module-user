@@ -2,13 +2,13 @@
 
 ## Implementation logic overview
 
-When logging in to the authorization, the user name, the user's non-secure information, etc. can be encrypted into the access_token.
+When logging in, the user name, the user's non-secure information, etc. can be encrypted into the access_token.
 
 When authenticating, the access_token decrypts the user name, and queries the current user's permissions through the user name. Before the method is called, the guard uses the authority to compare the current user's permission with the method's permission annotation. If it is consistent, it is allowed to be called. Otherwise, it is returned. 403.
 
 ### Authorization process
 
-Log in with the username and password, the authorization service will verify, and the JWT signed access_token, expires_in will be returned after successful authentication.
+Log in with the username and password, the authorization service will verify, and the JWT signed access_token, expires_in will be returned after successful authorization.
 
 `access_token`: token, calculation method: jwt.sign(username, options?))
 

@@ -1,5 +1,6 @@
 import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { __ as t } from 'i18n';
 import { Repository } from 'typeorm';
 
 import { InfoItem } from '../entities/info-item.entity';
@@ -35,7 +36,7 @@ export class RoleService {
     async updateRole(id: number, name: string) {
         const role = await this.roleRepo.findOne(id);
         if (!role) {
-            throw new HttpException(`The role id of '${id}' does not exist`, 404);
+            throw new HttpException(t('The role id of %s does not exist', id.toString()), 404);
         }
 
         if (name !== role.name) {
@@ -54,14 +55,14 @@ export class RoleService {
     async deleteRole(id: number) {
         const role = await this.roleRepo.findOne(id, { relations: ['permissions'] });
         if (!role) {
-            throw new HttpException(`The role id of '${id}' does not exist`, 404);
+            throw new HttpException(t('The role id of %s does not exist', id.toString()), 404);
         }
 
         try {
             this.roleRepo.createQueryBuilder('role').relation(Role, 'permissions').of(role).remove(role.permissions);
             await this.roleRepo.remove(role);
         } catch (err) {
-            throw new HttpException(`Database error: ${err.toString()}`, 500);
+            throw new HttpException(t('Database error %s', err.toString()), 500);
         }
     }
 
@@ -74,7 +75,7 @@ export class RoleService {
     async setPermissions(id: number, permissionIds: number[]) {
         const role = await this.roleRepo.findOne(id);
         if (!role) {
-            throw new HttpException(`The role id of '${id}' does not exist`, 404);
+            throw new HttpException(t('The role id of %s does not exist', id.toString()), 404);
         }
 
         const permissionArr = await this.permissionRepo.findByIds(permissionIds);
@@ -84,7 +85,7 @@ export class RoleService {
             });
 
             if (!exist) {
-                throw new HttpException(`The permission id of '${permissionId}' does not exist`, 404);
+                throw new HttpException(t('The permission id of %s does not exist', permissionId.toString()), 404);
             }
         });
 
@@ -108,7 +109,7 @@ export class RoleService {
         const role = await this.roleRepo.findOne(roleId, { relations: ['permissions'] });
 
         if (!role) {
-            throw new HttpException(`The role id of '${roleId}' does not exist`, 404);
+            throw new HttpException(t('The role id of %s does not exist', roleId.toString()), 404);
         }
 
         const roleInfoData: RoleInfoData = {

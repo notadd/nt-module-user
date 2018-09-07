@@ -1,5 +1,6 @@
 import { forwardRef, HttpException, Inject, Injectable } from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
+import { __ as t } from 'i18n';
 import { EntityManager, Repository } from 'typeorm';
 
 import { AuthService } from '../auth/auth.service';
@@ -131,7 +132,7 @@ export class UserService {
     async findByRoleId(roleId: number) {
         const users = await this.entityManager.createQueryBuilder().relation(Role, 'users').of(roleId).loadMany<User>();
         if (!users.length) {
-            throw new HttpException('No users belong to this role', 404);
+            throw new HttpException(t('No users belong to this role'), 404);
         }
         return this.findUserInfoById(users.map(user => user.id)) as Promise<UserInfoData[]>;
     }
@@ -144,7 +145,7 @@ export class UserService {
     async findByOrganizationId(organizationId: number): Promise<UserInfoData[]> {
         const users = await this.entityManager.createQueryBuilder().relation(Organization, 'users').of(organizationId).loadMany<User>();
         if (!users.length) {
-            throw new HttpException('No users belong to this Organization', 404);
+            throw new HttpException(t('No users belong to this organization'), 404);
         }
         return this.findUserInfoById(users.map(user => user.id)) as Promise<UserInfoData[]>;
     }
@@ -157,7 +158,7 @@ export class UserService {
     async findOneWithRolesAndPermissions(username: string): Promise<User> {
         const user = await this.userRepo.findOne({ where: { username }, relations: ['roles', 'roles.permissions'] });
         if (!user) {
-            throw new HttpException('User does not exist', 404);
+            throw new HttpException(t('User does not exist'), 404);
         }
         return user;
     }
@@ -212,7 +213,7 @@ export class UserService {
     async login(username: string, password: string): Promise<JwtReply> {
         const user = await this.findOneWithRolesAndPermissions(username);
         if (!await this.cryptoUtil.checkPassword(password, user.password)) {
-            throw new HttpException('invalid password', 406);
+            throw new HttpException(t('invalid password'), 406);
         }
 
         return this.authService.createToken({ username });
@@ -237,7 +238,7 @@ export class UserService {
     private async findOneById(id: number): Promise<User> {
         const exist = this.userRepo.findOne(id);
         if (!exist) {
-            throw new HttpException('User does not exist', 404);
+            throw new HttpException(t('User does not exist'), 404);
         }
         return exist;
     }
@@ -249,7 +250,7 @@ export class UserService {
      */
     private async checkUsernameExist(username: string): Promise<void> {
         if (await this.userRepo.findOne({ where: { username } })) {
-            throw new HttpException('Username already exists', 409);
+            throw new HttpException(t('Username already exists'), 409);
         }
     }
 

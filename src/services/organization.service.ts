@@ -1,5 +1,6 @@
 import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { __ as t } from 'i18n';
 import { Repository, TreeRepository } from 'typeorm';
 
 import { Organization } from '../entities/organization.entity';
@@ -36,7 +37,7 @@ export class OrganizationService {
     async findChildren(id: number): Promise<Organization> {
         const exist = await this.organizationReq.findOne(id);
         if (!exist) {
-            throw new HttpException(`The organization id of '${id}' does not exist`, 404);
+            throw new HttpException(t('The organization with id of %s does not exist', id.toString()), 404);
         }
         const children = await this.organizationReq.findDescendantsTree(exist);
         return children;
@@ -53,7 +54,7 @@ export class OrganizationService {
         if (parentId) {
             parent = await this.organizationReq.findOne(parentId);
             if (!parent) {
-                throw new HttpException(`The organization's parent id of '${parentId}' does not exist`, 404);
+                throw new HttpException(t('The parent organization with id of %s does not exist', parentId.toString()), 404);
             }
         }
 
@@ -63,7 +64,7 @@ export class OrganizationService {
         try {
             await this.organizationReq.save(organization);
         } catch (err) {
-            throw new HttpException(`Database error: ${err.toString()}`, 500);
+            throw new HttpException(t('Database error %s', err.toString()), 500);
         }
     }
 
@@ -77,7 +78,7 @@ export class OrganizationService {
     async updateOrganization(id: number, name: string, parentId: number): Promise<void> {
         const exist = await this.organizationReq.findOne(id);
         if (!exist) {
-            throw new HttpException(`The organization id of '${id}' does not exist`, 404);
+            throw new HttpException(t('The organization with id of %s does not exist', id.toString()), 404);
         }
 
         if (name !== exist.name) {
@@ -88,7 +89,7 @@ export class OrganizationService {
         if (parentId) {
             parent = await this.organizationReq.findOne(parentId);
             if (!parent) {
-                throw new HttpException(`The organization's parent id of '${parentId}' does not exist`, 404);
+                throw new HttpException(t('The parent organization with id of %s does not exist', parentId.toString()), 404);
             }
         }
         try {
@@ -96,7 +97,7 @@ export class OrganizationService {
             exist.parent = parent as any;
             await this.organizationReq.save(exist);
         } catch (err) {
-            throw new HttpException(`Database error: ${err.toString()}`, 500);
+            throw new HttpException(t('Database error %s', err.toString()), 500);
         }
     }
 
@@ -108,7 +109,7 @@ export class OrganizationService {
     async deleteOrganization(id: number): Promise<void> {
         const exist = await this.organizationReq.findOne(id);
         if (!exist) {
-            throw new HttpException(`The organization id of '${id}' does not exist`, 404);
+            throw new HttpException(t('The organization with id of %s does not exist', id.toString()), 404);
         }
 
         const children = await this.organizationReq.findDescendants(exist);
@@ -117,8 +118,8 @@ export class OrganizationService {
         }
         try {
             await this.organizationReq.delete(id);
-        } catch (error) {
-            throw new HttpException(`Database error: ${error.toString()}`, 500);
+        } catch (err) {
+            throw new HttpException(t('Database error %s', err.toString()), 500);
         }
     }
 
@@ -131,7 +132,7 @@ export class OrganizationService {
     async addUsersToOrganization(id: number, userIds: number[]): Promise<void> {
         const exist = await this.organizationReq.findOne(id, { relations: ['users'] });
         if (!exist) {
-            throw new HttpException(`The organization id of '${id}' does not exist`, 404);
+            throw new HttpException(t('The organization with id of %s does not exist', id.toString()), 404);
         }
 
         const userArr = await this.userRep.findByIds(userIds);
@@ -140,7 +141,7 @@ export class OrganizationService {
                 return user.id === userId;
             });
             if (!find) {
-                throw new HttpException(`The user id of '${userId}' does not exist`, 404);
+                throw new HttpException(t('The user id of %s does not exist', userId.toString()), 404);
             }
         });
 
@@ -149,14 +150,14 @@ export class OrganizationService {
                 return id === user.id;
             });
             if (find) {
-                throw new HttpException(`User with id of ${user.id} is already under organization`, 409);
+                throw new HttpException(t('User with id of %s is already under organization', user.id.toString()), 409);
             }
         });
         exist.users.push(...userArr);
         try {
             await this.organizationReq.save(exist);
-        } catch (error) {
-            throw new HttpException(`Database error: ${error.toString()}`, 500);
+        } catch (err) {
+            throw new HttpException(t('Database error %s', err.toString()), 500);
         }
     }
 
@@ -169,7 +170,7 @@ export class OrganizationService {
     async deleteUserFromOrganization(id: number, userIds: number[]): Promise<void> {
         const exist = await this.organizationReq.findOne(id, { relations: ['users'] });
         if (!exist) {
-            throw new HttpException(`The organization id of '${id}' does not exist`, 404);
+            throw new HttpException(t('The organization with id of %s does not exist', id.toString()), 404);
         }
 
         const userArr = await this.userRep.findByIds(userIds);
@@ -178,20 +179,20 @@ export class OrganizationService {
                 return user.id === userId;
             });
             if (!find) {
-                throw new HttpException(`The user id of '${userId}' does not exist`, 404);
+                throw new HttpException(t('The user id of %s does not exist', userId.toString()), 404);
             }
             const index = exist.users.findIndex(user => {
                 return user.id === userId;
             });
             if (index < 0) {
-                throw new HttpException(`The user id of '${userId}' does not appear in this organization`, 404);
+                throw new HttpException(t('The user id of %s does not appear in this organization', userId.toString()), 404);
             }
             exist.users.splice(index, 1);
         });
         try {
             await this.organizationReq.save(exist);
         } catch (err) {
-            throw new HttpException(`Database error: ${err.toString()}`, 500);
+            throw new HttpException(t('Database error %s', err.toString()), 500);
         }
     }
 }

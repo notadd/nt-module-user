@@ -1,5 +1,6 @@
 import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { __ as t } from 'i18n';
 import { Repository } from 'typeorm';
 
 import { InfoGroup } from '../entities/info-group.entity';
@@ -22,7 +23,7 @@ export class InfoGroupService {
     async create(name: string, roleId: number) {
         await this.entityCheckService.checkNameExist(InfoGroup, name);
         if (await this.infoGroupRepo.findOne({ role: { id: roleId } })) {
-            throw new HttpException('The role information group already exists', 409);
+            throw new HttpException(t('The role information group already exists'), 409);
         }
         this.infoGroupRepo.save(this.infoGroupRepo.create({ name, role: { id: roleId } }));
     }
@@ -41,7 +42,7 @@ export class InfoGroupService {
             .loadMany<InfoItem>();
 
         const duplicateIds = infoItems.map(infoItem => infoItem.id).filter(infoItemId => infoItemIds.includes(infoItemId));
-        if (duplicateIds.length) throw new HttpException(`Information item's id: ${duplicateIds} already exists`, 409);
+        if (duplicateIds.length) throw new HttpException(t('Information item with id [%s] already exists', duplicateIds.toString()), 409);
 
         this.infoGroupRepo.createQueryBuilder('infoGroup').relation(InfoGroup, 'infoItems').of(infoGroupId).add(infoItemIds);
     }

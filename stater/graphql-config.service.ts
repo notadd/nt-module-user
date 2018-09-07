@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { GqlModuleOptions, GqlOptionsFactory } from '@nestjs/graphql';
 import * as GraphQLJSON from 'graphql-type-json';
 
-import { AuthService } from '../auth/auth.service';
+import { AuthService } from '../src/auth/auth.service';
 
 @Injectable()
 export class GraphQLConfigService implements GqlOptionsFactory {

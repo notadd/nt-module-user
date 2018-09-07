@@ -3,12 +3,12 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { UserModule } from '../src';
-import { GraphQLConfigService } from '../src/services/graphql-config.service';
+import { GraphQLConfigService } from './graphql-config.service';
 
 @Module({
     imports: [
         GraphQLModule.forRootAsync({
-           useClass: GraphQLConfigService
+            useClass: GraphQLConfigService
         }),
         TypeOrmModule.forRoot({
             type: 'postgres',
@@ -23,7 +23,7 @@ import { GraphQLConfigService } from '../src/services/graphql-config.service';
             synchronize: true,
             dropSchema: false
         }),
-        UserModule
+        UserModule.forRoot({ i18n: 'zh-CN' })
     ],
     controllers: [],
     providers: [],

@@ -1,8 +1,9 @@
-import { Global, Inject, Module, OnModuleInit } from '@nestjs/common';
+import { DynamicModule, Global, Inject, Module, OnModuleInit } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ModulesContainer } from '@nestjs/core/injector/modules-container';
 import { MetadataScanner } from '@nestjs/core/metadata-scanner';
 import { InjectEntityManager, InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
+import { __ as t, configure as i18nConfigure } from 'i18n';
 import { EntityManager, In, Not, Repository } from 'typeorm';
 
 import { AuthGurad } from './auth/auth.gurad';
@@ -49,7 +50,7 @@ import { CryptoUtil } from './utils/crypto.util';
         InfoItemResolver, InfoItemService,
         CryptoUtil
     ],
-    exports: [AuthService]
+    exports: [AuthService, OrganizationService, UserService, RoleService, InfoGroupService, InfoItemService]
 })
 export class UserModule implements OnModuleInit {
     private readonly metadataScanner: MetadataScanner;
@@ -65,6 +66,17 @@ export class UserModule implements OnModuleInit {
         @InjectRepository(User) private readonly userRepo: Repository<User>
     ) {
         this.metadataScanner = new MetadataScanner();
+    }
+
+    static forRoot(options: { i18n: string }): DynamicModule {
+        i18nConfigure({
+            locales: ['en-US', 'zh-CN'],
+            defaultLocale: options.i18n,
+            directory: 'src/i18n'
+        });
+        return {
+            module: UserModule
+        };
     }
 
     async onModuleInit() {
@@ -92,6 +104,8 @@ export class UserModule implements OnModuleInit {
                 if (isResolverOrController) {
                     // Get the metadata in the @Resource() annotation on the Resolver or Controller class
                     const resource: Resource = Reflect.getMetadata(RESOURCE_DEFINITION, component.instance.constructor);
+                    // Translate the resources name
+                    resource.name = t(resource.name);
                     // Get the prototype object of the Resolver or Controller class
                     const prototype = Object.getPrototypeOf(component.instance);
                     if (prototype) {
@@ -100,6 +114,10 @@ export class UserModule implements OnModuleInit {
                         const permissions: Permission[] = this.metadataScanner.scanFromPrototype(component.instance, prototype, name => {
                             // Get the metadata in the @Permission() annotation on the method in the Resolver or Controller class
                             return Reflect.getMetadata(PERMISSION_DEFINITION, component.instance, name);
+                        });
+                        // Translate the permissions name
+                        permissions.forEach(permission => {
+                            permission.name = t(permission.name);
                         });
                         // If the metadata exists, it will be added to the resource collection,
                         // and it will be automatically deduplicated according to resource.indetify

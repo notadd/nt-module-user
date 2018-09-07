@@ -30,8 +30,13 @@ modules.forEach(module => {
     });
 });
 
+gulp.task('copy-i18n', function () {
+    return gulp.src('src/i18n/*')
+        .pipe(gulp.dest(dist + '/i18n'))
+});
+
 gulp.task('copy-docs', function () {
-    return gulp.src('README.md')
+    return gulp.src(['README.md', 'README_zh.md'])
         .pipe(gulp.dest(dist))
 });
 
@@ -40,4 +45,4 @@ gulp.task('copy-license', function () {
         .pipe(gulp.dest(dist))
 });
 
-gulp.task("build", sequence("module-user", 'copy-docs', 'copy-license'));
+gulp.task("build", sequence("module-user", 'copy-i18n', 'copy-docs', 'copy-license'));

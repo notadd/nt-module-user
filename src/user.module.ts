@@ -68,7 +68,7 @@ export class UserModule implements OnModuleInit {
         this.metadataScanner = new MetadataScanner();
     }
 
-    static forRoot(options: { i18n: string }): DynamicModule {
+    static forRoot(options: { i18n: 'en-US' | 'zh-CN' }): DynamicModule {
         i18nConfigure({
             locales: ['en-US', 'zh-CN'],
             defaultLocale: options.i18n,

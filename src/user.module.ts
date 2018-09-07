@@ -104,8 +104,6 @@ export class UserModule implements OnModuleInit {
                 if (isResolverOrController) {
                     // Get the metadata in the @Resource() annotation on the Resolver or Controller class
                     const resource: Resource = Reflect.getMetadata(RESOURCE_DEFINITION, component.instance.constructor);
-                    // Translate the resources name
-                    resource.name = t(resource.name);
                     // Get the prototype object of the Resolver or Controller class
                     const prototype = Object.getPrototypeOf(component.instance);
                     if (prototype) {
@@ -115,13 +113,17 @@ export class UserModule implements OnModuleInit {
                             // Get the metadata in the @Permission() annotation on the method in the Resolver or Controller class
                             return Reflect.getMetadata(PERMISSION_DEFINITION, component.instance, name);
                         });
-                        // Translate the permissions name
-                        permissions.forEach(permission => {
-                            permission.name = t(permission.name);
-                        });
                         // If the metadata exists, it will be added to the resource collection,
                         // and it will be automatically deduplicated according to resource.indetify
-                        if (resource) metadataMap.set(resource.identify, { resource, permissions });
+                        if (resource) {
+                            // Translate the resources name
+                            resource.name = t(resource.name);
+                            // Translate the permissions name
+                            permissions.forEach(permission => {
+                                permission.name = t(permission.name);
+                            });
+                            metadataMap.set(resource.identify, { resource, permissions });
+                        }
                     }
                 }
             });

@@ -72,7 +72,7 @@ export class UserModule implements OnModuleInit {
         i18nConfigure({
             locales: ['en-US', 'zh-CN'],
             defaultLocale: options.i18n,
-            directory: 'src/i18n'
+            directory: __dirname + '/i18n'
         });
         return {
             module: UserModule

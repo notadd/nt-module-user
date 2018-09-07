@@ -5,8 +5,8 @@ type Query {
     findRegisterUserInfoItem: RegisterUserInfoItemResult
     # Query the currently logged in user information
     findCurrentUserInfo: UserInfoResult
-    # Query user information by ID
-    findUserInfoById(userId: Int!): UserInfoResult
+    # Query user information by ID array
+    findUserInfoByIds(userIds: [Int]!): UsersInfoResult
     # Query all user information under the specified role ID
     findUsersInRole(roleId: Int!): UsersInfoResult
     # Query all user information under the specified organization ID

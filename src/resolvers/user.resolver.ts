@@ -74,16 +74,16 @@ export class UserResolver {
         return { code: 200, message: t('Update current login user information successfully') };
     }
 
-    @Query('findUserInfoById')
-    @Permission({ name: 'find_user_info_by_id', identify: 'user:findUserInfoById', action: 'find' })
-    async findUserInfoById(req, body: { userId: number }): Promise<CommonResult> {
-        const data = await this.userService.findUserInfoById(body.userId) as UserInfoData;
-        return { code: 200, message: t('Query the specified user information successfully'), data };
+    @Query('findUserInfoByIds')
+    @Permission({ name: 'find_user_info_by_ids', identify: 'user:findUserInfoByIds', action: 'find' })
+    async findUserInfoById(req, body: { userIds: number[] }): Promise<CommonResult> {
+        const data = await this.userService.findUserInfoById(body.userIds) as UserInfoData[];
+        return { code: 200, message: t('Query the specified users information successfully'), data };
     }
 
     @Query('findCurrentUserInfo')
     async findCurrentUserInfo(req, body, context): Promise<CommonResult> {
-        const data = await this.userService.findUserInfoById(context.user.id);
+        const data = await this.userService.findUserInfoById(context.user.id) as UserInfoData;
         return { code: 200, message: t('Query the current login user information successfully'), data };
     }
 

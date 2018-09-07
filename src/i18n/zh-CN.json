@@ -96,5 +96,9 @@
     "No users belong to this Organization": "没有用户属于这个组织",
     "User does not exist": "用户不存在",
     "invalid password": "密码错误",
-    "Username already exists": "用户名已存在"
+    "Username already exists": "用户名已存在",
+    "Request header lacks authorization parameters，it should be: Authorization or authorization": "请求头缺少授权参数，授权参数名称为 Authorization 或 authorization",
+    "The authorization code prefix is incorrect. it should be: Bearer or bearer": "授权码前缀有误，前缀为 Bearer 或 bearer",
+    "The authorization code is incorrect": "授权码错误",
+    "The authorization code has expired": "授权码已过期"
 }

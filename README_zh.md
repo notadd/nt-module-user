@@ -7,8 +7,8 @@
 ## 功能
 
 - [x] 注册
-- [x] 登录授权
-- [x] 鉴权
+- [x] 登录
+- [x] 授权、鉴权
 - [x] 组织管理
 - [x] 用户管理
 - [x] 角色管理
@@ -68,7 +68,7 @@ import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { UserModule } from '@notadd/module-user';
+import { UserModule } from './user';
 
 @Module({
     imports: [

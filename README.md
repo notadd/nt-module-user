@@ -9,8 +9,8 @@
 ## Features
 
 - [x] registration
-- [x] login authorization
-- [x] Authentication
+- [x] login
+- [x] Authorization and Authentication
 - [x] Organization Management
 - [x] User Management
 - [x] role management
@@ -70,7 +70,7 @@ import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { UserModule } from '@notadd/module-user';
+import { UserModule } from './user';
 
 @Module({
     imports: [

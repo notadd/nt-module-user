@@ -28,7 +28,7 @@
     "set_permissions_to_role": "set_permissions_to_role",
     "find_roles": "find_roles",
     "find_one_role_info": "find_one_role_info",
-    "find_resources": "查询资源",
+    "find_resources": "find_resources",
     "create_info_group": "create_info_group",
     "delete_info_group": "delete_info_group",
     "update_info_group": "update_info_group",

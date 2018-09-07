@@ -14,6 +14,7 @@
 - [x] 角色管理
 - [x] 信息组管理
 - [x] 信息项管理
+- [x] 全局 i18n 支持
 - [ ] ......
 
 ## 使用说明
@@ -22,7 +23,7 @@
 
 ### 导入用户模块
 
-在应用程序根模块中导入 `UserModule`
+在应用程序根模块中导入 `UserModule`，并配置 i18n 选项
 
 ### 资源定义
 
@@ -75,7 +76,7 @@ import { UserModule } from '@notadd/module-user';
            useClass: GraphQLConfigService
         }),
         TypeOrmModule.forRoot(),
-        UserModule
+        UserModule.forRoot({ i18n: 'zh-CN' })
     ],
     controllers: [],
     providers: [],

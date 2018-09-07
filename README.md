@@ -16,6 +16,7 @@
 - [x] role management
 - [x] Information Group Management
 - [x] Information Item Management
+- [x] Global i18n support
 - [ ] ......
 
 ## Instructions for use
@@ -24,7 +25,7 @@ Most of the interfaces of the user module define permissions. When initializing,
 
 ### Import User Module
 
-Import `UserModule` in the application root module
+Import `UserModule` in the application root module, and configure the i18n option
 
 ### Resource Definition
 
@@ -77,7 +78,7 @@ import { UserModule } from '@notadd/module-user';
            useClass: GraphQLConfigService
         }),
         TypeOrmModule.forRoot(),
-        UserModule
+        UserModule.forRoot({ i18n: 'en-US' })
     ],
     controllers: [],
     providers: [],

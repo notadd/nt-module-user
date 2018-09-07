@@ -8,23 +8,14 @@ import { User } from '../entities/user.entity';
 @Injectable()
 export class AuthGurad implements CanActivate {
     async canActivate(context: ExecutionContext): Promise<boolean> {
-        /**
-         * whitelist
-         */
-        if (['login', 'register'].includes(context.getHandler().name)) {
-            return true;
-        }
-
         const gqlCtx = GqlExecutionContext.create(context);
 
         const user: User = gqlCtx.getContext().user;
 
-        if (user.username === 'sadmin') {
-            return true;
-        }
+        if (user && user.username === 'sadmin') return true;
 
         const userPerm: string[] = [];
-        user.roles.forEach(role => {
+        user && user.roles.forEach(role => {
             role.permissions.forEach(permission => {
                 userPerm.push(permission.identify);
             });

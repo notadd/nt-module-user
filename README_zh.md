@@ -1,4 +1,4 @@
-# Notadd 用户模块
+# Notadd 用户模块(GraphQL Api 版本)
 
 ## 文档
 

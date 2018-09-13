@@ -1,4 +1,4 @@
-# Notadd User Module
+# Notadd User Module(GraphQL Api Version)
 
 [中文文档](./README_zh.md)
 

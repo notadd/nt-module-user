@@ -1,4 +1,5 @@
 import { forwardRef, HttpException, Inject, Injectable } from '@nestjs/common';
+import { RpcException } from '@nestjs/microservices';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { __ as t } from 'i18n';
 import { EntityManager, Repository } from 'typeorm';
@@ -9,7 +10,6 @@ import { Organization } from '../entities/organization.entity';
 import { Role } from '../entities/role.entity';
 import { UserInfo } from '../entities/user-info.entity';
 import { User } from '../entities/user.entity';
-import { JwtReply } from '../interfaces/jwt.interface';
 import { CreateUserInput, UpdateUserInput, UserInfoData } from '../interfaces/user.interface';
 import { CryptoUtil } from '../utils/crypto.util';
 import { RoleService } from './role.service';
@@ -36,13 +36,13 @@ export class UserService {
         createUserInput.password = await this.cryptoUtil.encryptPassword(createUserInput.password);
         const user = await this.userRepo.save(this.userRepo.create(createUserInput));
         if (createUserInput.roleIds && createUserInput.roleIds.length) {
-            this.userRepo.createQueryBuilder('user').relation(User, 'roles').of(user).add(createUserInput.roleIds);
+            await this.userRepo.createQueryBuilder('user').relation(User, 'roles').of(user).add(createUserInput.roleIds);
         }
         if (createUserInput.organizationIds && createUserInput.organizationIds.length) {
-            this.userRepo.createQueryBuilder('user').relation(User, 'organizations').of(user).add(createUserInput.organizationIds);
+            await this.userRepo.createQueryBuilder('user').relation(User, 'organizations').of(user).add(createUserInput.organizationIds);
         }
         if (createUserInput.infoKVs && createUserInput.infoKVs.length) {
-            this.createOrUpdateUserInfos(user, createUserInput.infoKVs, 'create');
+            await this.createOrUpdateUserInfos(user, createUserInput.infoKVs, 'create');
         }
     }
 
@@ -53,7 +53,7 @@ export class UserService {
      * @param roleId The specified role id
      */
     async addUserRole(userId: number, roleId: number) {
-        this.userRepo.createQueryBuilder('user').relation(User, 'roles').of(userId).add(roleId);
+        await this.userRepo.createQueryBuilder('user').relation(User, 'roles').of(userId).add(roleId);
     }
 
     /**
@@ -63,7 +63,7 @@ export class UserService {
      * @param roleId The specified role id
      */
     async deleteUserRole(userId: number, roleId: number) {
-        this.userRepo.createQueryBuilder('user').relation(User, 'roles').of(userId).remove(roleId);
+        await this.userRepo.createQueryBuilder('user').relation(User, 'roles').of(userId).remove(roleId);
     }
 
     /**
@@ -74,7 +74,7 @@ export class UserService {
     async recycleUser(id: number): Promise<void> {
         const user = await this.findOneById(id);
         user.recycle = true;
-        this.userRepo.save(user);
+        await this.userRepo.save(user);
     }
 
     /**
@@ -84,9 +84,9 @@ export class UserService {
      */
     async deleteUser(id: number): Promise<void> {
         const user = await this.userRepo.findOne(id, { relations: ['roles', 'organizations'] });
-        this.userRepo.createQueryBuilder('user').relation(User, 'roles').of(user).remove(user.roles);
-        this.userRepo.createQueryBuilder('user').relation(User, 'organizations').of(user).remove(user.organizations);
-        this.userRepo.remove(user);
+        await this.userRepo.createQueryBuilder('user').relation(User, 'roles').of(user).remove(user.roles);
+        await this.userRepo.createQueryBuilder('user').relation(User, 'organizations').of(user).remove(user.organizations);
+        await this.userRepo.remove(user);
     }
 
     /**
@@ -98,29 +98,29 @@ export class UserService {
     async updateUserInfo(id: number, updateUserInput: UpdateUserInput): Promise<void> {
         const user = await this.userRepo.findOne(id, { relations: ['userInfos'] });
         if (updateUserInput.email) {
-            this.userRepo.update(user.id, { email: updateUserInput.email });
+            await this.userRepo.update(user.id, { email: updateUserInput.email });
         }
         if (updateUserInput.mobile) {
-            this.userRepo.update(user.id, { mobile: updateUserInput.mobile });
+            await this.userRepo.update(user.id, { mobile: updateUserInput.mobile });
         }
         if (updateUserInput.password) {
             const newPassword = await this.cryptoUtil.encryptPassword(updateUserInput.password);
-            this.userRepo.update(user.id, { password: newPassword });
+            await this.userRepo.update(user.id, { password: newPassword });
         }
         if (updateUserInput.roleIds && updateUserInput.roleIds.length) {
-            updateUserInput.roleIds.forEach(roleId => {
-                this.userRepo.createQueryBuilder('user').relation(User, 'roles').of(user).remove(roleId.before);
-                this.userRepo.createQueryBuilder('user').relation(User, 'roles').of(user).add(roleId.after);
+            updateUserInput.roleIds.forEach(async roleId => {
+                await this.userRepo.createQueryBuilder('user').relation(User, 'roles').of(user).remove(roleId.before);
+                await this.userRepo.createQueryBuilder('user').relation(User, 'roles').of(user).add(roleId.after);
             });
         }
         if (updateUserInput.organizationIds && updateUserInput.organizationIds.length) {
-            updateUserInput.organizationIds.forEach(organizationId => {
-                this.userRepo.createQueryBuilder('user').relation(User, 'organizations').of(user).remove(organizationId.before);
-                this.userRepo.createQueryBuilder('user').relation(User, 'organizations').of(user).add(organizationId.after);
+            updateUserInput.organizationIds.forEach(async organizationId => {
+                await this.userRepo.createQueryBuilder('user').relation(User, 'organizations').of(user).remove(organizationId.before);
+                await this.userRepo.createQueryBuilder('user').relation(User, 'organizations').of(user).add(organizationId.after);
             });
         }
         if (updateUserInput.infoKVs && updateUserInput.infoKVs.length) {
-            this.createOrUpdateUserInfos(user, updateUserInput.infoKVs, 'update');
+            await this.createOrUpdateUserInfos(user, updateUserInput.infoKVs, 'update');
         }
     }
 
@@ -132,7 +132,7 @@ export class UserService {
     async findByRoleId(roleId: number) {
         const users = await this.entityManager.createQueryBuilder().relation(Role, 'users').of(roleId).loadMany<User>();
         if (!users.length) {
-            throw new HttpException(t('No users belong to this role'), 404);
+            throw new RpcException({ code: 404, message: t('No users belong to this role') });
         }
         return this.findUserInfoById(users.map(user => user.id)) as Promise<UserInfoData[]>;
     }
@@ -145,7 +145,7 @@ export class UserService {
     async findByOrganizationId(organizationId: number): Promise<UserInfoData[]> {
         const users = await this.entityManager.createQueryBuilder().relation(Organization, 'users').of(organizationId).loadMany<User>();
         if (!users.length) {
-            throw new HttpException(t('No users belong to this organization'), 404);
+            throw new RpcException({ code: 404, message: t('No users belong to this role') });
         }
         return this.findUserInfoById(users.map(user => user.id)) as Promise<UserInfoData[]>;
     }
@@ -158,7 +158,7 @@ export class UserService {
     async findOneWithRolesAndPermissions(username: string): Promise<User> {
         const user = await this.userRepo.findOne({ where: { username }, relations: ['roles', 'roles.permissions'] });
         if (!user) {
-            throw new HttpException(t('User does not exist'), 404);
+            throw new RpcException({ code: 404, message: t('User does not exist') });
         }
         return user;
     }
@@ -205,18 +205,29 @@ export class UserService {
     }
 
     /**
-     * Ordinary user login
+     * user login
      *
      * @param username username
      * @param password password
      */
-    async login(username: string, password: string): Promise<JwtReply> {
-        const user = await this.findOneWithRolesAndPermissions(username);
+    async login(username: string, password: string) {
+        const user = await this.userRepo.findOne({ where: { username }, relations: ['roles', 'organizations', 'userInfos', 'userInfos.infoItem'] });
+        if (!user) throw new RpcException({ code: 404, message: t('User does not exist') });
+        if (user.banned || user.recycle) throw new RpcException({ code: 400, message: t('User is banned') });
+        const infoItem = await this.infoItemRepo.createQueryBuilder('infoItem')
+            .leftJoin('infoItem.infoGroups', 'infoGroups')
+            .leftJoin('infoGroups.role', 'role')
+            .leftJoin('role.users', 'users')
+            .where('users.username = :username', { username })
+            .orderBy('infoItem.order', 'ASC')
+            .getMany();
+
+        const userInfoData = this.refactorUserData(user, infoItem);
         if (!await this.cryptoUtil.checkPassword(password, user.password)) {
             throw new HttpException(t('invalid password'), 406);
         }
-
-        return this.authService.createToken({ username });
+        const tokenInfo = await this.authService.createToken({ username });
+        return { tokenInfo, userInfoData };
     }
 
     /**
@@ -227,7 +238,7 @@ export class UserService {
      */
     async register(createUserInput: CreateUserInput): Promise<void> {
         createUserInput.roleIds = [1];
-        this.createUser(createUserInput);
+        await this.createUser(createUserInput);
     }
 
     /**
@@ -238,7 +249,7 @@ export class UserService {
     private async findOneById(id: number): Promise<User> {
         const exist = this.userRepo.findOne(id);
         if (!exist) {
-            throw new HttpException(t('User does not exist'), 404);
+            throw new RpcException({ code: 404, message: t('User does not exist') });
         }
         return exist;
     }
@@ -250,7 +261,7 @@ export class UserService {
      */
     private async checkUsernameExist(username: string): Promise<void> {
         if (await this.userRepo.findOne({ where: { username } })) {
-            throw new HttpException(t('Username already exists'), 409);
+            throw new RpcException({ code: 409, message: t('Username already exists') });
         }
     }
 
@@ -274,7 +285,7 @@ export class UserService {
 
             infoKVs.forEach(async infoKV => {
                 if (infoKV.key) {
-                    this.userInfoRepo.update(infoKV.key, { value: infoKV.value });
+                    await this.userInfoRepo.update(infoKV.key, { value: infoKV.value });
                 } else {
                     await this.userInfoRepo.save(this.userInfoRepo.create({ value: infoKV.value, user, infoItem: { id: infoKV.relationId } }));
                 }

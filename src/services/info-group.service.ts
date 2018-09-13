@@ -1,16 +1,20 @@
-import { HttpException, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { RpcException } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
 import { __ as t } from 'i18n';
 import { Repository } from 'typeorm';
 
 import { InfoGroup } from '../entities/info-group.entity';
 import { InfoItem } from '../entities/info-item.entity';
+import { Role } from '../entities/role.entity';
 import { EntityCheckService } from './entity-check.service';
 
 @Injectable()
 export class InfoGroupService {
     constructor(
         @InjectRepository(InfoGroup) private readonly infoGroupRepo: Repository<InfoGroup>,
+        @InjectRepository(Role) private readonly roleRepo: Repository<Role>,
+        @InjectRepository(InfoItem) private readonly infoItemRepo: Repository<InfoItem>,
         @Inject(EntityCheckService) private readonly entityCheckService: EntityCheckService
     ) { }
 
@@ -23,9 +27,9 @@ export class InfoGroupService {
     async create(name: string, roleId: number) {
         await this.entityCheckService.checkNameExist(InfoGroup, name);
         if (await this.infoGroupRepo.findOne({ role: { id: roleId } })) {
-            throw new HttpException(t('The role information group already exists'), 409);
+            throw new RpcException({ code: 409, message: t('The role information group already exists') });
         }
-        this.infoGroupRepo.save(this.infoGroupRepo.create({ name, role: { id: roleId } }));
+        await this.infoGroupRepo.save(this.infoGroupRepo.create({ name, role: { id: roleId } }));
     }
 
     /**
@@ -35,16 +39,24 @@ export class InfoGroupService {
      * @param infoItemIds The specified information item's id array
      */
     async addInfoItem(infoGroupId: number, infoItemIds: number[]) {
-        const infoItems = await this.infoGroupRepo
+        const existInfoItems = await this.infoItemRepo.findByIds(infoItemIds);
+        const notExistInfoItemIds = infoItemIds.filter(infoItemId => !existInfoItems.map(v => v.id).includes(infoItemId));
+        if (notExistInfoItemIds.length) {
+            throw new RpcException({ code: 404, message: t('Information item with id [%s] does not exists', notExistInfoItemIds.toString()) });
+        }
+
+        const existInfoGroupItems = await this.infoGroupRepo
             .createQueryBuilder('infoGroup')
             .relation(InfoGroup, 'infoItems')
             .of(infoGroupId)
             .loadMany<InfoItem>();
 
-        const duplicateIds = infoItems.map(infoItem => infoItem.id).filter(infoItemId => infoItemIds.includes(infoItemId));
-        if (duplicateIds.length) throw new HttpException(t('Information item with id [%s] already exists', duplicateIds.toString()), 409);
+        const duplicateIds = existInfoGroupItems.map(infoItem => infoItem.id).filter(infoItemId => infoItemIds.includes(infoItemId));
+        if (duplicateIds.length) {
+            throw new RpcException({ code: 409, message: t('Information item with id [%s] already exists', duplicateIds.toString()) });
+        }
 
-        this.infoGroupRepo.createQueryBuilder('infoGroup').relation(InfoGroup, 'infoItems').of(infoGroupId).add(infoItemIds);
+        await this.infoGroupRepo.createQueryBuilder('infoGroup').relation(InfoGroup, 'infoItems').of(infoGroupId).add(infoItemIds);
     }
 
     /**
@@ -53,7 +65,7 @@ export class InfoGroupService {
      * @param id The information group's id
      */
     async delete(id: number) {
-        this.infoGroupRepo.delete(id);
+        await this.infoGroupRepo.delete(id);
     }
 
     /**
@@ -63,7 +75,7 @@ export class InfoGroupService {
      * @param infoItemIds The specified information item's id array
      */
     async deleteIntoItem(infoGroupId: number, infoItemIds: number[]) {
-        this.infoGroupRepo.createQueryBuilder('infoGroup').relation(InfoGroup, 'infoItems').of(infoGroupId).remove(infoItemIds);
+        await this.infoGroupRepo.createQueryBuilder('infoGroup').relation(InfoGroup, 'infoItems').of(infoGroupId).remove(infoItemIds);
     }
 
     /**
@@ -73,8 +85,12 @@ export class InfoGroupService {
      * @param name The name to be update
      */
     async update(id: number, name: string, roleId: number) {
+        const infoGroupExist = await this.infoGroupRepo.findOne(id);
+        if (!infoGroupExist) throw new RpcException({ code: 404, message: t('The information group whit id of %s does not exist', id.toString()) });
         await this.entityCheckService.checkNameExist(InfoGroup, name);
-        this.infoGroupRepo.update(id, { name, role: { id: roleId } });
+        const roleExist = await this.roleRepo.findOne(roleId);
+        if (!roleExist) throw new RpcException({ code: 404, message: t('The role id of %s does not exist', roleId.toString()) });
+        await this.infoGroupRepo.update(id, { name, role: { id: roleId } });
     }
 
     /**
@@ -90,6 +106,6 @@ export class InfoGroupService {
      * @param id The specified information group's id
      */
     async findItemsById(id: number) {
-        return this.infoGroupRepo.createQueryBuilder('infoGroup').relation(InfoGroup, 'infoItems').of(id).loadMany();
+        return this.infoGroupRepo.createQueryBuilder('infoGroup').relation(InfoGroup, 'infoItems').of(id).loadMany<InfoItem>();
     }
 }

@@ -1,4 +1,5 @@
-import { HttpException, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { RpcException } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
 import { __ as t } from 'i18n';
 import { Repository } from 'typeorm';
@@ -36,7 +37,7 @@ export class RoleService {
     async updateRole(id: number, name: string) {
         const role = await this.roleRepo.findOne(id);
         if (!role) {
-            throw new HttpException(t('The role id of %s does not exist', id.toString()), 404);
+            throw new RpcException({ code: 404, message: t('The role id of %s does not exist', id.toString()) });
         }
 
         if (name !== role.name) {
@@ -55,14 +56,14 @@ export class RoleService {
     async deleteRole(id: number) {
         const role = await this.roleRepo.findOne(id, { relations: ['permissions'] });
         if (!role) {
-            throw new HttpException(t('The role id of %s does not exist', id.toString()), 404);
+            throw new RpcException({ code: 404, message: t('The role id of %s does not exist', id.toString()) });
         }
 
         try {
             this.roleRepo.createQueryBuilder('role').relation(Role, 'permissions').of(role).remove(role.permissions);
             await this.roleRepo.remove(role);
         } catch (err) {
-            throw new HttpException(t('Database error %s', err.toString()), 500);
+            throw new RpcException({ code: 500, message: t('Database error %s', err.toString()) });
         }
     }
 
@@ -75,7 +76,7 @@ export class RoleService {
     async setPermissions(id: number, permissionIds: number[]) {
         const role = await this.roleRepo.findOne(id);
         if (!role) {
-            throw new HttpException(t('The role id of %s does not exist', id.toString()), 404);
+            throw new RpcException({ code: 404, message: t('The role id of %s does not exist', id.toString()) });
         }
 
         const permissionArr = await this.permissionRepo.findByIds(permissionIds);
@@ -85,7 +86,7 @@ export class RoleService {
             });
 
             if (!exist) {
-                throw new HttpException(t('The permission id of %s does not exist', permissionId.toString()), 404);
+                throw new RpcException({ code: 404, message: t('The permission id of %s does not exist', permissionId.toString()) });
             }
         });
 
@@ -109,7 +110,7 @@ export class RoleService {
         const role = await this.roleRepo.findOne(roleId, { relations: ['permissions'] });
 
         if (!role) {
-            throw new HttpException(t('The role id of %s does not exist', roleId.toString()), 404);
+            throw new RpcException({ code: 404, message: t('The role id of %s does not exist', roleId.toString()) });
         }
 
         const roleInfoData: RoleInfoData = {

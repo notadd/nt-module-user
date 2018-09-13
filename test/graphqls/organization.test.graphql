@@ -33,6 +33,19 @@ mutation createOrganization($name: String!, $parentId: Int) {
   "parentId": 2
 }
 
+# 更新组织
+mutation updateOrganization($id: Int!, $name: String!, $parentId: Int!) {
+  updateOrganization(id: $id, name: $name, parentId: $parentId) {
+    code
+    message
+  }
+}
+{
+  "id": 1,
+	"name": "aaaaaaa",
+  "parentId": 2
+}
+
 # 获取根组织
 query findRootOrganizations {
   findRootOrganizations {

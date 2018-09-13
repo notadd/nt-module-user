@@ -10,6 +10,30 @@ mutation createInfoGroup($name: String!, $roleId: Int!) {
   "roleId": 1
 }
 
+# 删除信息组
+mutation deleteInfoGroup($groupId: Int!) {
+  deleteInfoGroup(groupId: $groupId) {
+    code
+    message
+  }
+}
+{
+  "groupId": 1
+}
+
+# 更新信息组
+mutation updateInfoGroup($groupId: Int!, $name: String!, $roleId: Int!) {
+  updateInfoGroup(groupId: $groupId, name: $name, roleId: $roleId) {
+    code
+    message
+  }
+}
+{
+  "groupId": 2,
+  "name": "测试信息组",
+  "roleId": 1
+}
+
 # 项指定信息组添加指定信息项
 mutation addInfoItemToInfoGroup($infoGroupId: Int!, $infoItemIds: [Int]!) {
   addInfoItemToInfoGroup(infoGroupId: $infoGroupId, infoItemIds: $infoItemIds) {
@@ -20,6 +44,17 @@ mutation addInfoItemToInfoGroup($infoGroupId: Int!, $infoItemIds: [Int]!) {
 {
   "infoGroupId": 1,
   "infoItemIds": [1, 2, 3]
+}
+# 删除指定信息组中的指定信息项
+mutation deleteIntoItemFromInfoGroup($infoGroupId: Int!, $infoItemIds: [Int]!) {
+  deleteIntoItemFromInfoGroup(infoGroupId: $infoGroupId, infoItemIds: $infoItemIds) {
+    code
+    message
+  }
+}
+{
+  "infoGroupId": 1,
+  "infoItemIds": [1]
 }
 
 # 查询所有信息组

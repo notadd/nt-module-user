@@ -36,6 +36,36 @@ mutation createInfoItem($infoItemInput: InfoItemInput) {
   }
 }
 
+# 删除信息项
+mutation deleteInfoItem($infoItemId: Int!) {
+  deleteInfoItem(infoItemId: $infoItemId) {
+    code
+    message
+  }
+}
+{
+	"infoItemId": 2
+}
+
+# 更新信息项
+mutation updateInfoItem($updateInfoItemInput: UpdateInfoItemInput) {
+  updateInfoItem(updateInfoItemInput: $updateInfoItemInput) {
+    code
+    message
+  }
+}
+{
+	"updateInfoItemInput": {
+    "id": 3,
+    "name": "a",
+    "type": "ccc",
+    "order": 23,
+    "description": "ffffff",
+    "registerDisplay": true,
+    "informationDisplay": false
+  }
+}
+
 # 查询所有信息项
 query findAllInfoItem {
   findAllInfoItem {

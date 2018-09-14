@@ -1,8 +1,5 @@
 {
     "lerna": "3.2.1",
-    "publish": {
-      "allowBranch": "graphql-api"
-    },
     "packages": [
       "package"
     ],

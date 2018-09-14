@@ -42,8 +42,14 @@ export class UserGrpcController {
     }
 
     @GrpcMethod('UserService')
+    async banUser(payload: { userId: number }) {
+        await this.userService.recycleOrBanUser(payload.userId, 'ban');
+        return { code: 200, message: t('Ban User successfully') };
+    }
+
+    @GrpcMethod('UserService')
     async recycleUser(payload: { userId: number }) {
-        await this.userService.recycleUser(payload.userId);
+        await this.userService.recycleOrBanUser(payload.userId, 'recycle');
         return { code: 200, message: t('Delete user to recycle bin successfully') };
     }
 
@@ -51,6 +57,18 @@ export class UserGrpcController {
     async deleteRecycledUser(payload: { userId: number }) {
         await this.userService.deleteUser(payload.userId);
         return { code: 200, message: t('Delete user in the recycle bin successfully') };
+    }
+
+    @GrpcMethod('UserService')
+    async revertBannedUser(payload: { userId: number }) {
+        await this.userService.revertBannedOrRecycledUser(payload.userId, 'banned');
+        return { code: 200, message: t('Revert banned user successfully') };
+    }
+
+    @GrpcMethod('UserService')
+    async revertRecycledUser(payload: { userId: number }) {
+        await this.userService.revertBannedOrRecycledUser(payload.userId, 'recycled');
+        return { code: 200, message: t('Revert recycled user successfully') };
     }
 
     @GrpcMethod('UserService')

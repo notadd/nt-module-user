@@ -67,13 +67,18 @@ export class UserService {
     }
 
     /**
-     * Delete user to recycle bin
+     * Delete user to recycle bin or ban user
      *
      * @param id The specified user id
      */
-    async recycleUser(id: number): Promise<void> {
+    async recycleOrBanUser(id: number, action: 'recycle' | 'ban'): Promise<void> {
         const user = await this.findOneById(id);
-        user.recycle = true;
+        if (action === 'recycle') {
+            user.recycle = true;
+        }
+        if (action === 'ban') {
+            user.banned = true;
+        }
         await this.userRepo.save(user);
     }
 
@@ -87,6 +92,22 @@ export class UserService {
         await this.userRepo.createQueryBuilder('user').relation(User, 'roles').of(user).remove(user.roles);
         await this.userRepo.createQueryBuilder('user').relation(User, 'organizations').of(user).remove(user.organizations);
         await this.userRepo.remove(user);
+    }
+
+    /**
+     * Revert user from which was banned or recycled
+     *
+     * @param id The specified user id
+     */
+    async revertBannedOrRecycledUser(id: number, status: 'recycled' | 'banned') {
+        const user = await this.findOneById(id);
+        if (status === 'recycled') {
+            user.recycle = false;
+        }
+        if (status === 'banned') {
+            user.banned = false;
+        }
+        await this.userRepo.save(user);
     }
 
     /**

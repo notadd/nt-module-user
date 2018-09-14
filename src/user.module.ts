@@ -41,6 +41,7 @@ import { CryptoUtil } from './utils/crypto.util';
     providers: [
         { provide: APP_GUARD, useClass: AuthGurad },
         AuthService,
+        EntityManager,
         EntityCheckService,
         OrganizationResolver, OrganizationService,
         UserResolver, UserService,

@@ -1,0 +1,1 @@
+{"version":3,"sources":["../src/interfaces/info-item.interface.ts"],"names":[],"mappings":"","file":"info-item.interface.js","sourcesContent":["export interface UpdateInfoItemInput {\n    id: number;\n    order: number;\n    type: string;\n    name: string;\n    description: string;\n    registerDisplay: boolean;\n    informationDisplay: boolean;\n}"]}

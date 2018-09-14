@@ -1,0 +1,1 @@
+{"version":3,"sources":["../src/interfaces/common-result.interface.ts"],"names":[],"mappings":"AAAA,MAAM,WAAW,YAAY;IACzB,IAAI,EAAE,MAAM,CAAC;IACb,OAAO,EAAE,MAAM,CAAC;IAChB,IAAI,CAAC,EAAE,GAAG,CAAC;CACd","file":"common-result.interface.d.ts","sourcesContent":["export interface CommonResult {\n    code: number;\n    message: string;\n    data?: any;\n}"]}

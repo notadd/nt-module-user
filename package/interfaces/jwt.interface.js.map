@@ -1,0 +1,1 @@
+{"version":3,"sources":["../src/interfaces/jwt.interface.ts"],"names":[],"mappings":"","file":"jwt.interface.js","sourcesContent":["export interface JwtPayload {\n    username: string;\n    options?: any;\n}\n\nexport interface JwtReply {\n    accessToken: string;\n    expiresIn: number;\n}"]}

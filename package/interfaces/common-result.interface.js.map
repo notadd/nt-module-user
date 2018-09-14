@@ -1,0 +1,1 @@
+{"version":3,"sources":["../src/interfaces/common-result.interface.ts"],"names":[],"mappings":"","file":"common-result.interface.js","sourcesContent":["export interface CommonResult {\n    code: number;\n    message: string;\n    data?: any;\n}"]}

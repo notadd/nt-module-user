@@ -1,0 +1,1 @@
+{"version":3,"sources":["../src/interfaces/resource.interface.ts"],"names":[],"mappings":"","file":"resource.interface.js","sourcesContent":["export interface Resource {\n    name: string;\n    identify: string;\n}"]}

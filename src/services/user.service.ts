@@ -5,11 +5,8 @@ import { EntityManager, Repository } from 'typeorm';
 
 import { AuthService } from '../auth/auth.service';
 import { InfoItem } from '../entities/info-item.entity';
-import { Organization } from '../entities/organization.entity';
-import { Role } from '../entities/role.entity';
 import { UserInfo } from '../entities/user-info.entity';
 import { User } from '../entities/user.entity';
-import { JwtReply } from '../interfaces/jwt.interface';
 import { CreateUserInput, UpdateUserInput, UserInfoData } from '../interfaces/user.interface';
 import { CryptoUtil } from '../utils/crypto.util';
 import { RoleService } from './role.service';
@@ -67,14 +64,19 @@ export class UserService {
     }
 
     /**
-     * Delete user to recycle bin
+     * Delete user to recycle bin or ban user
      *
      * @param id The specified user id
      */
-    async recycleUser(id: number): Promise<void> {
+    async recycleOrBanUser(id: number, action: 'recycle' | 'ban'): Promise<void> {
         const user = await this.findOneById(id);
-        user.recycle = true;
-        this.userRepo.save(user);
+        if (action === 'recycle') {
+            user.recycle = true;
+        }
+        if (action === 'ban') {
+            user.banned = true;
+        }
+        await this.userRepo.save(user);
     }
 
     /**
@@ -84,9 +86,25 @@ export class UserService {
      */
     async deleteUser(id: number): Promise<void> {
         const user = await this.userRepo.findOne(id, { relations: ['roles', 'organizations'] });
-        this.userRepo.createQueryBuilder('user').relation(User, 'roles').of(user).remove(user.roles);
-        this.userRepo.createQueryBuilder('user').relation(User, 'organizations').of(user).remove(user.organizations);
-        this.userRepo.remove(user);
+        await this.userRepo.createQueryBuilder('user').relation(User, 'roles').of(user).remove(user.roles);
+        await this.userRepo.createQueryBuilder('user').relation(User, 'organizations').of(user).remove(user.organizations);
+        await this.userRepo.remove(user);
+    }
+
+    /**
+     * Revert user from which was banned or recycled
+     *
+     * @param id The specified user id
+     */
+    async revertBannedOrRecycledUser(id: number, status: 'recycled' | 'banned') {
+        const user = await this.findOneById(id);
+        if (status === 'recycled') {
+            user.recycle = false;
+        }
+        if (status === 'banned') {
+            user.banned = false;
+        }
+        await this.userRepo.save(user);
     }
 
     /**
@@ -98,29 +116,29 @@ export class UserService {
     async updateUserInfo(id: number, updateUserInput: UpdateUserInput): Promise<void> {
         const user = await this.userRepo.findOne(id, { relations: ['userInfos'] });
         if (updateUserInput.email) {
-            this.userRepo.update(user.id, { email: updateUserInput.email });
+            await this.userRepo.update(user.id, { email: updateUserInput.email });
         }
         if (updateUserInput.mobile) {
-            this.userRepo.update(user.id, { mobile: updateUserInput.mobile });
+            await this.userRepo.update(user.id, { mobile: updateUserInput.mobile });
         }
         if (updateUserInput.password) {
             const newPassword = await this.cryptoUtil.encryptPassword(updateUserInput.password);
-            this.userRepo.update(user.id, { password: newPassword });
+            await this.userRepo.update(user.id, { password: newPassword });
         }
         if (updateUserInput.roleIds && updateUserInput.roleIds.length) {
-            updateUserInput.roleIds.forEach(roleId => {
-                this.userRepo.createQueryBuilder('user').relation(User, 'roles').of(user).remove(roleId.before);
-                this.userRepo.createQueryBuilder('user').relation(User, 'roles').of(user).add(roleId.after);
+            updateUserInput.roleIds.forEach(async roleId => {
+                await this.userRepo.createQueryBuilder('user').relation(User, 'roles').of(user).remove(roleId.before);
+                await this.userRepo.createQueryBuilder('user').relation(User, 'roles').of(user).add(roleId.after);
             });
         }
         if (updateUserInput.organizationIds && updateUserInput.organizationIds.length) {
-            updateUserInput.organizationIds.forEach(organizationId => {
-                this.userRepo.createQueryBuilder('user').relation(User, 'organizations').of(user).remove(organizationId.before);
-                this.userRepo.createQueryBuilder('user').relation(User, 'organizations').of(user).add(organizationId.after);
+            updateUserInput.organizationIds.forEach(async organizationId => {
+                await this.userRepo.createQueryBuilder('user').relation(User, 'organizations').of(user).remove(organizationId.before);
+                await this.userRepo.createQueryBuilder('user').relation(User, 'organizations').of(user).add(organizationId.after);
             });
         }
         if (updateUserInput.infoKVs && updateUserInput.infoKVs.length) {
-            this.createOrUpdateUserInfos(user, updateUserInput.infoKVs, 'update');
+            await this.createOrUpdateUserInfos(user, updateUserInput.infoKVs, 'update');
         }
     }
 
@@ -130,7 +148,11 @@ export class UserService {
      * @param roleId The specified role id
      */
     async findByRoleId(roleId: number) {
-        const users = await this.entityManager.createQueryBuilder().relation(Role, 'users').of(roleId).loadMany<User>();
+        const users = await this.userRepo.createQueryBuilder('user')
+            .leftJoinAndSelect('user.roles', 'roles')
+            .where('roles.id = :roleId', { roleId })
+            .andWhere('user.recycle = false')
+            .getMany();
         if (!users.length) {
             throw new HttpException(t('No users belong to this role'), 404);
         }
@@ -143,7 +165,11 @@ export class UserService {
      * @param id The specified organization id
      */
     async findByOrganizationId(organizationId: number): Promise<UserInfoData[]> {
-        const users = await this.entityManager.createQueryBuilder().relation(Organization, 'users').of(organizationId).loadMany<User>();
+        const users = await this.userRepo.createQueryBuilder('user')
+            .leftJoinAndSelect('user.organizations', 'organizations')
+            .where('organizations.id = :organizationId', { organizationId })
+            .andWhere('user.recycle = false')
+            .getMany();
         if (!users.length) {
             throw new HttpException(t('No users belong to this organization'), 404);
         }
@@ -205,18 +231,29 @@ export class UserService {
     }
 
     /**
-     * Ordinary user login
+     * user login
      *
      * @param username username
      * @param password password
      */
-    async login(username: string, password: string): Promise<JwtReply> {
-        const user = await this.findOneWithRolesAndPermissions(username);
+    async login(username: string, password: string) {
+        const user = await this.userRepo.findOne({ where: { username }, relations: ['roles', 'organizations', 'userInfos', 'userInfos.infoItem'] });
+        if (!user) throw new HttpException(t('User does not exist'), 404);
+        if (user.banned || user.recycle) throw new HttpException(t('User is banned'), 400);
+        const infoItem = await this.infoItemRepo.createQueryBuilder('infoItem')
+            .leftJoin('infoItem.infoGroups', 'infoGroups')
+            .leftJoin('infoGroups.role', 'role')
+            .leftJoin('role.users', 'users')
+            .where('users.username = :username', { username })
+            .orderBy('infoItem.order', 'ASC')
+            .getMany();
+
+        const userInfoData = this.refactorUserData(user, infoItem);
         if (!await this.cryptoUtil.checkPassword(password, user.password)) {
             throw new HttpException(t('invalid password'), 406);
         }
-
-        return this.authService.createToken({ username });
+        const tokenInfo = await this.authService.createToken({ username });
+        return { tokenInfo, userInfoData };
     }
 
     /**

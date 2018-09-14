@@ -1,4 +1,4 @@
-import { Inject } from '@nestjs/common';
+import { HttpException, Inject } from '@nestjs/common';
 import { Mutation, Query, Resolver } from '@nestjs/graphql';
 import { __ as t } from 'i18n';
 
@@ -17,7 +17,17 @@ export class UserResolver {
     @Query('login')
     async login(req, body: { username: string, password: string }): Promise<CommonResult> {
         const data = await this.userService.login(body.username, body.password);
-        return { code: 200, message: t('Login success'), data };
+        return { code: 200, message: t('Login success'), data: data.tokenInfo };
+    }
+
+    @Query('adminLogin')
+    async adminLogin(req, body: { username: string, password: string }): Promise<CommonResult> {
+        const data = await this.userService.login(body.username, body.password);
+        const userInfoData = data.userInfoData;
+        if (userInfoData.username !== 'sadmin' && userInfoData.userRoles.map(v => v.id).includes(1)) {
+            throw new HttpException(t('You are not authorized to access'), 401);
+        }
+        return { code: 200, message: t('Login success'), data: data.tokenInfo };
     }
 
     @Mutation('register')
@@ -47,10 +57,17 @@ export class UserResolver {
         return { code: 200, message: t('Delete user role successfully') };
     }
 
+    @Mutation('banUser')
+    @Permission({ name: 'ban_user', identify: 'user:banUser', action: 'update' })
+    async banUser(req, body: { userId: number }): Promise<CommonResult> {
+        await this.userService.recycleOrBanUser(body.userId, 'recycle');
+        return { code: 200, message: t('Ban user successfully') };
+    }
+
     @Mutation('recycleUser')
-    @Permission({ name: 'recycle_user', identify: 'user:recycleUser', action: 'delete' })
+    @Permission({ name: 'recycle_user', identify: 'user:recycleUser', action: 'update' })
     async recycleUser(req, body: { userId: number }): Promise<CommonResult> {
-        await this.userService.recycleUser(body.userId);
+        await this.userService.recycleOrBanUser(body.userId, 'recycle');
         return { code: 200, message: t('Delete user to recycle bin successfully') };
     }
 
@@ -59,6 +76,20 @@ export class UserResolver {
     async deleteRecycledUser(req, body: { userId: number }): Promise<CommonResult> {
         await this.userService.deleteUser(body.userId);
         return { code: 200, message: t('Delete user in the recycle bin successfully') };
+    }
+
+    @Mutation('revertBannedUser')
+    @Permission({ name: 'revert_banned_user', identify: 'user:revertBannedUser', action: 'update' })
+    async revertBannedUser(req, body: { userId: number }): Promise<CommonResult> {
+        await this.userService.revertBannedOrRecycledUser(body.userId, 'banned');
+        return { code: 200, message: t('Revert banned user successfully') };
+    }
+
+    @Mutation('revertRecycledUser')
+    @Permission({ name: 'revert_recycled_user', identify: 'user:revertRecycledUser', action: 'update' })
+    async revertRecycledUser(req, body: { userId: number }): Promise<CommonResult> {
+        await this.userService.revertBannedOrRecycledUser(body.userId, 'recycled');
+        return { code: 200, message: t('Revert recycled user successfully') };
     }
 
     @Mutation('updateUserInfoById')

@@ -189,7 +189,7 @@ export class UserModule implements OnModuleInit {
 
         await this.roleRepo.save(this.roleRepo.create({
             id: 1,
-            name: 'ordinary user'
+            name: t('ordinary user')
         }));
     }
 
@@ -203,7 +203,7 @@ export class UserModule implements OnModuleInit {
 
         await this.infoGroupRepo.save(this.infoGroupRepo.create({
             id: 1,
-            name: 'ordinary user information group',
+            name: t('ordinary user information group'),
             role: {
                 id: 1
             }

@@ -95,10 +95,20 @@
     "No users belong to this role": "No users belong to this role",
     "No users belong to this organization": "No users belong to this Organization",
     "User does not exist": "User does not exist",
+    "User is banned": "User is banned",
     "invalid password": "invalid password",
     "Username already exists": "Username already exists",
     "Request header lacks authorization parameters，it should be: Authorization or authorization": "Request header lacks authorization parameters，it should be: Authorization or authorization",
     "The authorization code prefix is incorrect. it should be: Bearer or bearer": "The authorization code prefix is incorrect. it should be: Bearer or bearer",
     "The authorization code is incorrect": "The authorization code is incorrect",
-    "The authorization code has expired": "The authorization code has expired"
+    "The authorization code has expired": "The authorization code has expired",
+    "ordinary user": "ordinary user",
+    "ordinary user information group": "ordinary user information group",
+    "Ban user successfully": "Ban user successfully",
+	"Revert banned user successfully": "Revert banned user successfully",
+    "Revert recycled user successfully": "Revert recycled user successfully",
+    "You are not authorized to access": "You are not authorized to access",
+    "ban_user": "ban_user",
+	"revert_banned_user": "revert_banned_user",
+	"revert_recycled_user": "revert_recycled_user"
 }

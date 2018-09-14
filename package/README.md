@@ -1,10 +1,10 @@
 # Notadd User Module(GraphQL Api Version)
 
-[中文文档](./README_zh.md)
+[中文文档](https://github.com/notadd/ns-module-user/blob/graphql-api/README_zh.md)
 
 ## Document
 
-- [Design Document](./doc/design.md)
+- [Design Document](https://github.com/notadd/ns-module-user/blob/graphql-api/doc/design.md)
 
 ## Features
 

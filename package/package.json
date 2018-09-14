@@ -18,13 +18,13 @@
     },
     "license": "Apache-2.0",
     "dependencies": {
+        "@types/bcryptjs": "2.4.1",
+        "@types/i18n": "0.8.3",
+        "@types/jsonwebtoken": "7.2.8",
         "bcryptjs": "2.4.3",
         "i18n": "0.8.3",
         "jsonwebtoken": "8.3.0",
-        "moment": "2.22.2",
-        "@types/bcryptjs": "2.4.1",
-        "@types/jsonwebtoken": "7.2.8",
-        "@types/i18n": "0.8.3"
+        "moment": "2.22.2"
     },
     "bugs": {
         "url": "https://github.com/notadd/ns-module-user/issues"

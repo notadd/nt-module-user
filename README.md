@@ -6,7 +6,6 @@ Notadd 用户服务，向 Notadd 主程序提供 rpc 接口，其功能与 [**gr
 
 1. 下载 `master` 分支到本地
 2. 安装依赖 `yarn install`
-3. 手动创建数据库 module_user
-4. 修改数据库配置，配置项在 `user.module.ts` 中，只需修改 `host`、`port`、`username`、`password`、`database`、
-5. 启动 server，`yarn start`
-6. 启动 Notadd 主程序，[Notadd](https://github.com/notadd/notadd)
+3. 修改数据库配置，配置项在 `user.module.ts` 中，只需修改 `host`、`port`、`username`、`password`、`database`  (database 必须为创建好的数据库)
+4. 启动 server，`yarn start`
+5. 启动 Notadd 主程序，[Notadd](https://github.com/notadd/notadd)

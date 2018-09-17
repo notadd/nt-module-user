@@ -1,6 +1,6 @@
 # Notadd 用户模块(Grpc 版本)
 
-Notadd 用户服务，向 Notadd 主程序提供 rpc 接口，其功能与 [**graphql-api**](https://github.com/notadd/ns-module-user/tree/graphql-api) 版基本一致
+Notadd 用户服务，向 Notadd 主程序提供 rpc 接口，其功能与 [**graphql-api**](https://github.com/notadd/nt-module-user/tree/graphql-api) 版基本一致
 
 ## 使用说明
 

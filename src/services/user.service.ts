@@ -1,10 +1,9 @@
-import { forwardRef, HttpException, Inject, Injectable } from '@nestjs/common';
+import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { __ as t } from 'i18n';
 import { EntityManager, Repository } from 'typeorm';
 
-import { AuthService } from '../auth/auth.service';
 import { InfoItem } from '../entities/info-item.entity';
 import { Organization } from '../entities/organization.entity';
 import { Role } from '../entities/role.entity';
@@ -12,6 +11,7 @@ import { UserInfo } from '../entities/user-info.entity';
 import { User } from '../entities/user.entity';
 import { CreateUserInput, UpdateUserInput, UserInfoData } from '../interfaces/user.interface';
 import { CryptoUtil } from '../utils/crypto.util';
+import { AuthService } from './auth.service';
 import { RoleService } from './role.service';
 
 @Injectable()
@@ -22,7 +22,7 @@ export class UserService {
         @InjectRepository(UserInfo) private readonly userInfoRepo: Repository<UserInfo>,
         @InjectRepository(InfoItem) private readonly infoItemRepo: Repository<InfoItem>,
         @Inject(CryptoUtil) private readonly cryptoUtil: CryptoUtil,
-        @Inject(forwardRef(() => AuthService)) private readonly authService: AuthService,
+        @Inject(AuthService) private readonly authService: AuthService,
         @Inject(RoleService) private readonly roleService: RoleService
     ) { }
 

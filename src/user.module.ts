@@ -3,7 +3,6 @@ import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { configure as i18nConfigure } from 'i18n';
 import { Repository } from 'typeorm';
 
-import { AuthService } from './auth/auth.service';
 import { InfoGroupGrpcController } from './controllers/info-group.grpc.controller';
 import { InfoItemGrpcController } from './controllers/info-item.grpc.controller';
 import { OrganizationGrpcController } from './controllers/organization.grpc.controller';
@@ -18,6 +17,7 @@ import { Resource } from './entities/resource.entity';
 import { Role } from './entities/role.entity';
 import { UserInfo } from './entities/user-info.entity';
 import { User } from './entities/user.entity';
+import { AuthService } from './services/auth.service';
 import { EntityCheckService } from './services/entity-check.service';
 import { InfoGroupService } from './services/info-group.service';
 import { InfoItemService } from './services/info-item.service';

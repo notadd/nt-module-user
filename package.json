@@ -3,9 +3,9 @@
     "version": "1.0.0",
     "description": "The user module for Notadd application.",
     "scripts": {
-        "start": "ts-node -r tsconfig-paths/register stater/main.ts",
+        "start": "ts-node -r tsconfig-paths/register starter/main.ts",
         "start:watch": "nodemon",
-        "debug": "node --inspect-brk -r ts-node/register stater/main.ts",
+        "debug": "node --inspect-brk -r ts-node/register starter/main.ts",
         "debug:watch": "nodemon --config nodemon-debug.json",
         "check": "tslint -p tsconfig.json -c tslint.json",
         "fix": "tslint -p tsconfig.json -c tslint.json --fix",

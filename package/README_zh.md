@@ -2,7 +2,7 @@
 
 ## 文档
 
-- [设计文档](https://github.com/notadd/ns-module-user/blob/graphql-api/doc/design_zh.md)
+- [设计文档](https://github.com/notadd/nt-module-user/blob/graphql-api/doc/design_zh.md)
 
 ## 功能
 

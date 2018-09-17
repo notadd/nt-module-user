@@ -5,14 +5,12 @@ import { join } from 'path';
 import { UserModule } from './user.module';
 
 async function bootstrap() {
-    const app = await NestFactory.create(UserModule.forRoot({ i18n: 'zh-CN' }));
-
-    app.connectMicroservice({
+    const app = await NestFactory.createMicroservice(UserModule.forRoot({ i18n: 'zh-CN' }), {
         transport: Transport.GRPC,
         options: {
             url: '0.0.0.0' + ':50051',
             package: 'notadd_module_user',
-            protoPath: join(__dirname, '../src/protobufs/user-module.proto'),
+            protoPath: join(__dirname, 'protobufs/user-module.proto'),
             loader: {
                 arrays: true,
                 keepCase: true,
@@ -23,7 +21,8 @@ async function bootstrap() {
             }
         }
     });
-    await app.startAllMicroservicesAsync();
+
+    await app.listenAsync();
 }
 
 bootstrap();

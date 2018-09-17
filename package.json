@@ -1,5 +1,5 @@
 {
-    "name": "module-user",
+    "name": "nt-module-user",
     "version": "1.0.0",
     "description": "The user module for Notadd application.",
     "scripts": {

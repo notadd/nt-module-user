@@ -68,7 +68,7 @@ import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { UserModule } from './user';
+import { UserModule } from '@notadd/module-user';
 
 @Module({
     imports: [
@@ -95,12 +95,12 @@ export class AppModule { }
 import { Inject, Injectable } from '@nestjs/common';
 import { GqlModuleOptions, GqlOptionsFactory } from '@nestjs/graphql';
 import * as GraphQLJSON from 'graphql-type-json';
-import { AuthenticationService } from '@notadd/module-user';
+import { AuthService } from '@notadd/module-user';
 
 @Injectable()
 export class GraphQLConfigService implements GqlOptionsFactory {
     constructor(
-        @Inject(AuthenticationService) private readonly authService: AuthenticationService
+        @Inject(AuthService) private readonly authService: AuthService
     ) {}
 
     createGqlOptions(): GqlModuleOptions {
@@ -190,7 +190,7 @@ export class GraphQLConfigService implements GqlOptionsFactory {
 - `login(username: String!, password: String!)` 普通用户登录
 - `findRegisterUserInfoItem` 查询普通用户注册时所需填写的信息项
 - `findCurrentUserInfo` 查询当前登录的用户信息
-- `findUserInfoById(userId: Int!)` 通过ID查询用户信息
+- `findUserInfoByIds(userIds: [Int]!)` 通过ID查询用户信息
 - `findUsersInRole(roleId: Int!)` 查询指定角色ID下的所有用户信息
 - `findUsersInOrganization(organizationId: Int!)` 获取指定组织ID下的用户
 

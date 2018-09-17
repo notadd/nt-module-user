@@ -33,13 +33,13 @@ export class UserService {
         createUserInput.password = await this.cryptoUtil.encryptPassword(createUserInput.password);
         const user = await this.userRepo.save(this.userRepo.create(createUserInput));
         if (createUserInput.roleIds && createUserInput.roleIds.length) {
-            this.userRepo.createQueryBuilder('user').relation(User, 'roles').of(user).add(createUserInput.roleIds);
+            await this.userRepo.createQueryBuilder('user').relation(User, 'roles').of(user).add(createUserInput.roleIds);
         }
         if (createUserInput.organizationIds && createUserInput.organizationIds.length) {
-            this.userRepo.createQueryBuilder('user').relation(User, 'organizations').of(user).add(createUserInput.organizationIds);
+            await this.userRepo.createQueryBuilder('user').relation(User, 'organizations').of(user).add(createUserInput.organizationIds);
         }
         if (createUserInput.infoKVs && createUserInput.infoKVs.length) {
-            this.createOrUpdateUserInfos(user, createUserInput.infoKVs, 'create');
+            await this.createOrUpdateUserInfos(user, createUserInput.infoKVs, 'create');
         }
     }
 
@@ -50,7 +50,7 @@ export class UserService {
      * @param roleId The specified role id
      */
     async addUserRole(userId: number, roleId: number) {
-        this.userRepo.createQueryBuilder('user').relation(User, 'roles').of(userId).add(roleId);
+        await this.userRepo.createQueryBuilder('user').relation(User, 'roles').of(userId).add(roleId);
     }
 
     /**
@@ -60,7 +60,7 @@ export class UserService {
      * @param roleId The specified role id
      */
     async deleteUserRole(userId: number, roleId: number) {
-        this.userRepo.createQueryBuilder('user').relation(User, 'roles').of(userId).remove(roleId);
+        await this.userRepo.createQueryBuilder('user').relation(User, 'roles').of(userId).remove(roleId);
     }
 
     /**
@@ -264,7 +264,7 @@ export class UserService {
      */
     async register(createUserInput: CreateUserInput): Promise<void> {
         createUserInput.roleIds = [1];
-        this.createUser(createUserInput);
+        await this.createUser(createUserInput);
     }
 
     /**

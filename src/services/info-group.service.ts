@@ -25,7 +25,7 @@ export class InfoGroupService {
         if (await this.infoGroupRepo.findOne({ role: { id: roleId } })) {
             throw new HttpException(t('The role information group already exists'), 409);
         }
-        this.infoGroupRepo.save(this.infoGroupRepo.create({ name, role: { id: roleId } }));
+        await this.infoGroupRepo.save(this.infoGroupRepo.create({ name, role: { id: roleId } }));
     }
 
     /**
@@ -44,7 +44,7 @@ export class InfoGroupService {
         const duplicateIds = infoItems.map(infoItem => infoItem.id).filter(infoItemId => infoItemIds.includes(infoItemId));
         if (duplicateIds.length) throw new HttpException(t('Information item with id [%s] already exists', duplicateIds.toString()), 409);
 
-        this.infoGroupRepo.createQueryBuilder('infoGroup').relation(InfoGroup, 'infoItems').of(infoGroupId).add(infoItemIds);
+        await this.infoGroupRepo.createQueryBuilder('infoGroup').relation(InfoGroup, 'infoItems').of(infoGroupId).add(infoItemIds);
     }
 
     /**
@@ -53,7 +53,7 @@ export class InfoGroupService {
      * @param id The information group's id
      */
     async delete(id: number) {
-        this.infoGroupRepo.delete(id);
+        await this.infoGroupRepo.delete(id);
     }
 
     /**
@@ -63,7 +63,7 @@ export class InfoGroupService {
      * @param infoItemIds The specified information item's id array
      */
     async deleteIntoItem(infoGroupId: number, infoItemIds: number[]) {
-        this.infoGroupRepo.createQueryBuilder('infoGroup').relation(InfoGroup, 'infoItems').of(infoGroupId).remove(infoItemIds);
+        await this.infoGroupRepo.createQueryBuilder('infoGroup').relation(InfoGroup, 'infoItems').of(infoGroupId).remove(infoItemIds);
     }
 
     /**
@@ -74,7 +74,7 @@ export class InfoGroupService {
      */
     async update(id: number, name: string, roleId: number) {
         await this.entityCheckService.checkNameExist(InfoGroup, name);
-        this.infoGroupRepo.update(id, { name, role: { id: roleId } });
+        await this.infoGroupRepo.update(id, { name, role: { id: roleId } });
     }
 
     /**

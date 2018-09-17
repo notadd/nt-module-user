@@ -20,7 +20,7 @@ export class InfoItemService {
      */
     async create(infoItem: InfoItem) {
         await this.entityCheckService.checkNameExist(InfoItem, infoItem.name);
-        this.infoItemRepo.save(this.infoItemRepo.create(infoItem));
+        await this.infoItemRepo.save(this.infoItemRepo.create(infoItem));
     }
 
     /**
@@ -30,8 +30,8 @@ export class InfoItemService {
      */
     async delete(id: number) {
         const infoItem = await this.infoItemRepo.findOne(id, { relations: ['userInfos', 'infoGroups'] });
-        this.infoItemRepo.createQueryBuilder('infoItem').relation(InfoItem, 'infoGroups').of(id).remove(infoItem.infoGroups);
-        this.infoItemRepo.remove(infoItem);
+        await this.infoItemRepo.createQueryBuilder('infoItem').relation(InfoItem, 'infoGroups').of(id).remove(infoItem.infoGroups);
+        await this.infoItemRepo.remove(infoItem);
     }
 
     /**
@@ -45,22 +45,22 @@ export class InfoItemService {
     async update(updateInfoItemInput: UpdateInfoItemInput) {
         await this.entityCheckService.checkNameExist(InfoItem, updateInfoItemInput.name);
         if (updateInfoItemInput.order) {
-            this.infoItemRepo.update(updateInfoItemInput.id, { order: updateInfoItemInput.order });
+            await this.infoItemRepo.update(updateInfoItemInput.id, { order: updateInfoItemInput.order });
         }
         if (updateInfoItemInput.type) {
-            this.infoItemRepo.update(updateInfoItemInput.id, { type: updateInfoItemInput.type });
+            await this.infoItemRepo.update(updateInfoItemInput.id, { type: updateInfoItemInput.type });
         }
         if (updateInfoItemInput.name) {
-            this.infoItemRepo.update(updateInfoItemInput.id, { name: updateInfoItemInput.name });
+            await this.infoItemRepo.update(updateInfoItemInput.id, { name: updateInfoItemInput.name });
         }
         if (updateInfoItemInput.description) {
-            this.infoItemRepo.update(updateInfoItemInput.id, { description: updateInfoItemInput.description });
+            await this.infoItemRepo.update(updateInfoItemInput.id, { description: updateInfoItemInput.description });
         }
         if (updateInfoItemInput.registerDisplay) {
-            this.infoItemRepo.update(updateInfoItemInput.id, { registerDisplay: updateInfoItemInput.registerDisplay });
+            await this.infoItemRepo.update(updateInfoItemInput.id, { registerDisplay: updateInfoItemInput.registerDisplay });
         }
         if (updateInfoItemInput.informationDisplay) {
-            this.infoItemRepo.update(updateInfoItemInput.id, { informationDisplay: updateInfoItemInput.informationDisplay });
+            await this.infoItemRepo.update(updateInfoItemInput.id, { informationDisplay: updateInfoItemInput.informationDisplay });
         }
     }
 

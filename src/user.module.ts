@@ -2,9 +2,9 @@ import { DynamicModule, Global, Inject, Module, OnModuleInit } from '@nestjs/com
 import { APP_GUARD } from '@nestjs/core';
 import { ModulesContainer } from '@nestjs/core/injector/modules-container';
 import { MetadataScanner } from '@nestjs/core/metadata-scanner';
-import { InjectEntityManager, InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
+import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { __ as t, configure as i18nConfigure } from 'i18n';
-import { EntityManager, In, Not, Repository } from 'typeorm';
+import { In, Not, Repository } from 'typeorm';
 
 import { AuthGurad } from './auth/auth.gurad';
 import { AuthService } from './auth/auth.service';
@@ -41,7 +41,6 @@ import { CryptoUtil } from './utils/crypto.util';
     providers: [
         { provide: APP_GUARD, useClass: AuthGurad },
         AuthService,
-        EntityManager,
         EntityCheckService,
         OrganizationResolver, OrganizationService,
         UserResolver, UserService,
@@ -59,7 +58,6 @@ export class UserModule implements OnModuleInit {
     constructor(
         @Inject(UserService) private readonly userService: UserService,
         @Inject(ModulesContainer) private readonly modulesContainer: ModulesContainer,
-        @InjectEntityManager() private readonly entityManager: EntityManager,
         @InjectRepository(Resource) private readonly resourceRepo: Repository<Resource>,
         @InjectRepository(Permission) private readonly permissionRepo: Repository<Permission>,
         @InjectRepository(Role) private readonly roleRepo: Repository<Role>,
@@ -158,7 +156,7 @@ export class UserModule implements OnModuleInit {
         const existResources = await this.resourceRepo.find({ order: { id: 'ASC' } });
         const newResourcess = scannedResources.filter(sr => !existResources.map(v => v.identify).includes(sr.identify));
         // Save the new resources
-        if (newResourcess.length > 0) await this.entityManager.insert(Resource, this.resourceRepo.create(newResourcess));
+        if (newResourcess.length > 0) await this.resourceRepo.save(this.resourceRepo.create(newResourcess));
 
         // All permission annotations that were scanned
         const scannedPermissions = <Permission[]>[].concat(...scannedResourcesAndPermissions.map(v => v.permissions));
@@ -177,7 +175,7 @@ export class UserModule implements OnModuleInit {
         const existPermissions = await this.permissionRepo.find({ order: { id: 'ASC' } });
         const newPermissions = scannedPermissions.filter(sp => !existPermissions.map(v => v.identify).includes(sp.identify));
         // Save the new permissions
-        if (newPermissions.length > 0) await this.entityManager.insert(Permission, this.permissionRepo.create(newPermissions));
+        if (newPermissions.length > 0) await this.permissionRepo.save(this.permissionRepo.create(newPermissions));
     }
 
     /**

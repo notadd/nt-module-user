@@ -46,10 +46,9 @@ const role_service_1 = require("./services/role.service");
 const user_service_1 = require("./services/user.service");
 const crypto_util_1 = require("./utils/crypto.util");
 let UserModule = UserModule_1 = class UserModule {
-    constructor(userService, modulesContainer, entityManager, resourceRepo, permissionRepo, roleRepo, infoGroupRepo, userRepo) {
+    constructor(userService, modulesContainer, resourceRepo, permissionRepo, roleRepo, infoGroupRepo, userRepo) {
         this.userService = userService;
         this.modulesContainer = modulesContainer;
-        this.entityManager = entityManager;
         this.resourceRepo = resourceRepo;
         this.permissionRepo = permissionRepo;
         this.roleRepo = roleRepo;
@@ -110,7 +109,7 @@ let UserModule = UserModule_1 = class UserModule {
         const existResources = await this.resourceRepo.find({ order: { id: 'ASC' } });
         const newResourcess = scannedResources.filter(sr => !existResources.map(v => v.identify).includes(sr.identify));
         if (newResourcess.length > 0)
-            await this.entityManager.insert(resource_entity_1.Resource, this.resourceRepo.create(newResourcess));
+            await this.resourceRepo.save(this.resourceRepo.create(newResourcess));
         const scannedPermissions = [].concat(...scannedResourcesAndPermissions.map(v => v.permissions));
         const resource = await this.resourceRepo.find({ where: { identify: typeorm_2.In(scannedPermissions.map(v => v.resource.identify)) } });
         scannedPermissions.forEach(permission => {
@@ -123,7 +122,7 @@ let UserModule = UserModule_1 = class UserModule {
         const existPermissions = await this.permissionRepo.find({ order: { id: 'ASC' } });
         const newPermissions = scannedPermissions.filter(sp => !existPermissions.map(v => v.identify).includes(sp.identify));
         if (newPermissions.length > 0)
-            await this.entityManager.insert(permission_entity_1.Permission, this.permissionRepo.create(newPermissions));
+            await this.permissionRepo.save(this.permissionRepo.create(newPermissions));
     }
     async createDefaultRole() {
         const defaultRole = await this.roleRepo.findOne(1);
@@ -163,7 +162,6 @@ UserModule = UserModule_1 = __decorate([
         providers: [
             { provide: core_1.APP_GUARD, useClass: auth_gurad_1.AuthGurad },
             auth_service_1.AuthService,
-            typeorm_2.EntityManager,
             entity_check_service_1.EntityCheckService,
             organization_resolver_1.OrganizationResolver, organization_service_1.OrganizationService,
             user_resolver_1.UserResolver, user_service_1.UserService,
@@ -177,15 +175,13 @@ UserModule = UserModule_1 = __decorate([
     }),
     __param(0, common_1.Inject(user_service_1.UserService)),
     __param(1, common_1.Inject(modules_container_1.ModulesContainer)),
-    __param(2, typeorm_1.InjectEntityManager()),
-    __param(3, typeorm_1.InjectRepository(resource_entity_1.Resource)),
-    __param(4, typeorm_1.InjectRepository(permission_entity_1.Permission)),
-    __param(5, typeorm_1.InjectRepository(role_entity_1.Role)),
-    __param(6, typeorm_1.InjectRepository(info_group_entity_1.InfoGroup)),
-    __param(7, typeorm_1.InjectRepository(user_entity_1.User)),
+    __param(2, typeorm_1.InjectRepository(resource_entity_1.Resource)),
+    __param(3, typeorm_1.InjectRepository(permission_entity_1.Permission)),
+    __param(4, typeorm_1.InjectRepository(role_entity_1.Role)),
+    __param(5, typeorm_1.InjectRepository(info_group_entity_1.InfoGroup)),
+    __param(6, typeorm_1.InjectRepository(user_entity_1.User)),
     __metadata("design:paramtypes", [user_service_1.UserService,
         modules_container_1.ModulesContainer,
-        typeorm_2.EntityManager,
         typeorm_2.Repository,
         typeorm_2.Repository,
         typeorm_2.Repository,

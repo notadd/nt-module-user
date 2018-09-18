@@ -18,7 +18,9 @@ const core_1 = require("@nestjs/core");
 const modules_container_1 = require("@nestjs/core/injector/modules-container");
 const metadata_scanner_1 = require("@nestjs/core/metadata-scanner");
 const typeorm_1 = require("@nestjs/typeorm");
+const fs_1 = require("fs");
 const i18n_1 = require("i18n");
+const path_1 = require("path");
 const typeorm_2 = require("typeorm");
 const auth_gurad_1 = require("./auth/auth.gurad");
 const auth_service_1 = require("./auth/auth.service");
@@ -57,10 +59,15 @@ let UserModule = UserModule_1 = class UserModule {
         this.metadataScanner = new metadata_scanner_1.MetadataScanner();
     }
     static forRoot(options) {
+        if (!fs_1.existsSync('src/i18n')) {
+            fs_1.mkdirSync(path_1.join('src/i18n'));
+            fs_1.writeFileSync(path_1.join('src/i18n', 'zh-CN.json'), fs_1.readFileSync(__dirname + '/i18n/zh-CN.json'));
+            fs_1.writeFileSync(path_1.join('src/i18n', 'en-US.json'), fs_1.readFileSync(__dirname + '/i18n/en-US.json'));
+        }
         i18n_1.configure({
             locales: ['en-US', 'zh-CN'],
             defaultLocale: options.i18n,
-            directory: __dirname + '/i18n'
+            directory: 'src/i18n'
         });
         return {
             module: UserModule_1
@@ -75,16 +82,16 @@ let UserModule = UserModule_1 = class UserModule {
     async loadResourcesAndPermissions() {
         const metadataMap = new Map();
         this.modulesContainer.forEach(module => {
-            module.components.forEach(component => {
-                const isResolverOrController = Reflect.getMetadataKeys(component.instance.constructor)
+            for (const [key, value] of [...module.components, ...module.routes]) {
+                const isResolverOrController = Reflect.getMetadataKeys(value.instance.constructor)
                     .filter(key => ['graphql:resolver_type', 'path']
                     .includes(key)).length > 0;
                 if (isResolverOrController) {
-                    const resource = Reflect.getMetadata(decorators_1.RESOURCE_DEFINITION, component.instance.constructor);
-                    const prototype = Object.getPrototypeOf(component.instance);
+                    const resource = Reflect.getMetadata(decorators_1.RESOURCE_DEFINITION, value.instance.constructor);
+                    const prototype = Object.getPrototypeOf(value.instance);
                     if (prototype) {
-                        const permissions = this.metadataScanner.scanFromPrototype(component.instance, prototype, name => {
-                            return Reflect.getMetadata(decorators_1.PERMISSION_DEFINITION, component.instance, name);
+                        const permissions = this.metadataScanner.scanFromPrototype(value.instance, prototype, name => {
+                            return Reflect.getMetadata(decorators_1.PERMISSION_DEFINITION, value.instance, name);
                         });
                         if (resource) {
                             resource.name = i18n_1.__(resource.name);
@@ -95,7 +102,7 @@ let UserModule = UserModule_1 = class UserModule {
                         }
                     }
                 }
-            });
+            }
         });
         const scannedResourcesAndPermissions = [...metadataMap.values()].map(metadataValue => {
             metadataValue.permissions.forEach(v => v.resource = metadataValue.resource);
@@ -110,6 +117,10 @@ let UserModule = UserModule_1 = class UserModule {
         const newResourcess = scannedResources.filter(sr => !existResources.map(v => v.identify).includes(sr.identify));
         if (newResourcess.length > 0)
             await this.resourceRepo.save(this.resourceRepo.create(newResourcess));
+        existResources.forEach(er => {
+            er.name = scannedResources.find(sr => sr.identify === er.identify).name;
+        });
+        await this.resourceRepo.save(existResources);
         const scannedPermissions = [].concat(...scannedResourcesAndPermissions.map(v => v.permissions));
         const resource = await this.resourceRepo.find({ where: { identify: typeorm_2.In(scannedPermissions.map(v => v.resource.identify)) } });
         scannedPermissions.forEach(permission => {
@@ -123,6 +134,11 @@ let UserModule = UserModule_1 = class UserModule {
         const newPermissions = scannedPermissions.filter(sp => !existPermissions.map(v => v.identify).includes(sp.identify));
         if (newPermissions.length > 0)
             await this.permissionRepo.save(this.permissionRepo.create(newPermissions));
+        existPermissions.forEach(ep => {
+            ep.name = scannedPermissions.find(sp => sp.identify === ep.identify).name;
+            ep.action = scannedPermissions.find(sp => sp.identify === ep.identify).action;
+        });
+        await this.permissionRepo.save(existPermissions);
     }
     async createDefaultRole() {
         const defaultRole = await this.roleRepo.findOne(1);

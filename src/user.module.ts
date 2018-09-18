@@ -3,7 +3,9 @@ import { APP_GUARD } from '@nestjs/core';
 import { ModulesContainer } from '@nestjs/core/injector/modules-container';
 import { MetadataScanner } from '@nestjs/core/metadata-scanner';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { __ as t, configure as i18nConfigure } from 'i18n';
+import { join } from 'path';
 import { In, Not, Repository } from 'typeorm';
 
 import { AuthGurad } from './auth/auth.gurad';
@@ -68,10 +70,15 @@ export class UserModule implements OnModuleInit {
     }
 
     static forRoot(options: { i18n: 'en-US' | 'zh-CN' }): DynamicModule {
+        if (!existsSync('src/i18n')) {
+            mkdirSync(join('src/i18n'));
+            writeFileSync(join('src/i18n', 'zh-CN.json'), readFileSync(__dirname + '/i18n/zh-CN.json'));
+            writeFileSync(join('src/i18n', 'en-US.json'), readFileSync(__dirname + '/i18n/en-US.json'));
+        }
         i18nConfigure({
             locales: ['en-US', 'zh-CN'],
             defaultLocale: options.i18n,
-            directory: __dirname + '/i18n'
+            directory: 'src/i18n'
         });
         return {
             module: UserModule
@@ -92,25 +99,23 @@ export class UserModule implements OnModuleInit {
         const metadataMap: Map<string, { resource: Resource, permissions: Permission[] }> = new Map();
         // Iterate Modules from module container
         this.modulesContainer.forEach(module => {
-            // Iterate the components from each module
-            module.components.forEach(component => {
-                // Determine if the current component is a Resolver or Controller
+            for (const [key, value] of [...module.components, ...module.routes]) {
                 const isResolverOrController =
-                    Reflect.getMetadataKeys(component.instance.constructor)
+                    Reflect.getMetadataKeys(value.instance.constructor)
                         .filter(key => ['graphql:resolver_type', 'path']
                             .includes(key)).length > 0;
 
                 if (isResolverOrController) {
                     // Get the metadata in the @Resource() annotation on the Resolver or Controller class
-                    const resource: Resource = Reflect.getMetadata(RESOURCE_DEFINITION, component.instance.constructor);
+                    const resource: Resource = Reflect.getMetadata(RESOURCE_DEFINITION, value.instance.constructor);
                     // Get the prototype object of the Resolver or Controller class
-                    const prototype = Object.getPrototypeOf(component.instance);
+                    const prototype = Object.getPrototypeOf(value.instance);
                     if (prototype) {
                         // Get the method name in the Resolver or Controller class,
                         // the name in the callback function is the method name in the current class
-                        const permissions: Permission[] = this.metadataScanner.scanFromPrototype(component.instance, prototype, name => {
+                        const permissions: Permission[] = this.metadataScanner.scanFromPrototype(value.instance, prototype, name => {
                             // Get the metadata in the @Permission() annotation on the method in the Resolver or Controller class
-                            return Reflect.getMetadata(PERMISSION_DEFINITION, component.instance, name);
+                            return Reflect.getMetadata(PERMISSION_DEFINITION, value.instance, name);
                         });
                         // If the metadata exists, it will be added to the resource collection,
                         // and it will be automatically deduplicated according to resource.indetify
@@ -125,7 +130,7 @@ export class UserModule implements OnModuleInit {
                         }
                     }
                 }
-            });
+            }
         });
 
         /**
@@ -157,6 +162,11 @@ export class UserModule implements OnModuleInit {
         const newResourcess = scannedResources.filter(sr => !existResources.map(v => v.identify).includes(sr.identify));
         // Save the new resources
         if (newResourcess.length > 0) await this.resourceRepo.save(this.resourceRepo.create(newResourcess));
+        // Update existing resources name
+        existResources.forEach(er => {
+            er.name = scannedResources.find(sr => sr.identify === er.identify).name;
+        });
+        await this.resourceRepo.save(existResources);
 
         // All permission annotations that were scanned
         const scannedPermissions = <Permission[]>[].concat(...scannedResourcesAndPermissions.map(v => v.permissions));
@@ -176,6 +186,12 @@ export class UserModule implements OnModuleInit {
         const newPermissions = scannedPermissions.filter(sp => !existPermissions.map(v => v.identify).includes(sp.identify));
         // Save the new permissions
         if (newPermissions.length > 0) await this.permissionRepo.save(this.permissionRepo.create(newPermissions));
+        // Update existing permissions name
+        existPermissions.forEach(ep => {
+            ep.name = scannedPermissions.find(sp => sp.identify === ep.identify).name;
+            ep.action = scannedPermissions.find(sp => sp.identify === ep.identify).action;
+        });
+        await this.permissionRepo.save(existPermissions);
     }
 
     /**

@@ -36,8 +36,7 @@ let OrganizationService = class OrganizationService {
         if (!exist) {
             throw new common_1.HttpException(i18n_1.__('The organization with id of %s does not exist', id.toString()), 404);
         }
-        const children = await this.organizationReq.findDescendantsTree(exist);
-        return children;
+        return this.organizationReq.findDescendantsTree(exist);
     }
     async createOrganization(name, parentId) {
         let parent;

@@ -28,7 +28,7 @@ let InfoGroupService = class InfoGroupService {
         if (await this.infoGroupRepo.findOne({ role: { id: roleId } })) {
             throw new common_1.HttpException(i18n_1.__('The role information group already exists'), 409);
         }
-        this.infoGroupRepo.save(this.infoGroupRepo.create({ name, role: { id: roleId } }));
+        await this.infoGroupRepo.save(this.infoGroupRepo.create({ name, role: { id: roleId } }));
     }
     async addInfoItem(infoGroupId, infoItemIds) {
         const infoItems = await this.infoGroupRepo
@@ -39,17 +39,17 @@ let InfoGroupService = class InfoGroupService {
         const duplicateIds = infoItems.map(infoItem => infoItem.id).filter(infoItemId => infoItemIds.includes(infoItemId));
         if (duplicateIds.length)
             throw new common_1.HttpException(i18n_1.__('Information item with id [%s] already exists', duplicateIds.toString()), 409);
-        this.infoGroupRepo.createQueryBuilder('infoGroup').relation(info_group_entity_1.InfoGroup, 'infoItems').of(infoGroupId).add(infoItemIds);
+        await this.infoGroupRepo.createQueryBuilder('infoGroup').relation(info_group_entity_1.InfoGroup, 'infoItems').of(infoGroupId).add(infoItemIds);
     }
     async delete(id) {
-        this.infoGroupRepo.delete(id);
+        await this.infoGroupRepo.delete(id);
     }
     async deleteIntoItem(infoGroupId, infoItemIds) {
-        this.infoGroupRepo.createQueryBuilder('infoGroup').relation(info_group_entity_1.InfoGroup, 'infoItems').of(infoGroupId).remove(infoItemIds);
+        await this.infoGroupRepo.createQueryBuilder('infoGroup').relation(info_group_entity_1.InfoGroup, 'infoItems').of(infoGroupId).remove(infoItemIds);
     }
     async update(id, name, roleId) {
         await this.entityCheckService.checkNameExist(info_group_entity_1.InfoGroup, name);
-        this.infoGroupRepo.update(id, { name, role: { id: roleId } });
+        await this.infoGroupRepo.update(id, { name, role: { id: roleId } });
     }
     async findAll() {
         return this.infoGroupRepo.find();

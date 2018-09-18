@@ -1,10 +1,10 @@
 # Notadd User Module(GraphQL Api Version)
 
-[中文文档](https://github.com/notadd/nt-module-user/blob/graphql-api/README_zh.md)
+[中文文档](./README_zh.md)
 
 ## Document
 
-- [Design Document](https://github.com/notadd/nt-module-user/blob/graphql-api/doc/design.md)
+- [Design Document](./doc/design.md)
 
 ## Features
 
@@ -45,7 +45,7 @@ Set annotations for defining resources on the `Resolver` or `Controller` class t
 
 Set annotations for defining operations on the `Resolver` and `Controller` methods. The user defines the operation permissions on the current resource, such as:
 
-`@Permission({ name: 'Add article', identify: 'artical:create', action: 'create', personal: true })`
+`@Permission({ name: 'Add article', identify: 'artical:create', action: 'create' })`
 
 `name`: The name of the permission, used to define the specific permission name, named: `operation + resource`, such as: `Add article in the article resource => 'Add article'
 
@@ -70,7 +70,7 @@ import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { UserModule } from './user';
+import { UserModule } from '@notadd/module-user';
 
 @Module({
     imports: [
@@ -87,7 +87,7 @@ import { UserModule } from './user';
 export class AppModule { }
 ```
 
-#### Authentication function, using the `validateUser` method of the `AuthenticationService` class in the graphql context, and passing the authenticated user to the context
+#### Authentication function, using the `validateUser` method of the `AuthService` class in the graphql context, and passing the authenticated user to the context
 
 `GraphQLJSON` is used to handle the `JSON` scalar type in graphql, you need to install `graphql-type-json` additionally, and then configure it into the resolvers option.
 
@@ -97,12 +97,12 @@ export class AppModule { }
 import { Inject, Injectable } from '@nestjs/common';
 import { GqlModuleOptions, GqlOptionsFactory } from '@nestjs/graphql';
 import * as GraphQLJSON from 'graphql-type-json';
-import { AuthenticationService } from '@notadd/module-user';
+import { AuthService } from '@notadd/module-user';
 
 @Injectable()
 export class GraphQLConfigService implements GqlOptionsFactory {
     constructor(
-        @Inject(AuthenticationService) private readonly authService: AuthenticationService
+        @Inject(AuthService) private readonly authService: AuthService
     ) {}
 
     createGqlOptions(): GqlModuleOptions {
@@ -117,92 +117,3 @@ export class GraphQLConfigService implements GqlOptionsFactory {
     }
 }
 ```
-
-## API Logic Description
-
-User modules provide rich and flexible interfaces to various upper-layer business systems. The following describes common interface logic.
-
-### Resources
-
-**Query**:
-
-- `findResources` queries all resource permissions and returns all resource and permission data defined by the current business system
-
-### Roles
-
-**Query**:
-
-- `findRoles` queries all roles, returns the id and name of all roles
-- `findOneRoleInfo(roleId: Int!)` Query role information, return the role details of the specified id, including the permissions owned by the role and the information items they own
-
-**Mutation**:
-
-- `createRole(name: String!)` Add a role
-- `updateRole(id: Int!, name: String!)` Update the role name
-- `deleteRole(id: Int!)` deletes the role of the specified id
-- `setPermissionsToRole(roleId: Int!, permissionIds: [Int]!)` Set permissions for the role
-
-### Information Groups
-
-**Query**:
-
-- `findAllInfoGroup` Query all information groups
-- `findInfoItemsByGroupId(groupId: Int!)` Query all information items under the specified information group
-
-**Mutation**:
-
-- `createInfoGroup(name: String!, roleId: Int!)` New information group
-- `deleteInfoGroup(groupId: Int!)` Delete the information group of the specified ID
-- `updateInfoGroup(groupId: Int!, name: String, roleId: Int)` Update the group name or the assigned role of the specified ID
-- `addInfoItemToInfoGroup(infoGroupId: Int!, infoItemIds: [Int]!)` Adds the specified information item to the specified information group
-- `deleteIntoItemFromInfoGroup(infoGroupId: Int!, infoItemIds: [Int]!)` Delete the specified information item of the specified information group
-
-### Information Items
-
-**Query**:
-
-- `findAllInfoItem` Query all information items
-
-**Mutation**:
-
-- `createInfoItem(infoItemInput: InfoItemInput)` new information item
-- `deleteInfoItem(infoItemId: Int!)` Delete the information item of the specified ID
-- `updateInfoItem(updateInfoItemInput: UpdateInfoItemInput)` Updates the information item name, label, description, and type of the specified ID
-
-### Organizations
-
-**Query**:
-
-- `findRootOrganizations` Get the root organization
-- `findAllOrganizations` Get all organizations
-- `findChildrenOrganizations(id: Int!)` Get all suborganizations under the specified organization
-
-**Mutation**:
-
-- `createOrganization(name: String!, parentId: Int)` creates an organization, when the parentId is empty, it represents the creation of the root organization
-- `updateOrganization(id: Int!, name: String!, parentId: Int!)` Update organization
-- `deleteOrganization(id: Int!)` delete organization
-- `addUsersToOrganization(id: Int!, userIds: [Int]!)` Add users to the organization
-- `deleteUserFromOrganization(id: Int!, userIds: [Int]!)` Delete the user under the organization
-
-### Users
-
-**Query**:
-
-- `login(username: String!, password: String!)` Ordinary user login
-- `findRegisterUserInfoItem` Query the information items required for normal user registration
-- `findCurrentUserInfo` Query the currently logged in user information
-- `findUserInfoById(userId: Int!)` Query user information by ID
-- `findUsersInRole(roleId: Int!)` Query all user information under the specified role ID
-- `findUsersInOrganization(organizationId: Int!)` Get the user under the specified organization ID
-
-**Mutation**:
-
-- `register(registerUserInput: RegisterUserInput)` Normal user registration, the key in the parameter infoKVs is the ID of the information item (infoItem.id), and the value is the value of the information item (userInfo.value)
-- `createUser(createUserInput: CreateUserInput)` creates the user, the key in the parameter infoKVs is the ID of the information item (infoItem.id), and the value is the value of the information item (userInfo.value)
-- `addUserRole(userId: Int!, roleId: Int!)` Add a role to the user
-- `deleteUserRole(userId: Int!, roleId: Int!)` Delete user role
-- `recycleUser(userId: Int!)` delete user to recycle bin
-- `deleteRecycledUser(userId: Int!)` deletes users in the recycle bin
-- `updateUserInfo(userId: Int!, updateUserInput: UpdateUserInput)` Update user information, the key in the parameter infoKVs is the ID of the user information item value (userInfo.id), the value is the value of the information item (userInfo.value), and the relationId is The ID of the information item. When the returned key is null, you also need to pass in null.
-- `updateCurrentUserInfo(updateCurrentUserInput: UpdateCurrentUserInput)` Updates the current login user information. The key in the infocVs parameter is the ID of the user information item value (userInfo.id), the value is the value of the information item (userInfo.value), and the relationId is the information item. ID, when the returned key is null, you also need to pass in null

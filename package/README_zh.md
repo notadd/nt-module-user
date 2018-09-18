@@ -2,7 +2,7 @@
 
 ## 文档
 
-- [设计文档](https://github.com/notadd/nt-module-user/blob/graphql-api/doc/design_zh.md)
+- [设计文档](./doc/design_zh.md)
 
 ## 功能
 
@@ -43,7 +43,7 @@
 
 在 `Resolver`、`Controller` 方法上设置定义操作的注解，用户定义对当前资源的操作权限，如：
 
-`@Permission({ name: '添加文章', identify: 'artical:create', action: 'create', personal: true })`
+`@Permission({ name: '添加文章', identify: 'artical:create', action: 'create' })`
 
 `name`: 权限的名称，用于定义具体的权限名称，命名方式为：`操作+资源`，如：`在文章资源中添加文章 => '添加文章'`
 
@@ -68,7 +68,7 @@ import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { UserModule } from './user';
+import { UserModule } from '@notadd/module-user';
 
 @Module({
     imports: [
@@ -85,7 +85,7 @@ import { UserModule } from './user';
 export class AppModule { }
 ```
 
-#### 鉴权功能，在 graphql 上下文中 使用 `AuthenticationService` 类的 `validateUser` 方法，并将通过身份验证的用户传递给上下文
+#### 鉴权功能，在 graphql 上下文中 使用 `AuthService` 类的 `validateUser` 方法，并将通过身份验证的用户传递给上下文
 
 `GraphQLJSON` 是用于处理 graphql 中的 `JSON` 标量类型，需要额外安装 `graphql-type-json`，然后将其配置到 resolvers 选项中
 
@@ -95,12 +95,12 @@ export class AppModule { }
 import { Inject, Injectable } from '@nestjs/common';
 import { GqlModuleOptions, GqlOptionsFactory } from '@nestjs/graphql';
 import * as GraphQLJSON from 'graphql-type-json';
-import { AuthenticationService } from '@notadd/module-user';
+import { AuthService } from '@notadd/module-user';
 
 @Injectable()
 export class GraphQLConfigService implements GqlOptionsFactory {
     constructor(
-        @Inject(AuthenticationService) private readonly authService: AuthenticationService
+        @Inject(AuthService) private readonly authService: AuthService
     ) {}
 
     createGqlOptions(): GqlModuleOptions {
@@ -190,7 +190,7 @@ export class GraphQLConfigService implements GqlOptionsFactory {
 - `login(username: String!, password: String!)` 普通用户登录
 - `findRegisterUserInfoItem` 查询普通用户注册时所需填写的信息项
 - `findCurrentUserInfo` 查询当前登录的用户信息
-- `findUserInfoById(userId: Int!)` 通过ID查询用户信息
+- `findUserInfoByIds(userIds: [Int]!)` 通过ID查询用户信息
 - `findUsersInRole(roleId: Int!)` 查询指定角色ID下的所有用户信息
 - `findUsersInOrganization(organizationId: Int!)` 获取指定组织ID下的用户
 

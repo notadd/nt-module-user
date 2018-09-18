@@ -37,20 +37,20 @@ let UserService = class UserService {
         createUserInput.password = await this.cryptoUtil.encryptPassword(createUserInput.password);
         const user = await this.userRepo.save(this.userRepo.create(createUserInput));
         if (createUserInput.roleIds && createUserInput.roleIds.length) {
-            this.userRepo.createQueryBuilder('user').relation(user_entity_1.User, 'roles').of(user).add(createUserInput.roleIds);
+            await this.userRepo.createQueryBuilder('user').relation(user_entity_1.User, 'roles').of(user).add(createUserInput.roleIds);
         }
         if (createUserInput.organizationIds && createUserInput.organizationIds.length) {
-            this.userRepo.createQueryBuilder('user').relation(user_entity_1.User, 'organizations').of(user).add(createUserInput.organizationIds);
+            await this.userRepo.createQueryBuilder('user').relation(user_entity_1.User, 'organizations').of(user).add(createUserInput.organizationIds);
         }
         if (createUserInput.infoKVs && createUserInput.infoKVs.length) {
-            this.createOrUpdateUserInfos(user, createUserInput.infoKVs, 'create');
+            await this.createOrUpdateUserInfos(user, createUserInput.infoKVs, 'create');
         }
     }
     async addUserRole(userId, roleId) {
-        this.userRepo.createQueryBuilder('user').relation(user_entity_1.User, 'roles').of(userId).add(roleId);
+        await this.userRepo.createQueryBuilder('user').relation(user_entity_1.User, 'roles').of(userId).add(roleId);
     }
     async deleteUserRole(userId, roleId) {
-        this.userRepo.createQueryBuilder('user').relation(user_entity_1.User, 'roles').of(userId).remove(roleId);
+        await this.userRepo.createQueryBuilder('user').relation(user_entity_1.User, 'roles').of(userId).remove(roleId);
     }
     async recycleOrBanUser(id, action) {
         const user = await this.findOneById(id);
@@ -185,7 +185,7 @@ let UserService = class UserService {
     }
     async register(createUserInput) {
         createUserInput.roleIds = [1];
-        this.createUser(createUserInput);
+        await this.createUser(createUserInput);
     }
     async findOneById(id) {
         const exist = this.userRepo.findOne(id);

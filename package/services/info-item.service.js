@@ -24,32 +24,32 @@ let InfoItemService = class InfoItemService {
     }
     async create(infoItem) {
         await this.entityCheckService.checkNameExist(info_item_entity_1.InfoItem, infoItem.name);
-        this.infoItemRepo.save(this.infoItemRepo.create(infoItem));
+        await this.infoItemRepo.save(this.infoItemRepo.create(infoItem));
     }
     async delete(id) {
         const infoItem = await this.infoItemRepo.findOne(id, { relations: ['userInfos', 'infoGroups'] });
-        this.infoItemRepo.createQueryBuilder('infoItem').relation(info_item_entity_1.InfoItem, 'infoGroups').of(id).remove(infoItem.infoGroups);
-        this.infoItemRepo.remove(infoItem);
+        await this.infoItemRepo.createQueryBuilder('infoItem').relation(info_item_entity_1.InfoItem, 'infoGroups').of(id).remove(infoItem.infoGroups);
+        await this.infoItemRepo.remove(infoItem);
     }
     async update(updateInfoItemInput) {
         await this.entityCheckService.checkNameExist(info_item_entity_1.InfoItem, updateInfoItemInput.name);
         if (updateInfoItemInput.order) {
-            this.infoItemRepo.update(updateInfoItemInput.id, { order: updateInfoItemInput.order });
+            await this.infoItemRepo.update(updateInfoItemInput.id, { order: updateInfoItemInput.order });
         }
         if (updateInfoItemInput.type) {
-            this.infoItemRepo.update(updateInfoItemInput.id, { type: updateInfoItemInput.type });
+            await this.infoItemRepo.update(updateInfoItemInput.id, { type: updateInfoItemInput.type });
         }
         if (updateInfoItemInput.name) {
-            this.infoItemRepo.update(updateInfoItemInput.id, { name: updateInfoItemInput.name });
+            await this.infoItemRepo.update(updateInfoItemInput.id, { name: updateInfoItemInput.name });
         }
         if (updateInfoItemInput.description) {
-            this.infoItemRepo.update(updateInfoItemInput.id, { description: updateInfoItemInput.description });
+            await this.infoItemRepo.update(updateInfoItemInput.id, { description: updateInfoItemInput.description });
         }
         if (updateInfoItemInput.registerDisplay) {
-            this.infoItemRepo.update(updateInfoItemInput.id, { registerDisplay: updateInfoItemInput.registerDisplay });
+            await this.infoItemRepo.update(updateInfoItemInput.id, { registerDisplay: updateInfoItemInput.registerDisplay });
         }
         if (updateInfoItemInput.informationDisplay) {
-            this.infoItemRepo.update(updateInfoItemInput.id, { informationDisplay: updateInfoItemInput.informationDisplay });
+            await this.infoItemRepo.update(updateInfoItemInput.id, { informationDisplay: updateInfoItemInput.informationDisplay });
         }
     }
     async findAll() {

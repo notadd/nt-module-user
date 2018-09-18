@@ -2878,10 +2878,6 @@ graphql@^14.0.0:
   dependencies:
     iterall "^1.2.2"
 
-gulp-rename@^1.4.0:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/gulp-rename/-/gulp-rename-1.4.0.tgz#de1c718e7c4095ae861f7296ef4f3248648240bd"
-
 gulp-sequence@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/gulp-sequence/-/gulp-sequence-1.0.0.tgz#862f93e6503e67c350a42948fa666953cf88ba67"

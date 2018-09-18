@@ -42,7 +42,6 @@
         "@types/jsonwebtoken": "^7.2.8",
         "@types/node": "^10.9.4",
         "gulp": "^3.9.1",
-        "gulp-rename": "^1.4.0",
         "gulp-sequence": "^1.0.0",
         "gulp-sourcemaps": "^2.6.4",
         "gulp-tslint": "^8.1.3",

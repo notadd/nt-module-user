@@ -1,5 +1,4 @@
 const gulp = require('gulp');
-const rename = require('gulp-rename');
 const sequence = require('gulp-sequence');
 const sourcemaps = require('gulp-sourcemaps');
 const ts = require('gulp-typescript');
@@ -14,6 +13,10 @@ const modules = Object.keys(packages);
 
 modules.forEach(module => {
     gulp.task(module, () => {
+        gulp.src([
+            'src/**/*.types.graphql',
+        ]).pipe(gulp.dest(dist));
+
         return packages[module]
             .src()
             .pipe(tslint({

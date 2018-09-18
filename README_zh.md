@@ -43,7 +43,7 @@
 
 在 `Resolver`、`Controller` 方法上设置定义操作的注解，用户定义对当前资源的操作权限，如：
 
-`@Permission({ name: '添加文章', identify: 'artical:create', action: 'create', personal: true })`
+`@Permission({ name: '添加文章', identify: 'artical:create', action: 'create' })`
 
 `name`: 权限的名称，用于定义具体的权限名称，命名方式为：`操作+资源`，如：`在文章资源中添加文章 => '添加文章'`
 
@@ -85,7 +85,7 @@ import { UserModule } from '@notadd/module-user';
 export class AppModule { }
 ```
 
-#### 鉴权功能，在 graphql 上下文中 使用 `AuthenticationService` 类的 `validateUser` 方法，并将通过身份验证的用户传递给上下文
+#### 鉴权功能，在 graphql 上下文中 使用 `AuthService` 类的 `validateUser` 方法，并将通过身份验证的用户传递给上下文
 
 `GraphQLJSON` 是用于处理 graphql 中的 `JSON` 标量类型，需要额外安装 `graphql-type-json`，然后将其配置到 resolvers 选项中
 

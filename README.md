@@ -45,7 +45,7 @@ Set annotations for defining resources on the `Resolver` or `Controller` class t
 
 Set annotations for defining operations on the `Resolver` and `Controller` methods. The user defines the operation permissions on the current resource, such as:
 
-`@Permission({ name: 'Add article', identify: 'artical:create', action: 'create', personal: true })`
+`@Permission({ name: 'Add article', identify: 'artical:create', action: 'create' })`
 
 `name`: The name of the permission, used to define the specific permission name, named: `operation + resource`, such as: `Add article in the article resource => 'Add article'
 
@@ -87,7 +87,7 @@ import { UserModule } from '@notadd/module-user';
 export class AppModule { }
 ```
 
-#### Authentication function, using the `validateUser` method of the `AuthenticationService` class in the graphql context, and passing the authenticated user to the context
+#### Authentication function, using the `validateUser` method of the `AuthService` class in the graphql context, and passing the authenticated user to the context
 
 `GraphQLJSON` is used to handle the `JSON` scalar type in graphql, you need to install `graphql-type-json` additionally, and then configure it into the resolvers option.
 

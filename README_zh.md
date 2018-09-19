@@ -7,7 +7,7 @@
 ## 功能
 
 - [x] 注册
-- [x] 登录
+- [x] 登录(用户名、邮箱、手机号+验证码)
 - [x] 授权、鉴权
 - [x] 组织管理
 - [x] 用户管理
@@ -188,19 +188,25 @@ export class GraphQLConfigService implements GqlOptionsFactory {
 **Query**：
 
 - `login(username: String!, password: String!)` 普通用户登录
+- `adminLogin(username: String!, password: String!)` 管理员登录
 - `findRegisterUserInfoItem` 查询普通用户注册时所需填写的信息项
 - `findCurrentUserInfo` 查询当前登录的用户信息
 - `findUserInfoByIds(userIds: [Int]!)` 通过ID查询用户信息
 - `findUsersInRole(roleId: Int!)` 查询指定角色ID下的所有用户信息
 - `findUsersInOrganization(organizationId: Int!)` 获取指定组织ID下的用户
 
+> 注意：手机号+验证码方式的登录使用的是腾讯云短信服务，需提前调用 `sms` 相关接口进行短信服务的配置
+
 **Mutation**：
 
 - `register(registerUserInput: RegisterUserInput)` 普通用户注册，参数 infoKVs 中的 key 是信息项的ID(infoItem.id)，值是信息项的值(userInfo.value)
 - `createUser(createUserInput: CreateUserInput)` 创建用户，参数 infoKVs 中的 key 是信息项的ID(infoItem.id)，值是信息项的值(userInfo.value)
 - `addUserRole(userId: Int!, roleId: Int!)` 给用户添加角色
+- `banUser(userId: Int!)` 封禁用户
 - `deleteUserRole(userId: Int!, roleId: Int!)` 删除用户角色
 - `recycleUser(userId: Int!)` 删除用户到回收站
 - `deleteRecycledUser(userId: Int!)` 删除回收站内的用户
-- `updateUserInfo(userId: Int!, updateUserInput: UpdateUserInput)` 更新用户信息，参数 infoKVs 中的 key是用户信息项值的ID(userInfo.id)，value是信息项的值(userInfo.value)，relationId 是信息项的ID，当返回的 key 为 null 时，也需要传入 null
+- `revertBannedUser(userId: Int!)` 恢复封禁的用户
+- `revertRecycledUser(userId: Int!)` 恢复回收站内的用户
+- `updateUserInfoById(userId: Int!, updateUserInput: UpdateUserInput)` 更新用户信息，参数 infoKVs 中的 key是用户信息项值的ID(userInfo.id)，value是信息项的值(userInfo.value)，relationId 是信息项的ID，当返回的 key 为 null 时，也需要传入 null
 - `updateCurrentUserInfo(updateCurrentUserInput: UpdateCurrentUserInput)` 更新当前登录用户信息，参数 infoKVs 中的 key是用户信息项值的ID(userInfo.id)，value是信息项的值(userInfo.value)，relationId 是信息项的ID，当返回的 key 为 null 时，也需要传入 null

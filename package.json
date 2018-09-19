@@ -1,6 +1,6 @@
 {
     "name": "nt-module-user",
-    "version": "1.0.0",
+    "version": "1.2.3",
     "description": "The user module for Notadd application.",
     "scripts": {
         "start": "ts-node -r tsconfig-paths/register starter/main.ts",

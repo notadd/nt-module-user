@@ -23,7 +23,7 @@ import { GraphQLConfigService } from './graphql-config.service';
             synchronize: true,
             dropSchema: false
         }),
-        UserModule.forRoot({ i18n: 'zh-CN', authTokenWhiteList: [''] })
+        UserModule.forRoot({ i18n: 'zh-CN' })
     ],
     controllers: [],
     providers: [],

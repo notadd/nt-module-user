@@ -15,20 +15,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
-const resource_entity_1 = require("../entities/resource.entity");
-let ResourceService = class ResourceService {
-    constructor(resourceRep) {
-        this.resourceRep = resourceRep;
+const system_module_entity_1 = require("../entities/system-module.entity");
+let SystemModuleService = class SystemModuleService {
+    constructor(systemModuleRepo) {
+        this.systemModuleRepo = systemModuleRepo;
     }
-    async findResources(moduleId) {
-        return this.resourceRep.find({ where: { module: { id: moduleId } }, relations: ['permissions'] });
+    async findSystemModules() {
+        return this.systemModuleRepo.find();
     }
 };
-ResourceService = __decorate([
+SystemModuleService = __decorate([
     common_1.Injectable(),
-    __param(0, typeorm_1.InjectRepository(resource_entity_1.Resource)),
+    __param(0, typeorm_1.InjectRepository(system_module_entity_1.SystemModule)),
     __metadata("design:paramtypes", [typeorm_2.Repository])
-], ResourceService);
-exports.ResourceService = ResourceService;
+], SystemModuleService);
+exports.SystemModuleService = SystemModuleService;
 
-//# sourceMappingURL=resource.service.js.map
+//# sourceMappingURL=system-module.service.js.map

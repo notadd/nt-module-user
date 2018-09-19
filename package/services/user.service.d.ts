@@ -1,4 +1,5 @@
-import { EntityManager, Repository } from 'typeorm';
+import { SmsComponent } from '@notadd/addon-sms';
+import { Repository } from 'typeorm';
 import { AuthService } from '../auth/auth.service';
 import { InfoItem } from '../entities/info-item.entity';
 import { UserInfo } from '../entities/user-info.entity';
@@ -7,14 +8,14 @@ import { CreateUserInput, UpdateUserInput, UserInfoData } from '../interfaces/us
 import { CryptoUtil } from '../utils/crypto.util';
 import { RoleService } from './role.service';
 export declare class UserService {
-    private readonly entityManager;
     private readonly userRepo;
     private readonly userInfoRepo;
     private readonly infoItemRepo;
     private readonly cryptoUtil;
     private readonly authService;
     private readonly roleService;
-    constructor(entityManager: EntityManager, userRepo: Repository<User>, userInfoRepo: Repository<UserInfo>, infoItemRepo: Repository<InfoItem>, cryptoUtil: CryptoUtil, authService: AuthService, roleService: RoleService);
+    private readonly smsComponentProvider;
+    constructor(userRepo: Repository<User>, userInfoRepo: Repository<UserInfo>, infoItemRepo: Repository<InfoItem>, cryptoUtil: CryptoUtil, authService: AuthService, roleService: RoleService, smsComponentProvider: SmsComponent);
     createUser(createUserInput: CreateUserInput): Promise<void>;
     addUserRole(userId: number, roleId: number): Promise<void>;
     deleteUserRole(userId: number, roleId: number): Promise<void>;
@@ -24,16 +25,20 @@ export declare class UserService {
     updateUserInfo(id: number, updateUserInput: UpdateUserInput): Promise<void>;
     findByRoleId(roleId: number): Promise<UserInfoData[]>;
     findByOrganizationId(organizationId: number): Promise<UserInfoData[]>;
-    findOneWithRolesAndPermissions(username: string): Promise<User>;
+    findOneWithRolesAndPermissions(loginName: string): Promise<User>;
     findUserInfoById(id: number | number[]): Promise<UserInfoData | UserInfoData[]>;
     findOneWithInfoItemsByRoleIds(roleIds: number[]): Promise<InfoItem[]>;
-    login(username: string, password: string): Promise<{
+    login(loginName: string, password: string): Promise<{
+        tokenInfo: import("src/interfaces/jwt.interface").JwtReply;
+        userInfoData: UserInfoData;
+    }>;
+    mobileLogin(mobile: string, validationCode: number): Promise<{
         tokenInfo: import("src/interfaces/jwt.interface").JwtReply;
         userInfoData: UserInfoData;
     }>;
     register(createUserInput: CreateUserInput): Promise<void>;
+    private checkUserStatus;
     private findOneById;
-    private checkUsernameExist;
     private createOrUpdateUserInfos;
     private refactorUserData;
 }

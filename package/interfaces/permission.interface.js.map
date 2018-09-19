@@ -1,1 +1,1 @@
-{"version":3,"sources":["../src/interfaces/permission.interface.ts"],"names":[],"mappings":"","file":"permission.interface.js","sourcesContent":["export interface Permission {\n    name: string;\n    action: string;\n    identify: string;\n    personal?: boolean;\n}"]}
+{"version":3,"sources":["../src/interfaces/permission.interface.ts"],"names":[],"mappings":"","file":"permission.interface.js","sourcesContent":["export interface Permission {\n    name: string;\n    action: string;\n    identify: string;\n}"]}

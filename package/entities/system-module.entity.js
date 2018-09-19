@@ -10,37 +10,24 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
-const permission_entity_1 = require("./permission.entity");
-const system_module_entity_1 = require("./system-module.entity");
-let Resource = class Resource {
+const resource_entity_1 = require("./resource.entity");
+let SystemModule = class SystemModule {
 };
 __decorate([
     typeorm_1.PrimaryGeneratedColumn(),
     __metadata("design:type", Number)
-], Resource.prototype, "id", void 0);
+], SystemModule.prototype, "id", void 0);
 __decorate([
     typeorm_1.Column(),
     __metadata("design:type", String)
-], Resource.prototype, "name", void 0);
+], SystemModule.prototype, "name", void 0);
 __decorate([
-    typeorm_1.Column({
-        unique: true
-    }),
-    __metadata("design:type", String)
-], Resource.prototype, "identify", void 0);
-__decorate([
-    typeorm_1.OneToMany(type => permission_entity_1.Permission, permission => permission.resource),
+    typeorm_1.OneToMany(type => resource_entity_1.Resource, resource => resource.systemModule),
     __metadata("design:type", Array)
-], Resource.prototype, "permissions", void 0);
-__decorate([
-    typeorm_1.ManyToOne(type => system_module_entity_1.SystemModule, systemModule => systemModule.resources, {
-        onDelete: 'CASCADE'
-    }),
-    __metadata("design:type", system_module_entity_1.SystemModule)
-], Resource.prototype, "systemModule", void 0);
-Resource = __decorate([
-    typeorm_1.Entity('resource')
-], Resource);
-exports.Resource = Resource;
+], SystemModule.prototype, "resources", void 0);
+SystemModule = __decorate([
+    typeorm_1.Entity('system_module')
+], SystemModule);
+exports.SystemModule = SystemModule;
 
-//# sourceMappingURL=resource.entity.js.map
+//# sourceMappingURL=system-module.entity.js.map

@@ -18,7 +18,7 @@ let ResourceResolver = class ResourceResolver {
         this.resourceService = resourceService;
     }
     async findResources(req, body) {
-        const data = await this.resourceService.findResources();
+        const data = await this.resourceService.findResources(body.systemModuleId);
         return { code: 200, message: i18n_1.__('Query the resource successfully'), data };
     }
 };

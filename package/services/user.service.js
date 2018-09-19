@@ -14,6 +14,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
+const addon_sms_1 = require("@notadd/addon-sms");
 const i18n_1 = require("i18n");
 const typeorm_2 = require("typeorm");
 const auth_service_1 = require("../auth/auth.service");
@@ -23,18 +24,31 @@ const user_entity_1 = require("../entities/user.entity");
 const crypto_util_1 = require("../utils/crypto.util");
 const role_service_1 = require("./role.service");
 let UserService = class UserService {
-    constructor(entityManager, userRepo, userInfoRepo, infoItemRepo, cryptoUtil, authService, roleService) {
-        this.entityManager = entityManager;
+    constructor(userRepo, userInfoRepo, infoItemRepo, cryptoUtil, authService, roleService, smsComponentProvider) {
         this.userRepo = userRepo;
         this.userInfoRepo = userInfoRepo;
         this.infoItemRepo = infoItemRepo;
         this.cryptoUtil = cryptoUtil;
         this.authService = authService;
         this.roleService = roleService;
+        this.smsComponentProvider = smsComponentProvider;
     }
     async createUser(createUserInput) {
-        await this.checkUsernameExist(createUserInput.username);
+        if (!(createUserInput.username || createUserInput.mobile || createUserInput.email)) {
+            throw new common_1.HttpException(i18n_1.__('Please make sure the username, mobile phone number, and email exist at least one'), 406);
+        }
+        if (createUserInput.username && await this.userRepo.findOne({ where: { username: createUserInput.username } })) {
+            throw new common_1.HttpException(i18n_1.__('Username already exists'), 409);
+        }
+        if (createUserInput.mobile && await this.userRepo.findOne({ where: { username: createUserInput.username } })) {
+            throw new common_1.HttpException(i18n_1.__('Mobile already exists'), 409);
+        }
+        if (createUserInput.email && await this.userRepo.findOne({ where: { username: createUserInput.username } })) {
+            throw new common_1.HttpException(i18n_1.__('Email already exists'), 409);
+        }
         createUserInput.password = await this.cryptoUtil.encryptPassword(createUserInput.password);
+        if (createUserInput.email)
+            createUserInput.email = createUserInput.email.toLocaleLowerCase();
         const user = await this.userRepo.save(this.userRepo.create(createUserInput));
         if (createUserInput.roleIds && createUserInput.roleIds.length) {
             await this.userRepo.createQueryBuilder('user').relation(user_entity_1.User, 'roles').of(user).add(createUserInput.roleIds);
@@ -81,7 +95,7 @@ let UserService = class UserService {
     async updateUserInfo(id, updateUserInput) {
         const user = await this.userRepo.findOne(id, { relations: ['userInfos'] });
         if (updateUserInput.email) {
-            await this.userRepo.update(user.id, { email: updateUserInput.email });
+            await this.userRepo.update(user.id, { email: updateUserInput.email.toLocaleLowerCase() });
         }
         if (updateUserInput.mobile) {
             await this.userRepo.update(user.id, { mobile: updateUserInput.mobile });
@@ -128,8 +142,14 @@ let UserService = class UserService {
         }
         return this.findUserInfoById(users.map(user => user.id));
     }
-    async findOneWithRolesAndPermissions(username) {
-        const user = await this.userRepo.findOne({ where: { username }, relations: ['roles', 'roles.permissions'] });
+    async findOneWithRolesAndPermissions(loginName) {
+        const user = await this.userRepo.createQueryBuilder('user')
+            .leftJoinAndSelect('user.roles', 'roles')
+            .leftJoinAndSelect('roles.permissions', 'permissions')
+            .where('user.username = :loginName', { loginName })
+            .orWhere('user.mobile = :loginName', { loginName })
+            .orWhere('user.email = :loginName', { loginName: loginName.toLocaleLowerCase() })
+            .getOne();
         if (!user) {
             throw new common_1.HttpException(i18n_1.__('User does not exist'), 404);
         }
@@ -163,29 +183,55 @@ let UserService = class UserService {
     async findOneWithInfoItemsByRoleIds(roleIds) {
         return this.roleService.findInfoGroupItemsByIds(roleIds);
     }
-    async login(username, password) {
-        const user = await this.userRepo.findOne({ where: { username }, relations: ['roles', 'organizations', 'userInfos', 'userInfos.infoItem'] });
-        if (!user)
-            throw new common_1.HttpException(i18n_1.__('User does not exist'), 404);
-        if (user.banned || user.recycle)
-            throw new common_1.HttpException(i18n_1.__('User is banned'), 400);
+    async login(loginName, password) {
+        const user = await this.userRepo.createQueryBuilder('user')
+            .leftJoinAndSelect('user.roles', 'roles')
+            .leftJoinAndSelect('user.organizations', 'organizations')
+            .leftJoinAndSelect('user.userInfos', 'userInfos')
+            .leftJoinAndSelect('userInfos.infoItem', 'infoItem')
+            .where('user.username = :loginName', { loginName })
+            .orWhere('user.email = :loginName', { loginName: loginName.toLocaleLowerCase() })
+            .getOne();
+        await this.checkUserStatus(user);
+        if (!await this.cryptoUtil.checkPassword(password, user.password)) {
+            throw new common_1.HttpException(i18n_1.__('invalid password'), 406);
+        }
         const infoItem = await this.infoItemRepo.createQueryBuilder('infoItem')
             .leftJoin('infoItem.infoGroups', 'infoGroups')
             .leftJoin('infoGroups.role', 'role')
             .leftJoin('role.users', 'users')
-            .where('users.username = :username', { username })
+            .where('users.username = :loginName', { loginName })
+            .orWhere('users.email = :loginName', { loginName: loginName.toLocaleLowerCase() })
             .orderBy('infoItem.order', 'ASC')
             .getMany();
         const userInfoData = this.refactorUserData(user, infoItem);
-        if (!await this.cryptoUtil.checkPassword(password, user.password)) {
-            throw new common_1.HttpException(i18n_1.__('invalid password'), 406);
-        }
-        const tokenInfo = await this.authService.createToken({ username });
+        const tokenInfo = await this.authService.createToken({ loginName });
+        return { tokenInfo, userInfoData };
+    }
+    async mobileLogin(mobile, validationCode) {
+        await this.smsComponentProvider.smsValidator(mobile, validationCode);
+        const user = await this.userRepo.findOne({ mobile }, { relations: ['roles', 'organizations', 'userInfos', 'userInfos.infoItem'] });
+        await this.checkUserStatus(user);
+        const infoItem = await this.infoItemRepo.createQueryBuilder('infoItem')
+            .leftJoin('infoItem.infoGroups', 'infoGroups')
+            .leftJoin('infoGroups.role', 'role')
+            .leftJoin('role.users', 'users')
+            .where('users.mobile = :mobile', { mobile })
+            .orderBy('infoItem.order', 'ASC')
+            .getMany();
+        const userInfoData = this.refactorUserData(user, infoItem);
+        const tokenInfo = await this.authService.createToken({ loginName: mobile });
         return { tokenInfo, userInfoData };
     }
     async register(createUserInput) {
         createUserInput.roleIds = [1];
         await this.createUser(createUserInput);
+    }
+    checkUserStatus(user) {
+        if (!user)
+            throw new common_1.HttpException(i18n_1.__('User does not exist'), 404);
+        if (user.banned || user.recycle)
+            throw new common_1.HttpException(i18n_1.__('User is banned'), 400);
     }
     async findOneById(id) {
         const exist = this.userRepo.findOne(id);
@@ -193,11 +239,6 @@ let UserService = class UserService {
             throw new common_1.HttpException(i18n_1.__('User does not exist'), 404);
         }
         return exist;
-    }
-    async checkUsernameExist(username) {
-        if (await this.userRepo.findOne({ where: { username } })) {
-            throw new common_1.HttpException(i18n_1.__('Username already exists'), 409);
-        }
     }
     async createOrUpdateUserInfos(user, infoKVs, action) {
         if (infoKVs.length) {
@@ -249,20 +290,20 @@ let UserService = class UserService {
 };
 UserService = __decorate([
     common_1.Injectable(),
-    __param(0, typeorm_1.InjectEntityManager()),
-    __param(1, typeorm_1.InjectRepository(user_entity_1.User)),
-    __param(2, typeorm_1.InjectRepository(user_info_entity_1.UserInfo)),
-    __param(3, typeorm_1.InjectRepository(info_item_entity_1.InfoItem)),
-    __param(4, common_1.Inject(crypto_util_1.CryptoUtil)),
-    __param(5, common_1.Inject(common_1.forwardRef(() => auth_service_1.AuthService))),
-    __param(6, common_1.Inject(role_service_1.RoleService)),
-    __metadata("design:paramtypes", [typeorm_2.EntityManager,
-        typeorm_2.Repository,
+    __param(0, typeorm_1.InjectRepository(user_entity_1.User)),
+    __param(1, typeorm_1.InjectRepository(user_info_entity_1.UserInfo)),
+    __param(2, typeorm_1.InjectRepository(info_item_entity_1.InfoItem)),
+    __param(3, common_1.Inject(crypto_util_1.CryptoUtil)),
+    __param(4, common_1.Inject(common_1.forwardRef(() => auth_service_1.AuthService))),
+    __param(5, common_1.Inject(role_service_1.RoleService)),
+    __param(6, common_1.Inject('SmsComponentToken')),
+    __metadata("design:paramtypes", [typeorm_2.Repository,
         typeorm_2.Repository,
         typeorm_2.Repository,
         crypto_util_1.CryptoUtil,
         auth_service_1.AuthService,
-        role_service_1.RoleService])
+        role_service_1.RoleService,
+        addon_sms_1.SmsComponent])
 ], UserService);
 exports.UserService = UserService;
 

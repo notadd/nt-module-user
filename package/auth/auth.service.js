@@ -26,7 +26,7 @@ let AuthService = class AuthService {
         return { accessToken, expiresIn: 60 * 60 * 24 };
     }
     async validateUser(req) {
-        if (req.body && ['IntrospectionQuery', 'login', 'register'].includes(req.body.operationName)) {
+        if (req.body && ['IntrospectionQuery', 'login', 'adminLogin', 'register'].includes(req.body.operationName)) {
             return;
         }
         let token = req.headers.authorization;
@@ -41,7 +41,7 @@ let AuthService = class AuthService {
         }
         try {
             const decodedToken = jwt.verify(token, 'secretKey');
-            return this.userService.findOneWithRolesAndPermissions(decodedToken.username);
+            return this.userService.findOneWithRolesAndPermissions(decodedToken.loginName);
         }
         catch (error) {
             if (error instanceof jwt.JsonWebTokenError) {

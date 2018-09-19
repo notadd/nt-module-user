@@ -22,7 +22,7 @@ export class AuthService {
         /**
          * whitelist
          */
-        if (req.body && ['IntrospectionQuery', 'login', 'register'].includes(req.body.operationName)) {
+        if (req.body && ['IntrospectionQuery', 'login', 'adminLogin', 'register'].includes(req.body.operationName)) {
             return;
         }
 
@@ -38,8 +38,8 @@ export class AuthService {
         }
 
         try {
-            const decodedToken = <{ username: string }>jwt.verify(token, 'secretKey');
-            return this.userService.findOneWithRolesAndPermissions(decodedToken.username);
+            const decodedToken = <{ loginName: string }>jwt.verify(token, 'secretKey');
+            return this.userService.findOneWithRolesAndPermissions(decodedToken.loginName);
         } catch (error) {
             if (error instanceof jwt.JsonWebTokenError) {
                 throw new AuthenticationError(t('The authorization code is incorrect'));

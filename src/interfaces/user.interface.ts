@@ -29,7 +29,7 @@ export interface UserInfoData {
 }
 
 export interface CreateUserInput {
-    username: string;
+    username?: string;
     email?: string;
     mobile?: string;
     password: string;

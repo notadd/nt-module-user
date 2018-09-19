@@ -17,8 +17,8 @@ import { GraphQLConfigService } from './graphql-config.service';
             username: 'postgres',
             password: '123456',
             database: 'module_user',
-            entities: [__dirname + '/../src/**/*.entity.ts'],
-            logger: 'simple-console',
+            entities: ['src/**/**.entity.ts', 'node_modules/**/**.entity.js'],
+            logger: 'advanced-console',
             logging: false,
             synchronize: true,
             dropSchema: false

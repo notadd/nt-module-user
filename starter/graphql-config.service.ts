@@ -12,7 +12,7 @@ export class GraphQLConfigService implements GqlOptionsFactory {
 
     createGqlOptions(): GqlModuleOptions {
         return {
-            typePaths: ['src/**/*.types.graphql'],
+            typePaths: ['src/**/*.types.graphql', 'node_modules/**/*.types.graphql'],
             resolvers: { JSON: GraphQLJSON },
             context: async ({ req }) => {
                 const user = await this.authService.validateUser(req);

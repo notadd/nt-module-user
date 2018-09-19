@@ -94,10 +94,13 @@
     "The permission id of %s does not exist": "The permission id of %s does not exist",
     "No users belong to this role": "No users belong to this role",
     "No users belong to this organization": "No users belong to this Organization",
+    "Please make sure the username, mobile phone number, and email exist at least one": "Please make sure the username, mobile phone number, and email exist at least one",
     "User does not exist": "User does not exist",
     "User is banned": "User is banned",
     "invalid password": "invalid password",
     "Username already exists": "Username already exists",
+    "Mobile already exists": "Mobile already exists",
+	"Email already exists": "Email already exists",
     "Request header lacks authorization parameters，it should be: Authorization or authorization": "Request header lacks authorization parameters，it should be: Authorization or authorization",
     "The authorization code prefix is incorrect. it should be: Bearer or bearer": "The authorization code prefix is incorrect. it should be: Bearer or bearer",
     "The authorization code is incorrect": "The authorization code is incorrect",
@@ -110,5 +113,6 @@
     "You are not authorized to access": "You are not authorized to access",
     "ban_user": "ban_user",
 	"revert_banned_user": "revert_banned_user",
-	"revert_recycled_user": "revert_recycled_user"
+    "revert_recycled_user": "revert_recycled_user",
+	"UserModule": "UserModule"
 }

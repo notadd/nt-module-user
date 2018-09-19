@@ -14,8 +14,8 @@ export class ResourceResolver {
 
     @Query('findResources')
     @Permission({ name: 'find_resources', identify: 'resource:findResources', action: 'find' })
-    async findResources(req, body): Promise<CommonResult> {
-        const data = await this.resourceService.findResources();
+    async findResources(req, body: { systemModuleId: number }): Promise<CommonResult> {
+        const data = await this.resourceService.findResources(body.systemModuleId);
         return { code: 200, message: t('Query the resource successfully'), data };
     }
 }

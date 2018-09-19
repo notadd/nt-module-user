@@ -10,7 +10,7 @@ export class ResourceService {
         @InjectRepository(Resource) private readonly resourceRep: Repository<Resource>
     ) { }
 
-    async findResources() {
-        return this.resourceRep.find({ relations: ['permissions'] });
+    async findResources(moduleId: number) {
+        return this.resourceRep.find({ where: { module: { id: moduleId } }, relations: ['permissions'] });
     }
 }

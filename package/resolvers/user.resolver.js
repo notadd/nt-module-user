@@ -23,20 +23,20 @@ let UserResolver = class UserResolver {
     }
     async login(req, body) {
         let data;
-        if (!parseInt(body.password)) {
+        if (isNaN(Number(body.password))) {
             data = await this.userService.login(body.username, body.password);
         }
-        else if (parseInt(body.password)) {
+        else if (!isNaN(Number(body.password))) {
             data = await this.userService.mobileLogin(body.username, parseInt(body.password));
         }
         return { code: 200, message: i18n_1.__('Login success'), data: data.tokenInfo };
     }
     async adminLogin(req, body) {
         let data;
-        if (!parseInt(body.password)) {
+        if (isNaN(Number(body.password))) {
             data = await this.userService.login(body.username, body.password);
         }
-        else if (parseInt(body.password)) {
+        else if (!isNaN(Number(body.password))) {
             data = await this.userService.mobileLogin(body.username, parseInt(body.password));
         }
         const userInfoData = data.userInfoData;

@@ -17,9 +17,9 @@ export class UserResolver {
     @Query('login')
     async login(req, body: { username: string, password: string }): Promise<CommonResult> {
         let data;
-        if (!parseInt(body.password)) {
+        if (isNaN(Number(body.password))) {
             data = await this.userService.login(body.username, body.password);
-        } else if (parseInt(body.password)) {
+        } else if (!isNaN(Number(body.password))) {
             data = await this.userService.mobileLogin(body.username, parseInt(body.password));
         }
         return { code: 200, message: t('Login success'), data: data.tokenInfo };
@@ -28,9 +28,9 @@ export class UserResolver {
     @Query('adminLogin')
     async adminLogin(req, body: { username: string, password: string }): Promise<CommonResult> {
         let data;
-        if (!parseInt(body.password)) {
+        if (isNaN(Number(body.password))) {
             data = await this.userService.login(body.username, body.password);
-        } else if (parseInt(body.password)) {
+        } else if (!isNaN(Number(body.password))) {
             data = await this.userService.mobileLogin(body.username, parseInt(body.password));
         }
         const userInfoData = data.userInfoData;

@@ -40,6 +40,7 @@ export interface CreateUserInput {
     organizationIds?: number[];
 }
 export interface UpdateUserInput {
+    username?: string;
     email?: string;
     mobile?: string;
     password?: string;

@@ -16,17 +16,19 @@ const common_1 = require("@nestjs/common");
 const apollo_server_core_1 = require("apollo-server-core");
 const i18n_1 = require("i18n");
 const jwt = require("jsonwebtoken");
+const auth_constant_1 = require("../constants/auth.constant");
 const user_service_1 = require("../services/user.service");
 let AuthService = class AuthService {
-    constructor(userService) {
+    constructor(userService, authTokenWhiteList) {
         this.userService = userService;
+        this.authTokenWhiteList = authTokenWhiteList;
     }
     async createToken(payload) {
         const accessToken = jwt.sign(payload, 'secretKey', { expiresIn: '1d' });
         return { accessToken, expiresIn: 60 * 60 * 24 };
     }
     async validateUser(req) {
-        if (req.body && ['IntrospectionQuery', 'login', 'adminLogin', 'register'].includes(req.body.operationName)) {
+        if (req.body && this.authTokenWhiteList.includes(req.body.operationName)) {
             return;
         }
         let token = req.headers.authorization;
@@ -56,7 +58,8 @@ let AuthService = class AuthService {
 AuthService = __decorate([
     common_1.Injectable(),
     __param(0, common_1.Inject(common_1.forwardRef(() => user_service_1.UserService))),
-    __metadata("design:paramtypes", [user_service_1.UserService])
+    __param(1, common_1.Inject(auth_constant_1.AUTH_TOKEN_WHITE_LIST)),
+    __metadata("design:paramtypes", [user_service_1.UserService, Array])
 ], AuthService);
 exports.AuthService = AuthService;
 

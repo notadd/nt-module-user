@@ -22,6 +22,7 @@ __decorate([
 ], User.prototype, "id", void 0);
 __decorate([
     typeorm_1.Column({
+        nullable: true,
         unique: true
     }),
     __metadata("design:type", String)

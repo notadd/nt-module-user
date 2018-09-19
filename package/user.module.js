@@ -25,6 +25,7 @@ const path_1 = require("path");
 const typeorm_2 = require("typeorm");
 const auth_gurad_1 = require("./auth/auth.gurad");
 const auth_service_1 = require("./auth/auth.service");
+const auth_constant_1 = require("./constants/auth.constant");
 const decorators_1 = require("./decorators");
 const info_group_entity_1 = require("./entities/info-group.entity");
 const info_item_entity_1 = require("./entities/info-item.entity");
@@ -74,7 +75,14 @@ let UserModule = UserModule_1 = class UserModule {
             defaultLocale: options.i18n,
             directory: 'src/i18n'
         });
+        if (options.authTokenWhiteList) {
+            options.authTokenWhiteList.push(...['IntrospectionQuery', 'login', 'adminLogin', 'register']);
+        }
+        else {
+            options.authTokenWhiteList = ['IntrospectionQuery', 'login', 'adminLogin', 'register'];
+        }
         return {
+            providers: [{ provide: auth_constant_1.AUTH_TOKEN_WHITE_LIST, useValue: options.authTokenWhiteList }],
             module: UserModule_1
         };
     }

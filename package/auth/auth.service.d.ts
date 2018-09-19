@@ -3,7 +3,8 @@ import { JwtPayload, JwtReply } from '../interfaces/jwt.interface';
 import { UserService } from '../services/user.service';
 export declare class AuthService {
     private readonly userService;
-    constructor(userService: UserService);
+    private readonly authTokenWhiteList;
+    constructor(userService: UserService, authTokenWhiteList: [string]);
     createToken(payload: JwtPayload): Promise<JwtReply>;
     validateUser(req: any): Promise<User>;
 }

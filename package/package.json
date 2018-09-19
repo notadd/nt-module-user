@@ -18,6 +18,7 @@
     },
     "license": "Apache-2.0",
     "dependencies": {
+        "@notadd/addon-sms": "2.4.2",
         "@types/bcryptjs": "2.4.1",
         "@types/i18n": "0.8.3",
         "@types/jsonwebtoken": "7.2.8",

@@ -16,13 +16,23 @@ export class UserResolver {
 
     @Query('login')
     async login(req, body: { username: string, password: string }): Promise<CommonResult> {
-        const data = await this.userService.login(body.username, body.password);
+        let data;
+        if (!parseInt(body.password)) {
+            data = await this.userService.login(body.username, body.password);
+        } else if (parseInt(body.password)) {
+            data = await this.userService.mobileLogin(body.username, parseInt(body.password));
+        }
         return { code: 200, message: t('Login success'), data: data.tokenInfo };
     }
 
     @Query('adminLogin')
     async adminLogin(req, body: { username: string, password: string }): Promise<CommonResult> {
-        const data = await this.userService.login(body.username, body.password);
+        let data;
+        if (!parseInt(body.password)) {
+            data = await this.userService.login(body.username, body.password);
+        } else if (parseInt(body.password)) {
+            data = await this.userService.mobileLogin(body.username, parseInt(body.password));
+        }
         const userInfoData = data.userInfoData;
         if (userInfoData.username !== 'sadmin' && userInfoData.userRoles.map(v => v.id).includes(1)) {
             throw new HttpException(t('You are not authorized to access'), 401);

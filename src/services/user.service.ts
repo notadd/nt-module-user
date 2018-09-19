@@ -36,10 +36,10 @@ export class UserService {
         if (createUserInput.username && await this.userRepo.findOne({ where: { username: createUserInput.username } })) {
             throw new HttpException(t('Username already exists'), 409);
         }
-        if (createUserInput.mobile && await this.userRepo.findOne({ where: { username: createUserInput.username } })) {
+        if (createUserInput.mobile && await this.userRepo.findOne({ where: { mobile: createUserInput.mobile } })) {
             throw new HttpException(t('Mobile already exists'), 409);
         }
-        if (createUserInput.email && await this.userRepo.findOne({ where: { username: createUserInput.username } })) {
+        if (createUserInput.email && await this.userRepo.findOne({ where: { email: createUserInput.email } })) {
             throw new HttpException(t('Email already exists'), 409);
         }
 
@@ -130,12 +130,26 @@ export class UserService {
      */
     async updateUserInfo(id: number, updateUserInput: UpdateUserInput): Promise<void> {
         const user = await this.userRepo.findOne(id, { relations: ['userInfos'] });
-        if (updateUserInput.email) {
-            await this.userRepo.update(user.id, { email: updateUserInput.email.toLocaleLowerCase() });
+
+        if (updateUserInput.username) {
+            if (await this.userRepo.findOne({ where: { username: updateUserInput.username } })) {
+                throw new HttpException(t('Username already exists'), 409);
+            }
+            await this.userRepo.update(user.id, { username: updateUserInput.username });
         }
         if (updateUserInput.mobile) {
+            if (await this.userRepo.findOne({ where: { mobile: updateUserInput.mobile } })) {
+                throw new HttpException(t('Mobile already exists'), 409);
+            }
             await this.userRepo.update(user.id, { mobile: updateUserInput.mobile });
         }
+        if (updateUserInput.email) {
+            if (await this.userRepo.findOne({ where: { email: updateUserInput.email } })) {
+                throw new HttpException(t('Email already exists'), 409);
+            }
+            await this.userRepo.update(user.id, { email: updateUserInput.email.toLocaleLowerCase() });
+        }
+
         if (updateUserInput.password) {
             const newPassword = await this.cryptoUtil.encryptPassword(updateUserInput.password);
             await this.userRepo.update(user.id, { password: newPassword });
@@ -265,6 +279,7 @@ export class UserService {
             .leftJoinAndSelect('user.userInfos', 'userInfos')
             .leftJoinAndSelect('userInfos.infoItem', 'infoItem')
             .where('user.username = :loginName', { loginName })
+            .orWhere('user.mobile = :loginName', { loginName })
             .orWhere('user.email = :loginName', { loginName: loginName.toLocaleLowerCase() })
             .getOne();
 
@@ -278,6 +293,7 @@ export class UserService {
             .leftJoin('infoGroups.role', 'role')
             .leftJoin('role.users', 'users')
             .where('users.username = :loginName', { loginName })
+            .orWhere('users.mobile = :loginName', { loginName })
             .orWhere('users.email = :loginName', { loginName: loginName.toLocaleLowerCase() })
             .orderBy('infoItem.order', 'ASC')
             .getMany();

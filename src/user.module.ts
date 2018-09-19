@@ -11,6 +11,7 @@ import { In, Not, Repository } from 'typeorm';
 
 import { AuthGurad } from './auth/auth.gurad';
 import { AuthService } from './auth/auth.service';
+import { AUTH_TOKEN_WHITE_LIST } from './constants/auth.constant';
 import { PERMISSION_DEFINITION, RESOURCE_DEFINITION } from './decorators';
 import { InfoGroup } from './entities/info-group.entity';
 import { InfoItem } from './entities/info-item.entity';
@@ -76,7 +77,7 @@ export class UserModule implements OnModuleInit {
         this.metadataScanner = new MetadataScanner();
     }
 
-    static forRoot(options: { i18n: 'en-US' | 'zh-CN' }): DynamicModule {
+    static forRoot(options: { i18n: 'en-US' | 'zh-CN', authTokenWhiteList: [string] }): DynamicModule {
         if (!existsSync('src/i18n')) {
             mkdirSync(join('src/i18n'));
             writeFileSync(join('src/i18n', 'zh-CN.json'), readFileSync(__dirname + '/i18n/zh-CN.json'));
@@ -87,7 +88,9 @@ export class UserModule implements OnModuleInit {
             defaultLocale: options.i18n,
             directory: 'src/i18n'
         });
+        options.authTokenWhiteList.push(...['IntrospectionQuery', 'login', 'adminLogin', 'register']);
         return {
+            providers: [{ provide: AUTH_TOKEN_WHITE_LIST, useValue: options.authTokenWhiteList }],
             module: UserModule
         };
     }

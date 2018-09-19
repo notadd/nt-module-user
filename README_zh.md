@@ -76,7 +76,7 @@ import { UserModule } from '@notadd/module-user';
            useClass: GraphQLConfigService
         }),
         TypeOrmModule.forRoot(),
-        UserModule.forRoot({ i18n: 'zh-CN' })
+        UserModule.forRoot({ i18n: 'zh-CN', authTokenWhiteList: [''] })
     ],
     controllers: [],
     providers: [],
@@ -84,6 +84,8 @@ import { UserModule } from '@notadd/module-user';
 })
 export class AppModule { }
 ```
+
+> Tips: i18n 配置用于用户模块的返回消息及资源、权限注解的 i18n 功能，authTokenWhiteList 可以传入字符串数组，用于配置授权白名单的接口
 
 #### 鉴权功能，在 graphql 上下文中 使用 `AuthService` 类的 `validateUser` 方法，并将通过身份验证的用户传递给上下文
 

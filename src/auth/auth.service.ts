@@ -3,6 +3,7 @@ import { AuthenticationError } from 'apollo-server-core';
 import { __ as t } from 'i18n';
 import * as jwt from 'jsonwebtoken';
 
+import { AUTH_TOKEN_WHITE_LIST } from '../constants/auth.constant';
 import { User } from '../entities/user.entity';
 import { JwtPayload, JwtReply } from '../interfaces/jwt.interface';
 import { UserService } from '../services/user.service';
@@ -10,7 +11,8 @@ import { UserService } from '../services/user.service';
 @Injectable()
 export class AuthService {
     constructor(
-        @Inject(forwardRef(() => UserService)) private readonly userService: UserService
+        @Inject(forwardRef(() => UserService)) private readonly userService: UserService,
+        @Inject(AUTH_TOKEN_WHITE_LIST) private readonly authTokenWhiteList: [string]
     ) { }
 
     async createToken(payload: JwtPayload): Promise<JwtReply> {
@@ -19,10 +21,7 @@ export class AuthService {
     }
 
     async validateUser(req: any): Promise<User> {
-        /**
-         * whitelist
-         */
-        if (req.body && ['IntrospectionQuery', 'login', 'adminLogin', 'register'].includes(req.body.operationName)) {
+        if (req.body && this.authTokenWhiteList.includes(req.body.operationName)) {
             return;
         }
 

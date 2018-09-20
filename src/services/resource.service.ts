@@ -1,64 +1,100 @@
 import { Injectable } from '@nestjs/common';
-import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
-import { EntityManager, In, Not, Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { __ as t } from 'i18n';
+import { In, Not, Repository } from 'typeorm';
 
 import { Permission } from '../entities/permission.entity';
 import { Resource } from '../entities/resource.entity';
+import { SystemModule } from '../entities/system-module.entity';
 
 @Injectable()
 export class ResourceService {
     constructor(
-        @InjectEntityManager() private readonly entityManager: EntityManager,
+        @InjectRepository(SystemModule) private readonly systemModuleRepo: Repository<SystemModule>,
         @InjectRepository(Resource) private readonly resourceRepo: Repository<Resource>,
         @InjectRepository(Permission) private readonly permissionRepo: Repository<Permission>
     ) { }
 
     async saveResourcesAndPermissions(payload: string) {
-        const metadataMap: Map<string, { resource: Resource, permissions: Permission[] }> = new Map();
+        const metadataMap: Map<string, Resource[]> = new Map();
         const obj = JSON.parse(payload);
         Object.keys(obj).forEach(k => metadataMap.set(k, obj[k]));
 
-        // All resource annotations and all permission annotations that were scanned
-        const scannedResourcesAndPermissions = [...metadataMap.values()].map(metadataValue => {
-            // Bind permissions to the corresponding resource
-            metadataValue.permissions.forEach(v => v.resource = metadataValue.resource);
-            return { permissions: metadataValue.permissions, resource: metadataValue.resource };
+        // Sacnned modules
+        const scannedModuleNames = [...metadataMap.keys()].map(v => t(v));
+        // Delete removed module
+        const notExistingModule = await this.systemModuleRepo.find({
+            where: { name: Not(In(scannedModuleNames.length ? scannedModuleNames : ['all'])) }
         });
+        if (notExistingModule.length) await this.systemModuleRepo.delete(notExistingModule.map(v => v.id));
+        // Create new module
+        const existingModules = await this.systemModuleRepo.find({ order: { id: 'ASC' } });
+        const newModules = scannedModuleNames.filter(sm => !existingModules.map(v => v.name).includes(sm)).map(moduleName => {
+            return this.systemModuleRepo.create({ name: moduleName });
+        });
+        if (newModules.length) await this.systemModuleRepo.save(newModules);
+        // Update existing module
+        if (existingModules.length) {
+            existingModules.forEach(em => {
+                em.name = scannedModuleNames.find(sm => sm === em.name);
+            });
+            await this.systemModuleRepo.save(existingModules);
+        }
 
-        // All resource annotations that were scanned
-        const scannedResources = scannedResourcesAndPermissions.map(v => v.resource);
-
-        // Remove the resources and their permissions which were removed from the annotation
-        const resourceIdentifies = [...metadataMap.keys()].length === 0 ? ['__delete_all_resource__'] : [...metadataMap.keys()];
+        // Sacnned resources
+        for (const [key, value] of metadataMap) {
+            const resourceModule = await this.systemModuleRepo.findOne({ where: { name: t(key) } });
+            value.forEach(async resouece => {
+                resouece.systemModule = resourceModule;
+            });
+        }
+        const scannedResources: Resource[] = <Resource[]>[].concat(...metadataMap.values());
+        // Delete removed resource
+        const resourceIdentifies = scannedResources.length ? scannedResources.map(v => v.identify) : ['__delete_all_resource__'];
         const notExistResources = await this.resourceRepo.find({ where: { identify: Not(In(resourceIdentifies)) } });
         if (notExistResources.length > 0) await this.resourceRepo.delete(notExistResources.map(v => v.id));
-        // Filter out the new resources
+        // Create new resource
         const existResources = await this.resourceRepo.find({ order: { id: 'ASC' } });
         const newResourcess = scannedResources.filter(sr => !existResources.map(v => v.identify).includes(sr.identify));
-        // Save the new resources
-        if (newResourcess.length > 0) await this.entityManager.insert(Resource, this.resourceRepo.create(newResourcess));
+        if (newResourcess.length > 0) await this.resourceRepo.save(this.resourceRepo.create(newResourcess));
+        // Update resource
+        if (existResources.length) {
+            existResources.forEach(er => {
+                er.name = scannedResources.find(sr => sr.identify === er.identify).name;
+            });
+            await this.resourceRepo.save(existResources);
+        }
 
-        // All permission annotations that were scanned
-        const scannedPermissions = <Permission[]>[].concat(...scannedResourcesAndPermissions.map(v => v.permissions));
-        // Query the resources of all the permission annotations scanned
+        // Sacnned permissions
+        const scannedPermissions = <Permission[]>[].concat(...scannedResources.map(metadataValue => {
+            metadataValue.permissions.forEach(v => v.resource = metadataValue);
+            return metadataValue.permissions;
+        }));
+        // Delete removed permission
         const resource = await this.resourceRepo.find({ where: { identify: In(scannedPermissions.map(v => v.resource.identify)) } });
-        // Bind resources to permissions
         scannedPermissions.forEach(permission => {
             permission.resource = resource.find(v => v.identify === permission.resource.identify);
         });
-        // Remove the permissions that were removed from annotations
+        // Create removed permission
         // tslint:disable-next-line:max-line-length
-        const permissionIdentifies = scannedPermissions.map(v => v.identify).length === 0 ? ['__delete_all_permission__'] : scannedPermissions.map(v => v.identify);
+        const permissionIdentifies = scannedPermissions.length ? scannedPermissions.map(v => v.identify) : ['__delete_all_permission__'];
         const notExistPermissions = await this.permissionRepo.find({ where: { identify: Not(In(permissionIdentifies)) } });
         if (notExistPermissions.length > 0) await this.permissionRepo.delete(notExistPermissions.map(v => v.id));
-        // Filter out the new permissions
+
         const existPermissions = await this.permissionRepo.find({ order: { id: 'ASC' } });
         const newPermissions = scannedPermissions.filter(sp => !existPermissions.map(v => v.identify).includes(sp.identify));
-        // Save the new permissions
-        if (newPermissions.length > 0) await this.entityManager.insert(Permission, this.permissionRepo.create(newPermissions));
+        if (newPermissions.length > 0) await this.permissionRepo.save(this.permissionRepo.create(newPermissions));
+        // Update permission
+        if (existPermissions.length) {
+            existPermissions.forEach(ep => {
+                ep.name = scannedPermissions.find(sp => sp.identify === ep.identify).name;
+                ep.action = scannedPermissions.find(sp => sp.identify === ep.identify).action;
+            });
+            await this.permissionRepo.save(existPermissions);
+        }
     }
 
-    async findResources() {
-        return this.resourceRepo.find({ relations: ['permissions'] });
+    async findResources(systemModuleId: number) {
+        return this.resourceRepo.find({ where: { systemModule: { id: systemModuleId } }, relations: ['permissions'] });
     }
 }

@@ -20,7 +20,8 @@ export class User {
     id: number;
 
     @Column({
-        unique: true
+        unique: true,
+        nullable: true
     })
     username: string;
 

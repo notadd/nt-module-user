@@ -1,6 +1,7 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 import { Permission } from './permission.entity';
+import { SystemModule } from './system-module.entity';
 
 @Entity('resource')
 export class Resource {
@@ -17,4 +18,9 @@ export class Resource {
 
     @OneToMany(type => Permission, permission => permission.resource)
     permissions: Permission[];
+
+    @ManyToOne(type => SystemModule, systemModule => systemModule.resources, {
+        onDelete: 'CASCADE'
+    })
+    systemModule: SystemModule;
 }

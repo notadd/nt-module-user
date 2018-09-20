@@ -8,6 +8,7 @@ import { InfoItemGrpcController } from './controllers/info-item.grpc.controller'
 import { OrganizationGrpcController } from './controllers/organization.grpc.controller';
 import { ResourceGrpcController } from './controllers/resource.grpc.controller';
 import { RoleGrpcController } from './controllers/role.grpc.controller';
+import { SystemModuleGrpcController } from './controllers/system.module.controller';
 import { UserGrpcController } from './controllers/user.grpc.controller';
 import { InfoGroup } from './entities/info-group.entity';
 import { InfoItem } from './entities/info-item.entity';
@@ -15,6 +16,7 @@ import { Organization } from './entities/organization.entity';
 import { Permission } from './entities/permission.entity';
 import { Resource } from './entities/resource.entity';
 import { Role } from './entities/role.entity';
+import { SystemModule } from './entities/system-module.entity';
 import { UserInfo } from './entities/user-info.entity';
 import { User } from './entities/user.entity';
 import { AuthService } from './services/auth.service';
@@ -24,6 +26,7 @@ import { InfoItemService } from './services/info-item.service';
 import { OrganizationService } from './services/organization.service';
 import { ResourceService } from './services/resource.service';
 import { RoleService } from './services/role.service';
+import { SystemModuleService } from './services/system-module.service';
 import { UserService } from './services/user.service';
 import { CryptoUtil } from './utils/crypto.util';
 
@@ -42,12 +45,13 @@ import { CryptoUtil } from './utils/crypto.util';
             synchronize: true,
             dropSchema: false
         }),
-        TypeOrmModule.forFeature([Organization, User, Role, Resource, Permission, InfoGroup, InfoItem, UserInfo])
+        TypeOrmModule.forFeature([Organization, User, Role, SystemModule, Resource, Permission, InfoGroup, InfoItem, UserInfo])
     ],
     controllers: [
         InfoGroupGrpcController,
         InfoItemGrpcController,
         OrganizationGrpcController,
+        SystemModuleGrpcController,
         ResourceGrpcController,
         RoleGrpcController,
         UserGrpcController
@@ -58,6 +62,7 @@ import { CryptoUtil } from './utils/crypto.util';
         OrganizationService,
         UserService,
         RoleService,
+        SystemModuleService,
         ResourceService,
         InfoGroupService,
         InfoItemService,

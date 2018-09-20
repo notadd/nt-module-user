@@ -18,8 +18,8 @@ export class ResourceGrpcController {
     }
 
     @GrpcMethod('ResourceService')
-    async findResources() {
-        const data = await this.resourceService.findResources();
+    async findResources(payload: { systemModuleId: number }) {
+        const data = await this.resourceService.findResources(payload.systemModuleId);
         return { code: 200, message: t('Query the resource successfully'), data };
     }
 }

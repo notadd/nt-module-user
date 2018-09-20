@@ -39,6 +39,7 @@ export interface CreateUserInput {
 }
 
 export interface UpdateUserInput {
+    username?: string;
     email?: string;
     mobile?: string;
     password?: string;

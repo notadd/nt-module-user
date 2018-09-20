@@ -63,7 +63,7 @@
     "invalid password": "invalid password",
     "Username already exists": "Username already exists",
     "Mobile already exists": "Mobile already exists",
-	"Email already exists": "Email already exists",
+    "Email already exists": "Email already exists",
     "Request header lacks authorization parameters，it should be: Authorization or authorization": "Request header lacks authorization parameters，it should be: Authorization or authorization",
     "The authorization code prefix is incorrect. it should be: Bearer or bearer": "The authorization code prefix is incorrect. it should be: Bearer or bearer",
     "The authorization code is incorrect": "The authorization code is incorrect",

@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { __ as t } from 'i18n';
 import { In, Not, Repository } from 'typeorm';
 
 import { Permission } from '../entities/permission.entity';
@@ -16,39 +15,42 @@ export class ResourceService {
     ) { }
 
     async saveResourcesAndPermissions(payload: string) {
-        const metadataMap: Map<string, Resource[]> = new Map();
+        const metadataMap: Map<string, { name: string, resource: Resource[] }> = new Map();
         const obj = JSON.parse(payload);
         Object.keys(obj).forEach(k => metadataMap.set(k, obj[k]));
 
         // Sacnned modules
-        const scannedModuleNames = [...metadataMap.keys()].map(v => t(v));
+        const scannedModules: { id: string, name: string }[] = [];
+        metadataMap.forEach((v, k) => {
+            scannedModules.push({ id: k, name: v.name });
+        });
+
         // Delete removed module
         const notExistingModule = await this.systemModuleRepo.find({
-            where: { name: Not(In(scannedModuleNames.length ? scannedModuleNames : ['all'])) }
+            where: { id: Not(In(scannedModules.length ? scannedModules.map(v => v.id) : ['all'])) }
         });
         if (notExistingModule.length) await this.systemModuleRepo.delete(notExistingModule.map(v => v.id));
         // Create new module
         const existingModules = await this.systemModuleRepo.find({ order: { id: 'ASC' } });
-        const newModules = scannedModuleNames.filter(sm => !existingModules.map(v => v.name).includes(sm)).map(moduleName => {
-            return this.systemModuleRepo.create({ name: moduleName });
-        });
-        if (newModules.length) await this.systemModuleRepo.save(newModules);
+        const newModules = scannedModules.filter(sm => !existingModules.map(v => v.id).includes(sm.id));
+        if (newModules.length) await this.systemModuleRepo.save(this.systemModuleRepo.create(newModules));
         // Update existing module
         if (existingModules.length) {
             existingModules.forEach(em => {
-                em.name = scannedModuleNames.find(sm => sm === em.name);
+                em.name = scannedModules.find(sm => sm.id === em.id).name;
             });
             await this.systemModuleRepo.save(existingModules);
         }
 
         // Sacnned resources
         for (const [key, value] of metadataMap) {
-            const resourceModule = await this.systemModuleRepo.findOne({ where: { name: t(key) } });
-            value.forEach(async resouece => {
+            const resourceModule = await this.systemModuleRepo.findOne({ where: { id: key } });
+            value.resource.forEach(async resouece => {
                 resouece.systemModule = resourceModule;
             });
         }
-        const scannedResources: Resource[] = <Resource[]>[].concat(...metadataMap.values());
+        const scannedResources: Resource[] = <Resource[]>[].concat(...[...metadataMap.values()].map(v => v.resource));
+
         // Delete removed resource
         const resourceIdentifies = scannedResources.length ? scannedResources.map(v => v.identify) : ['__delete_all_resource__'];
         const notExistResources = await this.resourceRepo.find({ where: { identify: Not(In(resourceIdentifies)) } });
@@ -76,7 +78,6 @@ export class ResourceService {
             permission.resource = resource.find(v => v.identify === permission.resource.identify);
         });
         // Create removed permission
-        // tslint:disable-next-line:max-line-length
         const permissionIdentifies = scannedPermissions.length ? scannedPermissions.map(v => v.identify) : ['__delete_all_permission__'];
         const notExistPermissions = await this.permissionRepo.find({ where: { identify: Not(In(permissionIdentifies)) } });
         if (notExistPermissions.length > 0) await this.permissionRepo.delete(notExistPermissions.map(v => v.id));

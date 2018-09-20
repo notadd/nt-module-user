@@ -94,65 +94,62 @@ let UserModule = UserModule_1 = class UserModule {
     }
     async loadResourcesAndPermissions() {
         const metadataMap = new Map();
-        this.modulesContainer.forEach(module => {
-            for (const [key, value] of [...module.components, ...module.routes]) {
-                const isResolverOrController = Reflect.getMetadataKeys(value.instance.constructor)
+        this.modulesContainer.forEach((moduleValue, moduleKey) => {
+            for (const [componentKey, componentKeyValue] of [...moduleValue.components, ...moduleValue.routes]) {
+                const isResolverOrController = Reflect.getMetadataKeys(componentKeyValue.instance.constructor)
                     .filter(key => ['graphql:resolver_type', 'path']
                     .includes(key)).length > 0;
                 if (isResolverOrController) {
-                    const resource = Reflect.getMetadata(decorators_1.RESOURCE_DEFINITION, value.instance.constructor);
-                    const prototype = Object.getPrototypeOf(value.instance);
-                    if (prototype) {
-                        const permissions = this.metadataScanner.scanFromPrototype(value.instance, prototype, name => {
-                            return Reflect.getMetadata(decorators_1.PERMISSION_DEFINITION, value.instance, name);
+                    const resource = Reflect.getMetadata(decorators_1.RESOURCE_DEFINITION, componentKeyValue.instance.constructor);
+                    const prototype = Object.getPrototypeOf(componentKeyValue.instance);
+                    if (resource && prototype) {
+                        const permissions = this.metadataScanner.scanFromPrototype(componentKeyValue.instance, prototype, name => {
+                            return Reflect.getMetadata(decorators_1.PERMISSION_DEFINITION, componentKeyValue.instance, name);
                         });
-                        if (resource) {
-                            resource.name = i18n_1.__(resource.name);
-                            permissions.forEach(permission => {
-                                permission.name = i18n_1.__(permission.name);
-                            });
-                            if (resource.permissions) {
-                                resource.permissions.push(...permissions);
-                            }
-                            else {
-                                resource.permissions = permissions;
-                            }
-                            if (metadataMap.has(module.metatype.name)) {
-                                metadataMap.get(module.metatype.name).push(resource);
-                            }
-                            else {
-                                metadataMap.set(module.metatype.name, [resource]);
-                            }
+                        resource.permissions = permissions;
+                        if (metadataMap.has(moduleKey)) {
+                            metadataMap.get(moduleKey).name = i18n_1.__(moduleValue.metatype.name);
+                            metadataMap.get(moduleKey).resource.push(resource);
+                        }
+                        else {
+                            metadataMap.set(moduleKey, { name: i18n_1.__(moduleValue.metatype.name), resource: [resource] });
                         }
                     }
                 }
             }
         });
-        const scannedModuleNames = [...metadataMap.keys()].map(v => i18n_1.__(v));
+        metadataMap.forEach(value => {
+            value.resource.forEach(resource => {
+                resource.name = i18n_1.__(resource.name);
+                resource.permissions.forEach(p => p.name = i18n_1.__(p.name));
+            });
+        });
+        const scannedModules = [];
+        metadataMap.forEach((v, k) => {
+            scannedModules.push({ id: k, name: v.name });
+        });
         const notExistingModule = await this.systemModuleRepo.find({
-            where: { name: typeorm_2.Not(typeorm_2.In(scannedModuleNames.length ? scannedModuleNames : ['all'])) }
+            where: { id: typeorm_2.Not(typeorm_2.In(scannedModules.length ? scannedModules.map(v => v.id) : ['all'])) }
         });
         if (notExistingModule.length)
             await this.systemModuleRepo.delete(notExistingModule.map(v => v.id));
         const existingModules = await this.systemModuleRepo.find({ order: { id: 'ASC' } });
-        const newModules = scannedModuleNames.filter(sm => !existingModules.map(v => v.name).includes(sm)).map(moduleName => {
-            return this.systemModuleRepo.create({ name: moduleName });
-        });
+        const newModules = scannedModules.filter(sm => !existingModules.map(v => v.id).includes(sm.id));
         if (newModules.length)
-            await this.systemModuleRepo.save(newModules);
+            await this.systemModuleRepo.save(this.systemModuleRepo.create(newModules));
         if (existingModules.length) {
             existingModules.forEach(em => {
-                em.name = scannedModuleNames.find(sm => sm === em.name);
+                em.name = scannedModules.find(sm => sm.id === em.id).name;
             });
             await this.systemModuleRepo.save(existingModules);
         }
         for (const [key, value] of metadataMap) {
-            const resourceModule = await this.systemModuleRepo.findOne({ where: { name: i18n_1.__(key) } });
-            value.forEach(async (resouece) => {
+            const resourceModule = await this.systemModuleRepo.findOne({ where: { id: key } });
+            value.resource.forEach(async (resouece) => {
                 resouece.systemModule = resourceModule;
             });
         }
-        const scannedResources = [].concat(...metadataMap.values());
+        const scannedResources = [].concat(...[...metadataMap.values()].map(v => v.resource));
         const resourceIdentifies = scannedResources.length ? scannedResources.map(v => v.identify) : ['__delete_all_resource__'];
         const notExistResources = await this.resourceRepo.find({ where: { identify: typeorm_2.Not(typeorm_2.In(resourceIdentifies)) } });
         if (notExistResources.length > 0)

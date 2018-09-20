@@ -1,6 +1,6 @@
 import { Resource } from './resource.entity';
 export declare class SystemModule {
-    id: number;
+    id: string;
     name: string;
     resources: Resource[];
 }

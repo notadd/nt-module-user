@@ -14,8 +14,8 @@ const resource_entity_1 = require("./resource.entity");
 let SystemModule = class SystemModule {
 };
 __decorate([
-    typeorm_1.PrimaryGeneratedColumn(),
-    __metadata("design:type", Number)
+    typeorm_1.PrimaryColumn(),
+    __metadata("design:type", String)
 ], SystemModule.prototype, "id", void 0);
 __decorate([
     typeorm_1.Column(),

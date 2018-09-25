@@ -15,11 +15,15 @@ export class AuthGurad implements CanActivate {
         if (user && user.username === 'sadmin') return true;
 
         const userPerm: string[] = [];
-        user && user.roles.forEach(role => {
-            role.permissions.forEach(permission => {
-                userPerm.push(permission.identify);
+        if (user && user.roles.length) {
+            user.roles.forEach(role => {
+                if (role.permissions && role.permissions.length) {
+                    role.permissions.forEach(permission => {
+                        userPerm.push(permission.identify);
+                    });
+                }
             });
-        });
+        }
         const handlerPerm = <Permission>Reflect.getMetadata(PERMISSION_DEFINITION, context.getClass().prototype, context.getHandler().name);
         if (handlerPerm && !userPerm.includes(handlerPerm.identify)) {
             return false;

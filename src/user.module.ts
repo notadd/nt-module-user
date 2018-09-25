@@ -14,6 +14,7 @@ import { InfoGroup } from './entities/info-group.entity';
 import { InfoItem } from './entities/info-item.entity';
 import { Organization } from './entities/organization.entity';
 import { Permission } from './entities/permission.entity';
+import { PersonalPermission } from './entities/personal-permission.entity';
 import { Resource } from './entities/resource.entity';
 import { Role } from './entities/role.entity';
 import { SystemModule } from './entities/system-module.entity';
@@ -45,7 +46,7 @@ import { CryptoUtil } from './utils/crypto.util';
             synchronize: true,
             dropSchema: false
         }),
-        TypeOrmModule.forFeature([Organization, User, Role, SystemModule, Resource, Permission, InfoGroup, InfoItem, UserInfo])
+        TypeOrmModule.forFeature([Organization, User, Role, SystemModule, Resource, Permission, PersonalPermission, InfoGroup, InfoItem, UserInfo])
     ],
     controllers: [
         InfoGroupGrpcController,

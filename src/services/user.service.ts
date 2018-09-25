@@ -5,6 +5,7 @@ import { __ as t } from 'i18n';
 import { Repository } from 'typeorm';
 
 import { InfoItem } from '../entities/info-item.entity';
+import { PersonalPermission } from '../entities/personal-permission.entity';
 import { UserInfo } from '../entities/user-info.entity';
 import { User } from '../entities/user.entity';
 import { CreateUserInput, UpdateUserInput, UserInfoData } from '../interfaces/user.interface';
@@ -16,6 +17,7 @@ import { RoleService } from './role.service';
 export class UserService {
     constructor(
         @InjectRepository(User) private readonly userRepo: Repository<User>,
+        @InjectRepository(PersonalPermission) private readonly personalPermissionRepo: Repository<PersonalPermission>,
         @InjectRepository(UserInfo) private readonly userInfoRepo: Repository<UserInfo>,
         @InjectRepository(InfoItem) private readonly infoItemRepo: Repository<InfoItem>,
         @Inject(CryptoUtil) private readonly cryptoUtil: CryptoUtil,
@@ -55,6 +57,10 @@ export class UserService {
         if (createUserInput.infoKVs && createUserInput.infoKVs.length) {
             await this.createOrUpdateUserInfos(user, createUserInput.infoKVs, 'create');
         }
+    }
+
+    async addPermissionToUser() {
+
     }
 
     /**
@@ -210,6 +216,8 @@ export class UserService {
      */
     async findOneWithRolesAndPermissions(loginName: string): Promise<User> {
         const user = await this.userRepo.createQueryBuilder('user')
+            .leftJoinAndSelect('user.personalPermissions', 'userPersonalPermissions')
+            .leftJoinAndSelect('userPersonalPermissions.permission', 'personalPermissions')
             .leftJoinAndSelect('user.roles', 'roles')
             .leftJoinAndSelect('roles.permissions', 'permissions')
             .where('user.username = :loginName', { loginName })

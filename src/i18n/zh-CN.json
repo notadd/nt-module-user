@@ -25,6 +25,7 @@
 	"Create a role successfully": "创建角色成功",
 	"Delete role successfully": "删除角色成功",
 	"Update role successfully": "更新角色成功",
+	"Remove permission from role successfully": "删除角色权限成功",
 	"Set role permissions successfully": "设置角色权限成功",
 	"Query all roles successfully": "查询所有角色成功",
 	"Query role information successfully": "查询角色信息成功",

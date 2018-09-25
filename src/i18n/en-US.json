@@ -25,6 +25,7 @@
     "Create a role successfully": "Create a role successfully",
     "Delete role successfully": "Delete role successfully",
     "Update role successfully": "Update role successfully",
+    "Remove permission from role successfully": "Remove permission from role successfully",
     "Set role permissions successfully": "Set role permissions successfully",
     "Query all roles successfully": "Query all roles successfully",
     "Query role information successfully": "Query role information successfully",

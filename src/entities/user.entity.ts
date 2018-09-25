@@ -11,6 +11,7 @@ import {
 } from 'typeorm';
 
 import { Organization } from './organization.entity';
+import { PersonalPermission } from './personal-permission.entity';
 import { Role } from './role.entity';
 import { UserInfo } from './user-info.entity';
 
@@ -58,6 +59,9 @@ export class User {
     })
     @JoinTable()
     roles: Role[];
+
+    @OneToMany(type => PersonalPermission, personalPermission => personalPermission.user)
+    personalPermissions: PersonalPermission[];
 
     @ManyToMany(type => Organization, organization => organization.users, {
         onDelete: 'CASCADE'

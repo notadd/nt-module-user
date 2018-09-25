@@ -29,6 +29,12 @@ export class RoleGrpcController {
     }
 
     @GrpcMethod('RoleService')
+    async removePermission(payload: { roleId: number, permissionId: number }) {
+        await this.roleService.removePermission(payload.roleId, payload.permissionId);
+        return { code: 200, message: t('Remove permission from role successfully') };
+    }
+
+    @GrpcMethod('RoleService')
     async setPermissionsToRole(payload: { roleId: number, permissionIds: number[] }) {
         await this.roleService.setPermissions(payload.roleId, payload.permissionIds);
         return { code: 200, message: t('Set role permissions successfully') };

@@ -16,11 +16,15 @@ let AuthGurad = class AuthGurad {
         if (user && user.username === 'sadmin')
             return true;
         const userPerm = [];
-        user && user.roles.forEach(role => {
-            role.permissions.forEach(permission => {
-                userPerm.push(permission.identify);
+        if (user && user.roles.length) {
+            user.roles.forEach(role => {
+                if (role.permissions && role.permissions.length) {
+                    role.permissions.forEach(permission => {
+                        userPerm.push(permission.identify);
+                    });
+                }
             });
-        });
+        }
         const handlerPerm = Reflect.getMetadata(decorators_1.PERMISSION_DEFINITION, context.getClass().prototype, context.getHandler().name);
         if (handlerPerm && !userPerm.includes(handlerPerm.identify)) {
             return false;

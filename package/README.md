@@ -29,7 +29,7 @@ Import `UserModule` in the application root module, and configure the i18n optio
 
 ### Resource Definition
 
-`@Resouce` is a general term for users to perform business operations on an entity resource.
+`@Resource` is a general term for users to perform business operations on an entity resource.
 
 Set annotations for defining resources on the `Resolver` or `Controller` class to define the current resource, such as:
 

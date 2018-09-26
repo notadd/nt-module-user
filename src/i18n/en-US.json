@@ -71,5 +71,7 @@
     "The authorization code has expired": "The authorization code has expired",
     "Ban User successfully": "Ban User successfully",
     "Revert banned user successfully": "Revert banned user successfully",
-    "Revert recycled user successfully": "Revert recycled user successfully"
+    "Revert recycled user successfully": "Revert recycled user successfully",
+	"Add permission to user successfully": "Add permission to user successfully",
+	"Delete permission of user successfully": "Delete permission of user successfully"
 }

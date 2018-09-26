@@ -71,5 +71,7 @@
 	"The authorization code has expired": "授权码已过期",
 	"Ban User successfully": "封禁用户成功",
 	"Revert banned user successfully": "解封用户成功",
-	"Revert recycled user successfully": "恢复用户成功"
+	"Revert recycled user successfully": "恢复用户成功",
+	"Add permission to user successfully": "给用户添加权限成功",
+	"Delete permission of user successfully": "删除用户的权限成功"
 }

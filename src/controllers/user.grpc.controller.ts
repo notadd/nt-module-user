@@ -118,4 +118,16 @@ export class UserGrpcController {
         const data = await this.userService.findOneWithRolesAndPermissions(payload.username);
         return { code: 200, message: t('Query users roles and permissions successfully'), data };
     }
+
+    @GrpcMethod('UserService')
+    async addPermissionToUser(payload: { userId: number, permissionId: number }) {
+        await this.userService.addPermissionToUser(payload.userId, payload.permissionId);
+        return { code: 200, message: t('Add permission to user successfully') };
+    }
+
+    @GrpcMethod('UserService')
+    async deletePermissionOfUser(payload: { userId: number, permissionId: number }) {
+        await this.userService.deletePermissionOfUser(payload.userId, payload.permissionId);
+        return { code: 200, message: t('Delete permission of user successfully') };
+    }
 }

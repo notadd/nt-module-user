@@ -5,6 +5,7 @@ import { __ as t } from 'i18n';
 import { Repository } from 'typeorm';
 
 import { InfoItem } from '../entities/info-item.entity';
+import { Permission } from '../entities/permission.entity';
 import { PersonalPermission } from '../entities/personal-permission.entity';
 import { UserInfo } from '../entities/user-info.entity';
 import { User } from '../entities/user.entity';
@@ -17,6 +18,7 @@ import { RoleService } from './role.service';
 export class UserService {
     constructor(
         @InjectRepository(User) private readonly userRepo: Repository<User>,
+        @InjectRepository(Permission) private readonly permissionRepo: Repository<Permission>,
         @InjectRepository(PersonalPermission) private readonly personalPermissionRepo: Repository<PersonalPermission>,
         @InjectRepository(UserInfo) private readonly userInfoRepo: Repository<UserInfo>,
         @InjectRepository(InfoItem) private readonly infoItemRepo: Repository<InfoItem>,
@@ -45,7 +47,7 @@ export class UserService {
         }
 
         createUserInput.password = await this.cryptoUtil.encryptPassword(createUserInput.password);
-        if (createUserInput.email) createUserInput.email = createUserInput.email.toLocaleLowerCase();
+        createUserInput.email = createUserInput.email.toLocaleLowerCase();
         const user = await this.userRepo.save(this.userRepo.create(createUserInput));
 
         if (createUserInput.roleIds && createUserInput.roleIds.length) {
@@ -59,8 +61,27 @@ export class UserService {
         }
     }
 
-    async addPermissionToUser() {
+    /**
+     * Add a personal permission to user
+     *
+     * @param userId The specified user id
+     * @param permissionId The specified permission id
+     */
+    async addPermissionToUser(userId: number, permissionId: number) {
+        const user = await this.findOneById(userId);
+        const permission = await this.permissionRepo.findOne(permissionId);
+        if (!permission) throw new RpcException({ code: 404, message: t('The permission id of %s does not exist', permissionId.toString()) });
+        await this.personalPermissionRepo.save(this.personalPermissionRepo.create({ user, permission, status: 1 }));
+    }
 
+    /**
+     * Delete a permission of specified user
+     *
+     * @param userId The specified user id
+     * @param permissionId The specified permission id
+     */
+    async deletePermissionOfUser(userId: number, permissionId: number) {
+        await this.personalPermissionRepo.delete({ user: { id: userId }, permission: { id: permissionId } });
     }
 
     /**
@@ -285,6 +306,7 @@ export class UserService {
             .leftJoinAndSelect('user.userInfos', 'userInfos')
             .leftJoinAndSelect('userInfos.infoItem', 'infoItem')
             .where('user.username = :loginName', { loginName })
+            .orWhere('user.mobile = :loginName', { loginName })
             .orWhere('user.email = :loginName', { loginName: loginName.toLocaleLowerCase() })
             .getOne();
 
@@ -298,6 +320,7 @@ export class UserService {
             .leftJoin('infoGroups.role', 'role')
             .leftJoin('role.users', 'users')
             .where('users.username = :loginName', { loginName })
+            .orWhere('users.mobile = :loginName', { loginName })
             .orWhere('users.email = :loginName', { loginName: loginName.toLocaleLowerCase() })
             .orderBy('infoItem.order', 'ASC')
             .getMany();
@@ -305,29 +328,6 @@ export class UserService {
         const userInfoData = this.refactorUserData(user, infoItem);
 
         const tokenInfo = await this.authService.createToken({ loginName });
-        return { tokenInfo, userInfoData };
-    }
-
-    /**
-     * user login by mobile
-     *
-     * @param mobile mobile
-     */
-    async mobileLogin(mobile: string) {
-        const user = await this.userRepo.findOne({ mobile }, { relations: ['roles', 'organizations', 'userInfos', 'userInfos.infoItem'] });
-        await this.checkUserStatus(user);
-
-        const infoItem = await this.infoItemRepo.createQueryBuilder('infoItem')
-            .leftJoin('infoItem.infoGroups', 'infoGroups')
-            .leftJoin('infoGroups.role', 'role')
-            .leftJoin('role.users', 'users')
-            .where('users.mobile = :mobile', { mobile })
-            .orderBy('infoItem.order', 'ASC')
-            .getMany();
-
-        const userInfoData = this.refactorUserData(user, infoItem);
-
-        const tokenInfo = await this.authService.createToken({ loginName: mobile });
         return { tokenInfo, userInfoData };
     }
 

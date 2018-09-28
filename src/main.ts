@@ -12,12 +12,7 @@ async function bootstrap() {
             package: 'notadd_module_user',
             protoPath: join(__dirname, 'protobufs/user-module.proto'),
             loader: {
-                arrays: true,
-                keepCase: true,
-                longs: String,
-                enums: String,
-                defaults: true,
-                oneofs: true
+                arrays: true
             }
         }
     });

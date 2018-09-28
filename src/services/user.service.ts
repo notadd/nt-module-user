@@ -47,7 +47,7 @@ export class UserService {
         }
 
         createUserInput.password = await this.cryptoUtil.encryptPassword(createUserInput.password);
-        createUserInput.email = createUserInput.email.toLocaleLowerCase();
+        if (createUserInput.email) createUserInput.email = createUserInput.email.toLocaleLowerCase();
         const user = await this.userRepo.save(this.userRepo.create(createUserInput));
 
         if (createUserInput.roleIds && createUserInput.roleIds.length) {

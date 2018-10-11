@@ -94,19 +94,19 @@ let UserService = class UserService {
     }
     async updateUserInfo(id, updateUserInput) {
         const user = await this.userRepo.findOne(id, { relations: ['userInfos'] });
-        if (updateUserInput.username) {
+        if (updateUserInput.username && updateUserInput.username !== user.username) {
             if (await this.userRepo.findOne({ where: { username: updateUserInput.username } })) {
                 throw new common_1.HttpException(i18n_1.__('Username already exists'), 409);
             }
             await this.userRepo.update(user.id, { username: updateUserInput.username });
         }
-        if (updateUserInput.mobile) {
+        if (updateUserInput.mobile && updateUserInput.mobile !== user.mobile) {
             if (await this.userRepo.findOne({ where: { mobile: updateUserInput.mobile } })) {
                 throw new common_1.HttpException(i18n_1.__('Mobile already exists'), 409);
             }
             await this.userRepo.update(user.id, { mobile: updateUserInput.mobile });
         }
-        if (updateUserInput.email) {
+        if (updateUserInput.email && updateUserInput.email !== user.email) {
             if (await this.userRepo.findOne({ where: { email: updateUserInput.email } })) {
                 throw new common_1.HttpException(i18n_1.__('Email already exists'), 409);
             }

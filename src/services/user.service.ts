@@ -352,7 +352,7 @@ export class UserService {
      * @param id The specified user id
      */
     private async findOneById(id: number): Promise<User> {
-        const exist = this.userRepo.findOne(id);
+        const exist = await this.userRepo.findOne(id);
         if (!exist) {
             throw new RpcException({ code: 404, message: t('User does not exist') });
         }

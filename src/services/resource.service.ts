@@ -20,31 +20,28 @@ export class ResourceService {
         Object.keys(obj).forEach(k => metadataMap.set(k, obj[k]));
 
         // Sacnned modules
-        const scannedModules: { id: string, name: string }[] = [];
-        metadataMap.forEach((v, k) => {
-            scannedModules.push({ id: k, name: v.name });
-        });
+        const scannedModules = [...metadataMap.values()].map(v => ({ name: v.name }));
 
         // Delete removed module
         const notExistingModule = await this.systemModuleRepo.find({
-            where: { id: Not(In(scannedModules.length ? scannedModules.map(v => v.id) : ['all'])) }
+            where: { name: Not(In(scannedModules.length ? scannedModules.map(v => v.name) : ['__delete_all_system_module__'])) }
         });
         if (notExistingModule.length) await this.systemModuleRepo.delete(notExistingModule.map(v => v.id));
         // Create new module
         const existingModules = await this.systemModuleRepo.find({ order: { id: 'ASC' } });
-        const newModules = scannedModules.filter(sm => !existingModules.map(v => v.id).includes(sm.id));
+        const newModules = scannedModules.filter(sm => !existingModules.map(v => v.name).includes(sm.name));
         if (newModules.length) await this.systemModuleRepo.save(this.systemModuleRepo.create(newModules));
         // Update existing module
         if (existingModules.length) {
             existingModules.forEach(em => {
-                em.name = scannedModules.find(sm => sm.id === em.id).name;
+                em.name = scannedModules.find(sm => sm.name === em.name).name;
             });
             await this.systemModuleRepo.save(existingModules);
         }
 
         // Sacnned resources
         for (const [key, value] of metadataMap) {
-            const resourceModule = await this.systemModuleRepo.findOne({ where: { id: key } });
+            const resourceModule = await this.systemModuleRepo.findOne({ where: { name: value.name } });
             value.resource.forEach(async resouece => {
                 resouece.systemModule = resourceModule;
             });

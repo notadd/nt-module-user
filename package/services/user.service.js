@@ -264,7 +264,7 @@ let UserService = class UserService {
             }
             infoKVs.forEach(async (infoKV) => {
                 if (infoKV.key) {
-                    this.userInfoRepo.update(infoKV.key, { value: infoKV.value });
+                    await this.userInfoRepo.update(infoKV.key, { value: infoKV.value });
                 }
                 else {
                     await this.userInfoRepo.save(this.userInfoRepo.create({ value: infoKV.value, user, infoItem: { id: infoKV.relationId } }));

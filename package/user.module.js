@@ -124,27 +124,24 @@ let UserModule = UserModule_1 = class UserModule {
                 resource.permissions.forEach(p => p.name = i18n_1.__(p.name));
             });
         });
-        const scannedModules = [];
-        metadataMap.forEach((v, k) => {
-            scannedModules.push({ id: k, name: v.name });
-        });
+        const scannedModules = [...metadataMap.values()].map(v => ({ name: v.name }));
         const notExistingModule = await this.systemModuleRepo.find({
-            where: { id: typeorm_2.Not(typeorm_2.In(scannedModules.length ? scannedModules.map(v => v.id) : ['all'])) }
+            where: { name: typeorm_2.Not(typeorm_2.In(scannedModules.length ? scannedModules.map(v => v.name) : ['__delete_all_system_module__'])) }
         });
         if (notExistingModule.length)
             await this.systemModuleRepo.delete(notExistingModule.map(v => v.id));
         const existingModules = await this.systemModuleRepo.find({ order: { id: 'ASC' } });
-        const newModules = scannedModules.filter(sm => !existingModules.map(v => v.id).includes(sm.id));
+        const newModules = scannedModules.filter(sm => !existingModules.map(v => v.name).includes(sm.name));
         if (newModules.length)
             await this.systemModuleRepo.save(this.systemModuleRepo.create(newModules));
         if (existingModules.length) {
             existingModules.forEach(em => {
-                em.name = scannedModules.find(sm => sm.id === em.id).name;
+                em.name = scannedModules.find(sm => sm.name === em.name).name;
             });
             await this.systemModuleRepo.save(existingModules);
         }
         for (const [key, value] of metadataMap) {
-            const resourceModule = await this.systemModuleRepo.findOne({ where: { id: key } });
+            const resourceModule = await this.systemModuleRepo.findOne({ where: { name: value.name } });
             value.resource.forEach(async (resouece) => {
                 resouece.systemModule = resourceModule;
             });

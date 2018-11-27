@@ -6,7 +6,7 @@ import { Permission } from '../entities/permission.entity';
 import { User } from '../entities/user.entity';
 
 @Injectable()
-export class AuthGurad implements CanActivate {
+export class AuthGuard implements CanActivate {
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const gqlCtx = GqlExecutionContext.create(context);
 

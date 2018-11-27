@@ -9,7 +9,7 @@ import { __ as t, configure as i18nConfigure } from 'i18n';
 import { join } from 'path';
 import { In, Not, Repository } from 'typeorm';
 
-import { AuthGurad } from './auth/auth.gurad';
+import { AuthGuard } from './auth/auth.guard';
 import { AuthService } from './auth/auth.service';
 import { AUTH_TOKEN_WHITE_LIST } from './constants/auth.constant';
 import { PERMISSION_DEFINITION, RESOURCE_DEFINITION } from './decorators';
@@ -47,7 +47,7 @@ import { CryptoUtil } from './utils/crypto.util';
     ],
     controllers: [],
     providers: [
-        { provide: APP_GUARD, useClass: AuthGurad },
+        { provide: APP_GUARD, useClass: AuthGuard },
         AuthService,
         EntityCheckService,
         OrganizationResolver, OrganizationService,

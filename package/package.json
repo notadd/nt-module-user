@@ -1,6 +1,6 @@
 {
     "name": "@notadd/module-user",
-    "version": "1.4.1",
+    "version": "1.4.2",
     "description": "The user module for Notadd application.",
     "main": "index.js",
     "author": "notadd",

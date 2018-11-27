@@ -8,6 +8,7 @@ import { AuthService } from '../auth/auth.service';
 import { InfoItem } from '../entities/info-item.entity';
 import { UserInfo } from '../entities/user-info.entity';
 import { User } from '../entities/user.entity';
+import { JwtReply } from '../interfaces/jwt.interface';
 import { CreateUserInput, UpdateUserInput, UserInfoData } from '../interfaces/user.interface';
 import { CryptoUtil } from '../utils/crypto.util';
 import { RoleService } from './role.service';
@@ -272,7 +273,7 @@ export class UserService {
      * @param loginName loginName: username or email
      * @param password password
      */
-    async login(loginName: string, password: string) {
+    async login(loginName: string, password: string): Promise<{ tokenInfo: JwtReply, userInfoData: UserInfoData }> {
         const user = await this.userRepo.createQueryBuilder('user')
             .leftJoinAndSelect('user.roles', 'roles')
             .leftJoinAndSelect('user.organizations', 'organizations')
@@ -310,7 +311,7 @@ export class UserService {
      * @param mobile mobile
      * @param validationCode validationCode
      */
-    async mobileLogin(mobile: string, validationCode: number) {
+    async mobileLogin(mobile: string, validationCode: number): Promise<{ tokenInfo: JwtReply, userInfoData: UserInfoData }> {
         await this.smsComponentProvider.smsValidator(mobile, validationCode);
 
         const user = await this.userRepo.findOne({ mobile }, { relations: ['roles', 'organizations', 'userInfos', 'userInfos.infoItem'] });

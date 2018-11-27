@@ -23,7 +23,7 @@ const fs_1 = require("fs");
 const i18n_1 = require("i18n");
 const path_1 = require("path");
 const typeorm_2 = require("typeorm");
-const auth_gurad_1 = require("./auth/auth.gurad");
+const auth_guard_1 = require("./auth/auth.guard");
 const auth_service_1 = require("./auth/auth.service");
 const auth_constant_1 = require("./constants/auth.constant");
 const decorators_1 = require("./decorators");
@@ -222,7 +222,7 @@ UserModule = UserModule_1 = __decorate([
         ],
         controllers: [],
         providers: [
-            { provide: core_1.APP_GUARD, useClass: auth_gurad_1.AuthGurad },
+            { provide: core_1.APP_GUARD, useClass: auth_guard_1.AuthGuard },
             auth_service_1.AuthService,
             entity_check_service_1.EntityCheckService,
             organization_resolver_1.OrganizationResolver, organization_service_1.OrganizationService,

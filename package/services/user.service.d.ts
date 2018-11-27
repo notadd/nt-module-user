@@ -4,6 +4,7 @@ import { AuthService } from '../auth/auth.service';
 import { InfoItem } from '../entities/info-item.entity';
 import { UserInfo } from '../entities/user-info.entity';
 import { User } from '../entities/user.entity';
+import { JwtReply } from '../interfaces/jwt.interface';
 import { CreateUserInput, UpdateUserInput, UserInfoData } from '../interfaces/user.interface';
 import { CryptoUtil } from '../utils/crypto.util';
 import { RoleService } from './role.service';
@@ -29,11 +30,11 @@ export declare class UserService {
     findUserInfoById(id: number | number[]): Promise<UserInfoData | UserInfoData[]>;
     findOneWithInfoItemsByRoleIds(roleIds: number[]): Promise<InfoItem[]>;
     login(loginName: string, password: string): Promise<{
-        tokenInfo: import("src/interfaces/jwt.interface").JwtReply;
+        tokenInfo: JwtReply;
         userInfoData: UserInfoData;
     }>;
     mobileLogin(mobile: string, validationCode: number): Promise<{
-        tokenInfo: import("src/interfaces/jwt.interface").JwtReply;
+        tokenInfo: JwtReply;
         userInfoData: UserInfoData;
     }>;
     register(createUserInput: CreateUserInput): Promise<void>;

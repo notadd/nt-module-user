@@ -42,7 +42,7 @@ import { CryptoUtil } from './utils/crypto.util';
             database: 'module_user',
             entities: [__dirname + '/../src/**/*.entity.ts'],
             logger: 'advanced-console',
-            logging: false,
+            logging: true,
             synchronize: true,
             dropSchema: false
         }),

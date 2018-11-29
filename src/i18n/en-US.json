@@ -72,6 +72,9 @@
     "Ban User successfully": "Ban User successfully",
     "Revert banned user successfully": "Revert banned user successfully",
     "Revert recycled user successfully": "Revert recycled user successfully",
-	"Add permission to user successfully": "Add permission to user successfully",
-	"Delete permission of user successfully": "Delete permission of user successfully"
+    "Add permission to user successfully": "Add permission to user successfully",
+    "Delete permission of user successfully": "Delete permission of user successfully",
+    "The permission has already been added": "The permission has already been added",
+    "The permission has already been deleted": "The permission has already been deleted",
+    "Can not delete the permission which is not exist in this user's permissions": "Can not delete the permission which is not exist in this user's permissions"
 }

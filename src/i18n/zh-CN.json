@@ -73,5 +73,8 @@
 	"Revert banned user successfully": "解封用户成功",
 	"Revert recycled user successfully": "恢复用户成功",
 	"Add permission to user successfully": "给用户添加权限成功",
-	"Delete permission of user successfully": "删除用户的权限成功"
+	"Delete permission of user successfully": "删除用户的权限成功",
+	"The permission has already been added": "权限已经被增加",
+	"The permission has already been deleted": "权限已经被删除",
+	"Can not delete the permission which is not exist in this user's permissions": "无法删除此用户权限中不存在的权限"
 }

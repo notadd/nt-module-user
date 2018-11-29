@@ -74,10 +74,7 @@ export class UserService {
      * @param permissionId The specified permission id
      */
     async addPermissionToUser(userId: number, permissionId: number) {
-        const user = await this.findOneById(userId);
-        const permission = await this.permissionRepo.findOne(permissionId);
-        if (!permission) throw new RpcException({ code: 404, message: t('The permission id of %s does not exist', permissionId.toString()) });
-        await this.personalPermissionRepo.save(this.personalPermissionRepo.create({ user, permission, status: 1 }));
+        await this.addOrDeletePermissionForUser(userId, permissionId, 'increase');
     }
 
     /**
@@ -87,7 +84,7 @@ export class UserService {
      * @param permissionId The specified permission id
      */
     async deletePermissionOfUser(userId: number, permissionId: number) {
-        await this.personalPermissionRepo.delete({ user: { id: userId }, permission: { id: permissionId } });
+        await this.addOrDeletePermissionForUser(userId, permissionId, 'decrease');
     }
 
     /**
@@ -347,6 +344,38 @@ export class UserService {
         await this.createUser(createUserInput);
     }
 
+    /**
+     * Add a permission to user or delete a permission of user
+     *
+     * @param userId The specified user id
+     * @param permissionId The specified permission id
+     * @param status The operation status
+     */
+    private async addOrDeletePermissionForUser(userId: number, permissionId: number, status: 'increase' | 'decrease') {
+        const user = await this.findOneById(userId);
+        const permission = await this.permissionRepo.findOne(permissionId);
+        if (!permission) throw new RpcException({ code: 404, message: t('The permission id of %s does not exist', permissionId.toString()) });
+
+        const personalPermission = await this.personalPermissionRepo.find({ permission: { id: permissionId } });
+        if (!!personalPermission.find(pp => pp.user.id === userId)) {
+            throw new RpcException({ code: 409, message: t(`The permission has already been ${status === 'increase' ? 'added' : 'deleted'}`) });
+        }
+
+        if (status === 'decrease') {
+            const user = await this.userRepo.findOne({ relations: ['roles', 'roles.permissions'] });
+            const permission = <Permission[]>[].concat(...user.roles.map(role => role.permissions));
+            if (!!!permission.find(p => p.id === permissionId)) {
+                throw new RpcException({ code: 406, message: t(`Can not delete the permission which is not exist in this user's permissions`) });
+            }
+        }
+        await this.personalPermissionRepo.save(this.personalPermissionRepo.create({ user, permission, status }));
+    }
+
+    /**
+     * check if user is exist and user is banned or recycle
+     *
+     * @param user user
+     */
     private checkUserStatus(user: User) {
         if (!user) throw new RpcException({ code: 404, message: t('User does not exist') });
         if (user.banned || user.recycle) throw new RpcException({ code: 400, message: t('User is banned') });

@@ -16,8 +16,12 @@ export class PersonalPermission {
     permission: Permission;
 
     /**
-     * personal permission status, 0 is been deleted, 1 is been added.
+     * personal permission status.
+     *
+     * increase means it is been added from user's current permission.
+     *
+     * decrease means it is been deleted to user's current permission.
      */
     @Column()
-    status: number;
+    status: 'increase' | 'decrease';
 }

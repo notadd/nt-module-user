@@ -473,7 +473,7 @@ message FindOneWithRolesAndPermissionsResponse {
         repeated PersonalPermission personalPermissions = 10;
         message PersonalPermission {
             int32 id = 1;
-            int32 status = 2;
+            string status = 2;
             Permission permission = 3;
         }
     }

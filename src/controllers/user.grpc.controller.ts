@@ -78,7 +78,7 @@ export class UserGrpcController {
     }
 
     @GrpcMethod('UserService')
-    async updateCurrentUserInfo(payload: { userId: number, updateCurrentUserInput: UpdateUserInput }, context) {
+    async updateCurrentUserInfo(payload: { userId: number, updateCurrentUserInput: UpdateUserInput }) {
         await this.userService.updateUserInfo(payload.userId, payload.updateCurrentUserInput);
         return { code: 200, message: t('Update current login user information successfully') };
     }

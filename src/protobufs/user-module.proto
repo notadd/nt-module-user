@@ -385,8 +385,8 @@ message UserData {
     string mobile = 4;
     bool banned = 5;
     bool recycle = 6;
-    string createTime = 7;
-    string updateTime = 8;
+    string createdAt = 7;
+    string updatedAt = 8;
     repeated UserRoleData userRoles = 9;
     repeated UserOrganizationData userOrganizations = 10;
     repeated UserInfoData userInfos = 11;
@@ -462,8 +462,8 @@ message FindOneWithRolesAndPermissionsResponse {
         string mobile = 4;
         bool banned = 5;
         bool recycle = 6;
-        string createTime = 7;
-        string updateTime = 8;
+        string createdAt = 7;
+        string updatedAt = 8;
         repeated UserRole roles = 9;
         message UserRole {
             int32 id = 1;

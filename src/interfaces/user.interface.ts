@@ -1,5 +1,5 @@
 export interface UserInfoData {
-    userId: number;
+    id: number;
     username: string;
     email: string;
     mobile: string;
@@ -18,7 +18,7 @@ export interface UserInfoData {
     userInfos: {
         id: number;
         order: number;
-        relationId: number;
+        infoItemId: number;
         type: string;
         name: string;
         value: string;
@@ -33,7 +33,7 @@ export interface CreateUserInput {
     email?: string;
     mobile?: string;
     password: string;
-    infoKVs?: { key: number; value: string }[];
+    infoKVs?: CreateUserInfoKVs[];
     roleIds?: number[];
     organizationIds?: number[];
 }
@@ -43,11 +43,7 @@ export interface UpdateUserInput {
     email?: string;
     mobile?: string;
     password?: string;
-    infoKVs?: {
-        key: number;
-        value: string;
-        relationId?: number
-    }[];
+    infoKVs?: UpdateUserInfoKVs[];
     roleIds?: {
         before: number;
         after: number;
@@ -56,4 +52,15 @@ export interface UpdateUserInput {
         before: number;
         after: number;
     }[];
+}
+
+export interface CreateUserInfoKVs {
+    infoItemId: number;
+    userInfoValue: string;
+}
+
+export interface UpdateUserInfoKVs {
+    userInfoId: number;
+    userInfoValue: string;
+    infoItemId?: number;
 }

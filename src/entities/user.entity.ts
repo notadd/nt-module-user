@@ -7,7 +7,7 @@ import {
     ManyToMany,
     OneToMany,
     PrimaryGeneratedColumn,
-    UpdateDateColumn,
+    UpdateDateColumn
 } from 'typeorm';
 
 import { Organization } from './organization.entity';

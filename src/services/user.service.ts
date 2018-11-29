@@ -9,7 +9,13 @@ import { Permission } from '../entities/permission.entity';
 import { PersonalPermission } from '../entities/personal-permission.entity';
 import { UserInfo } from '../entities/user-info.entity';
 import { User } from '../entities/user.entity';
-import { CreateUserInput, UpdateUserInput, UserInfoData } from '../interfaces/user.interface';
+import {
+    CreateUserInfoKVs,
+    CreateUserInput,
+    UpdateUserInfoKVs,
+    UpdateUserInput,
+    UserInfoData
+} from '../interfaces/user.interface';
 import { CryptoUtil } from '../utils/crypto.util';
 import { AuthService } from './auth.service';
 import { RoleService } from './role.service';
@@ -368,20 +374,22 @@ export class UserService {
      *
      * @param action Operation type, create or update (create | update)
      */
-    private async createOrUpdateUserInfos(user: User, infoKVs: { key: number, value: string, relationId?: number }[], action: 'create' | 'update') {
+    private async createOrUpdateUserInfos(user: User, infoKVs: CreateUserInfoKVs[] | UpdateUserInfoKVs[], action: 'create' | 'update') {
         if (infoKVs.length) {
             if (action === 'create') {
-                infoKVs.forEach(async infoKV => {
-                    await this.userInfoRepo.save(this.userInfoRepo.create({ value: infoKV.value, user, infoItem: { id: infoKV.key } }));
+                (infoKVs as CreateUserInfoKVs[]).forEach(async infoKV => {
+                    const userInfo = this.userInfoRepo.create({ value: infoKV.userInfoValue, user, infoItem: { id: infoKV.infoItemId } });
+                    await this.userInfoRepo.save(userInfo);
                 });
                 return;
             }
 
-            infoKVs.forEach(async infoKV => {
-                if (infoKV.key) {
-                    await this.userInfoRepo.update(infoKV.key, { value: infoKV.value });
+            (infoKVs as UpdateUserInfoKVs[]).forEach(async infoKV => {
+                if (infoKV.userInfoId) {
+                    await this.userInfoRepo.update(infoKV.userInfoId, { value: infoKV.userInfoValue });
                 } else {
-                    await this.userInfoRepo.save(this.userInfoRepo.create({ value: infoKV.value, user, infoItem: { id: infoKV.relationId } }));
+                    const userInfo = this.userInfoRepo.create({ value: infoKV.userInfoValue, user, infoItem: { id: infoKV.infoItemId } });
+                    await this.userInfoRepo.save(userInfo);
                 }
             });
         }
@@ -394,7 +402,7 @@ export class UserService {
      */
     private refactorUserData(user: User, infoItems: InfoItem[]) {
         const userInfoData: UserInfoData = {
-            userId: user.id,
+            id: user.id,
             username: user.username,
             email: user.email,
             mobile: user.mobile,
@@ -409,7 +417,7 @@ export class UserService {
                 return {
                     id: user.userInfos.length ? (userInfo ? userInfo.id : undefined) : undefined,
                     order: infoItem.order,
-                    relationId: infoItem.id,
+                    infoItemId: infoItem.id,
                     type: infoItem.type,
                     name: infoItem.name,
                     value: user.userInfos.length ? (userInfo ? userInfo.value : undefined) : undefined,

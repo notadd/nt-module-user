@@ -1,6 +1,6 @@
 {
     "name": "nt-module-user",
-    "version": "1.2.3",
+    "version": "1.5.0",
     "description": "The user module for Notadd application.",
     "scripts": {
         "start": "ts-node -r tsconfig-paths/register starter/main.ts",
@@ -42,7 +42,7 @@
         "@types/i18n": "^0.8.3",
         "@types/jsonwebtoken": "^8.3.0",
         "@types/node": "^10.12.15",
-        "gulp": "^4.0.0",
+        "gulp": "^3.9.1",
         "gulp-sequence": "^1.0.0",
         "gulp-sourcemaps": "^2.6.4",
         "gulp-tslint": "^8.1.3",

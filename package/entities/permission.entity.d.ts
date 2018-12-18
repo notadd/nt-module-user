@@ -8,4 +8,3 @@ export declare class Permission {
     identify: string;
     roles: Role[];
 }
-//# sourceMappingURL=permission.entity.d.ts.map

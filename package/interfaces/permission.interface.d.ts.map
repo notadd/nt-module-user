@@ -1,1 +1,0 @@
-{"version":3,"sources":["../src/interfaces/permission.interface.ts"],"names":[],"mappings":"AAAA,MAAM,WAAW,UAAU;IACvB,IAAI,EAAE,MAAM,CAAC;IACb,MAAM,EAAE,MAAM,CAAC;IACf,QAAQ,EAAE,MAAM,CAAC;CACpB","file":"permission.interface.d.ts","sourcesContent":["export interface Permission {\n    name: string;\n    action: string;\n    identify: string;\n}"]}

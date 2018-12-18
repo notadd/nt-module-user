@@ -5,4 +5,3 @@ export declare class ResourceService {
     constructor(resourceRep: Repository<Resource>);
     findResources(moduleId: number): Promise<Resource[]>;
 }
-//# sourceMappingURL=resource.service.d.ts.map

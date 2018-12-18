@@ -29,4 +29,3 @@ export declare class UserModule implements OnModuleInit {
     private createDefaultInfoGroup;
     private createSuperAdmin;
 }
-//# sourceMappingURL=user.module.d.ts.map

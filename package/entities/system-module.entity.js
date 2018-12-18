@@ -29,5 +29,3 @@ SystemModule = __decorate([
     typeorm_1.Entity('system_module')
 ], SystemModule);
 exports.SystemModule = SystemModule;
-
-//# sourceMappingURL=system-module.entity.js.map

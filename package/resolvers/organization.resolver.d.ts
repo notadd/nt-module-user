@@ -29,4 +29,3 @@ export declare class OrganizationResolver {
         userIds: number[];
     }): Promise<CommonResult>;
 }
-//# sourceMappingURL=organization.resolver.d.ts.map

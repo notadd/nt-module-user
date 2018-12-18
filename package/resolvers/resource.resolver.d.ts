@@ -7,4 +7,3 @@ export declare class ResourceResolver {
         systemModuleId: number;
     }): Promise<CommonResult>;
 }
-//# sourceMappingURL=resource.resolver.d.ts.map

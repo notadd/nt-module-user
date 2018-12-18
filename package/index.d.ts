@@ -11,4 +11,3 @@ export * from './services/info-group.service';
 export * from './services/info-item.service';
 export * from './decorators';
 export * from './user.module';
-//# sourceMappingURL=index.d.ts.map

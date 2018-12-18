@@ -58,4 +58,3 @@ export interface UpdateUserInput {
         after: number;
     }[];
 }
-//# sourceMappingURL=user.interface.d.ts.map

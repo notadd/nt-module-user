@@ -60,4 +60,3 @@ export declare class UserResolver {
         organizationId: number;
     }): Promise<CommonResult>;
 }
-//# sourceMappingURL=user.resolver.d.ts.map

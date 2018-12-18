@@ -8,5 +8,3 @@ function Resource(options) {
     };
 }
 exports.Resource = Resource;
-
-//# sourceMappingURL=resource.decorator.js.map

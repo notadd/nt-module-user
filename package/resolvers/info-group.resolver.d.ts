@@ -28,4 +28,3 @@ export declare class InfoGroupResolver {
         groupId: number;
     }): Promise<CommonResult>;
 }
-//# sourceMappingURL=info-group.resolver.d.ts.map

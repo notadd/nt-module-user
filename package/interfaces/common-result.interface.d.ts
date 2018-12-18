@@ -3,4 +3,3 @@ export interface CommonResult {
     message: string;
     data?: any;
 }
-//# sourceMappingURL=common-result.interface.d.ts.map

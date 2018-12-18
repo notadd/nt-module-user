@@ -1,1 +1,0 @@
-{"version":3,"sources":["../src/interfaces/resource.interface.ts"],"names":[],"mappings":"AAAA,MAAM,WAAW,QAAQ;IACrB,IAAI,EAAE,MAAM,CAAC;IACb,QAAQ,EAAE,MAAM,CAAC;CACpB","file":"resource.interface.d.ts","sourcesContent":["export interface Resource {\n    name: string;\n    identify: string;\n}"]}

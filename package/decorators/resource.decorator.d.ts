@@ -4,4 +4,3 @@ export declare function Resource(options: {
     name: string;
     identify: string;
 }): (target: any) => void;
-//# sourceMappingURL=resource.decorator.d.ts.map

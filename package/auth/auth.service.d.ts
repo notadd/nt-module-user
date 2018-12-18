@@ -8,4 +8,3 @@ export declare class AuthService {
     createToken(payload: JwtPayload): Promise<JwtReply>;
     validateUser(req: any): Promise<User>;
 }
-//# sourceMappingURL=auth.service.d.ts.map

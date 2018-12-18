@@ -4,4 +4,3 @@ export declare class EntityCheckService {
     constructor(entityManager: EntityManager);
     checkNameExist(entityClass: any, name: string): Promise<void>;
 }
-//# sourceMappingURL=entity-check.service.d.ts.map

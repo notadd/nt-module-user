@@ -7,4 +7,3 @@ export interface UpdateInfoItemInput {
     registerDisplay: boolean;
     informationDisplay: boolean;
 }
-//# sourceMappingURL=info-item.interface.d.ts.map

@@ -6,4 +6,3 @@ export declare class UserInfo {
     user: User;
     infoItem: InfoItem;
 }
-//# sourceMappingURL=user-info.entity.d.ts.map

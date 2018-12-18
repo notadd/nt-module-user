@@ -8,8 +8,11 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const moment = require("moment");
+const moment_1 = __importDefault(require("moment"));
 const typeorm_1 = require("typeorm");
 const organization_entity_1 = require("./organization.entity");
 const role_entity_1 = require("./role.entity");
@@ -79,7 +82,7 @@ __decorate([
     typeorm_1.CreateDateColumn({
         transformer: {
             from: (date) => {
-                return moment(date).format('YYYY-MM-DD HH:mm:ss');
+                return moment_1.default(date).format('YYYY-MM-DD HH:mm:ss');
             },
             to: () => {
                 return new Date();
@@ -92,7 +95,7 @@ __decorate([
     typeorm_1.UpdateDateColumn({
         transformer: {
             from: (date) => {
-                return moment(date).format('YYYY-MM-DD HH:mm:ss');
+                return moment_1.default(date).format('YYYY-MM-DD HH:mm:ss');
             },
             to: () => {
                 return new Date();
@@ -105,5 +108,3 @@ User = __decorate([
     typeorm_1.Entity('user')
 ], User);
 exports.User = User;
-
-//# sourceMappingURL=user.entity.js.map

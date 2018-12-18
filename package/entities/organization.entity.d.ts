@@ -6,4 +6,3 @@ export declare class Organization {
     parent: Organization;
     children: Organization[];
 }
-//# sourceMappingURL=organization.entity.d.ts.map

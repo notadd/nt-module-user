@@ -14,4 +14,3 @@ export interface RoleInfoData {
         type: string;
     }[];
 }
-//# sourceMappingURL=role.interface.d.ts.map

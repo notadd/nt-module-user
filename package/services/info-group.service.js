@@ -66,5 +66,3 @@ InfoGroupService = __decorate([
         entity_check_service_1.EntityCheckService])
 ], InfoGroupService);
 exports.InfoGroupService = InfoGroupService;
-
-//# sourceMappingURL=info-group.service.js.map

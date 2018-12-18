@@ -38,5 +38,3 @@ UserInfo = __decorate([
     typeorm_1.Entity('user_info')
 ], UserInfo);
 exports.UserInfo = UserInfo;
-
-//# sourceMappingURL=user-info.entity.js.map

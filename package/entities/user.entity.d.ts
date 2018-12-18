@@ -15,4 +15,3 @@ export declare class User {
     createTime: string;
     updateTime: string;
 }
-//# sourceMappingURL=user.entity.d.ts.map

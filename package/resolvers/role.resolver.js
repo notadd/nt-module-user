@@ -90,5 +90,3 @@ RoleResolver = __decorate([
     __metadata("design:paramtypes", [role_service_1.RoleService])
 ], RoleResolver);
 exports.RoleResolver = RoleResolver;
-
-//# sourceMappingURL=role.resolver.js.map

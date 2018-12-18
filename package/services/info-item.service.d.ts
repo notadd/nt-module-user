@@ -11,4 +11,3 @@ export declare class InfoItemService {
     update(updateInfoItemInput: UpdateInfoItemInput): Promise<void>;
     findAll(): Promise<InfoItem[]>;
 }
-//# sourceMappingURL=info-item.service.d.ts.map

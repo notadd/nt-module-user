@@ -8,5 +8,3 @@ function Permission(options) {
     };
 }
 exports.Permission = Permission;
-
-//# sourceMappingURL=permission.decorator.js.map

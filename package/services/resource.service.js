@@ -30,5 +30,3 @@ ResourceService = __decorate([
     __metadata("design:paramtypes", [typeorm_2.Repository])
 ], ResourceService);
 exports.ResourceService = ResourceService;
-
-//# sourceMappingURL=resource.service.js.map

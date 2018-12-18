@@ -38,5 +38,3 @@ Organization = __decorate([
     typeorm_1.Tree('closure-table')
 ], Organization);
 exports.Organization = Organization;
-
-//# sourceMappingURL=organization.entity.js.map

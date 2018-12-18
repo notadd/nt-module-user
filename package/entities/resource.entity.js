@@ -42,5 +42,3 @@ Resource = __decorate([
     typeorm_1.Entity('resource')
 ], Resource);
 exports.Resource = Resource;
-
-//# sourceMappingURL=resource.entity.js.map

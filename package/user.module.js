@@ -254,5 +254,3 @@ UserModule = UserModule_1 = __decorate([
         typeorm_2.Repository])
 ], UserModule);
 exports.UserModule = UserModule;
-
-//# sourceMappingURL=user.module.js.map

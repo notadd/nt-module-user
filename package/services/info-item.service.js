@@ -64,5 +64,3 @@ InfoItemService = __decorate([
         entity_check_service_1.EntityCheckService])
 ], InfoItemService);
 exports.InfoItemService = InfoItemService;
-
-//# sourceMappingURL=info-item.service.js.map

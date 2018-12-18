@@ -112,5 +112,3 @@ OrganizationResolver = __decorate([
     __metadata("design:paramtypes", [organization_service_1.OrganizationService])
 ], OrganizationResolver);
 exports.OrganizationResolver = OrganizationResolver;
-
-//# sourceMappingURL=organization.resolver.js.map

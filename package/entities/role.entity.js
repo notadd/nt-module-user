@@ -44,5 +44,3 @@ Role = __decorate([
     typeorm_1.Entity('role')
 ], Role);
 exports.Role = Role;
-
-//# sourceMappingURL=role.entity.js.map

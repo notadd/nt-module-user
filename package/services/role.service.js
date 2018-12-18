@@ -120,5 +120,3 @@ RoleService = __decorate([
         typeorm_2.Repository])
 ], RoleService);
 exports.RoleService = RoleService;
-
-//# sourceMappingURL=role.service.js.map

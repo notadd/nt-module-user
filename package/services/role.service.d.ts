@@ -17,4 +17,3 @@ export declare class RoleService {
     findOneRoleInfo(roleId: number): Promise<RoleInfoData>;
     findInfoGroupItemsByIds(ids: number[]): Promise<InfoItem[]>;
 }
-//# sourceMappingURL=role.service.d.ts.map

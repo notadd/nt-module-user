@@ -7,4 +7,3 @@ export declare class Resource {
     permissions: Permission[];
     systemModule: SystemModule;
 }
-//# sourceMappingURL=resource.entity.d.ts.map

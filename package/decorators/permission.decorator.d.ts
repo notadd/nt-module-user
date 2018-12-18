@@ -5,4 +5,3 @@ export declare function Permission(options: {
     identify: string;
     action: 'create' | 'delete' | 'update' | 'find';
 }): (target: any, propertyKey: string) => void;
-//# sourceMappingURL=permission.decorator.d.ts.map

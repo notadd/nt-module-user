@@ -16,4 +16,3 @@ export declare class OrganizationService {
     addUsersToOrganization(id: number, userIds: number[]): Promise<void>;
     deleteUserFromOrganization(id: number, userIds: number[]): Promise<void>;
 }
-//# sourceMappingURL=organization.service.d.ts.map

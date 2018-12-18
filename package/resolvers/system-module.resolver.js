@@ -40,5 +40,3 @@ SystemModuleResolver = __decorate([
     __metadata("design:paramtypes", [system_module_service_1.SystemModuleService])
 ], SystemModuleResolver);
 exports.SystemModuleResolver = SystemModuleResolver;
-
-//# sourceMappingURL=system-module.resolver.js.map

@@ -16,5 +16,3 @@ __export(require("./services/info-group.service"));
 __export(require("./services/info-item.service"));
 __export(require("./decorators"));
 __export(require("./user.module"));
-
-//# sourceMappingURL=index.js.map

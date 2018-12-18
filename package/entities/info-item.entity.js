@@ -59,5 +59,3 @@ InfoItem = __decorate([
     typeorm_1.Entity('info_item')
 ], InfoItem);
 exports.InfoItem = InfoItem;
-
-//# sourceMappingURL=info-item.entity.js.map

@@ -46,5 +46,3 @@ Permission = __decorate([
     typeorm_1.Entity('permission')
 ], Permission);
 exports.Permission = Permission;
-
-//# sourceMappingURL=permission.entity.js.map

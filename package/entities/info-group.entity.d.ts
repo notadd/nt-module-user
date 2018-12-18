@@ -6,4 +6,3 @@ export declare class InfoGroup {
     infoItems: InfoItem[];
     role: Role;
 }
-//# sourceMappingURL=info-group.entity.d.ts.map

@@ -3,4 +3,3 @@ export interface Permission {
     action: string;
     identify: string;
 }
-//# sourceMappingURL=permission.interface.d.ts.map

@@ -5,4 +5,3 @@ export declare class SystemModuleResolver {
     constructor(systemModuleService: SystemModuleService);
     findSystemModules(): Promise<CommonResult>;
 }
-//# sourceMappingURL=system-module.resolver.d.ts.map

@@ -11,11 +11,18 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const common_1 = require("@nestjs/common");
 const apollo_server_core_1 = require("apollo-server-core");
 const i18n_1 = require("i18n");
-const jwt = require("jsonwebtoken");
+const jwt = __importStar(require("jsonwebtoken"));
 const auth_constant_1 = require("../constants/auth.constant");
 const user_service_1 = require("../services/user.service");
 let AuthService = class AuthService {
@@ -28,18 +35,18 @@ let AuthService = class AuthService {
         return { accessToken, expiresIn: 60 * 60 * 24 };
     }
     async validateUser(req) {
-        if (req.body && this.authTokenWhiteList.includes(req.body.operationName)) {
+        if (req.body && this.authTokenWhiteList.some(item => req.body.query.includes(item))) {
             return;
         }
         let token = req.headers.authorization;
         if (!token) {
-            throw new apollo_server_core_1.AuthenticationError(i18n_1.__('Request header lacks authorization parameters，it should be: Authorization or authorization'));
+            throw new apollo_server_core_1.AuthenticationError(i18n_1.__('Request header lacks authorization parameters，it should be: Authorization'));
         }
-        if (['Bearer ', 'bearer '].includes(token.slice(0, 7))) {
+        if (token.slice(0, 6) === 'Bearer') {
             token = token.slice(7);
         }
         else {
-            throw new apollo_server_core_1.AuthenticationError(i18n_1.__('The authorization code prefix is incorrect. it should be: Bearer or bearer'));
+            throw new apollo_server_core_1.AuthenticationError(i18n_1.__('The authorization code prefix is incorrect. it should be: Bearer'));
         }
         try {
             const decodedToken = jwt.verify(token, 'secretKey');
@@ -62,5 +69,3 @@ AuthService = __decorate([
     __metadata("design:paramtypes", [user_service_1.UserService, Array])
 ], AuthService);
 exports.AuthService = AuthService;
-
-//# sourceMappingURL=auth.service.js.map

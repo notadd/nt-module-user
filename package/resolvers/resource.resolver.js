@@ -35,5 +35,3 @@ ResourceResolver = __decorate([
     __metadata("design:paramtypes", [resource_service_1.ResourceService])
 ], ResourceResolver);
 exports.ResourceResolver = ResourceResolver;
-
-//# sourceMappingURL=resource.resolver.js.map

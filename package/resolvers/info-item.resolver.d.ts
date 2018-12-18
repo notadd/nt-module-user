@@ -16,4 +16,3 @@ export declare class InfoItemResolver {
     }): Promise<CommonResult>;
     findAllInfoItem(): Promise<CommonResult>;
 }
-//# sourceMappingURL=info-item.resolver.d.ts.map

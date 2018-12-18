@@ -36,5 +36,3 @@ AuthGuard = __decorate([
     common_1.Injectable()
 ], AuthGuard);
 exports.AuthGuard = AuthGuard;
-
-//# sourceMappingURL=auth.guard.js.map

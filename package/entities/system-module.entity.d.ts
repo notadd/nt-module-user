@@ -4,4 +4,3 @@ export declare class SystemModule {
     name: string;
     resources: Resource[];
 }
-//# sourceMappingURL=system-module.entity.d.ts.map

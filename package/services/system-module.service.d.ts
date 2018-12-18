@@ -5,4 +5,3 @@ export declare class SystemModuleService {
     constructor(systemModuleRepo: Repository<SystemModule>);
     findSystemModules(): Promise<SystemModule[]>;
 }
-//# sourceMappingURL=system-module.service.d.ts.map

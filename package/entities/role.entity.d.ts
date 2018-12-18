@@ -8,4 +8,3 @@ export declare class Role {
     users: User[];
     infoGroup: InfoGroup;
 }
-//# sourceMappingURL=role.entity.d.ts.map

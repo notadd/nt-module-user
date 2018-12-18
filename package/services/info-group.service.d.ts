@@ -13,4 +13,3 @@ export declare class InfoGroupService {
     findAll(): Promise<InfoGroup[]>;
     findItemsById(id: number): Promise<any[]>;
 }
-//# sourceMappingURL=info-group.service.d.ts.map

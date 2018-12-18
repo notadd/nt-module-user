@@ -30,5 +30,3 @@ SystemModuleService = __decorate([
     __metadata("design:paramtypes", [typeorm_2.Repository])
 ], SystemModuleService);
 exports.SystemModuleService = SystemModuleService;
-
-//# sourceMappingURL=system-module.service.js.map

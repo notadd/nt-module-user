@@ -22,4 +22,3 @@ export declare class RoleResolver {
         roleId: number;
     }): Promise<CommonResult>;
 }
-//# sourceMappingURL=role.resolver.d.ts.map

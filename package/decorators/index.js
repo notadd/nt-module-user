@@ -5,5 +5,3 @@ function __export(m) {
 Object.defineProperty(exports, "__esModule", { value: true });
 __export(require("./resource.decorator"));
 __export(require("./permission.decorator"));
-
-//# sourceMappingURL=index.js.map

@@ -1,4 +1,4 @@
-import * as moment from 'moment';
+import moment from 'moment';
 import {
     Column,
     CreateDateColumn,
@@ -7,7 +7,7 @@ import {
     ManyToMany,
     OneToMany,
     PrimaryGeneratedColumn,
-    UpdateDateColumn,
+    UpdateDateColumn
 } from 'typeorm';
 
 import { Organization } from './organization.entity';

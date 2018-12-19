@@ -21,7 +21,7 @@ let ResourceService = class ResourceService {
         this.resourceRep = resourceRep;
     }
     async findResources(moduleId) {
-        return this.resourceRep.find({ where: { module: { id: moduleId } }, relations: ['permissions'] });
+        return this.resourceRep.find({ where: { systemModule: { id: moduleId } }, relations: ['permissions'] });
     }
 };
 ResourceService = __decorate([

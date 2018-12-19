@@ -11,6 +11,6 @@ export class ResourceService {
     ) { }
 
     async findResources(moduleId: number) {
-        return this.resourceRep.find({ where: { module: { id: moduleId } }, relations: ['permissions'] });
+        return this.resourceRep.find({ where: { systemModule: { id: moduleId } }, relations: ['permissions'] });
     }
 }

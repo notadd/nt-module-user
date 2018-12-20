@@ -279,9 +279,9 @@ export class UserService {
             .leftJoinAndSelect('user.organizations', 'organizations')
             .leftJoinAndSelect('user.userInfos', 'userInfos')
             .leftJoinAndSelect('userInfos.infoItem', 'infoItem')
-            .where('user.username = :loginName', { loginName })
-            .orWhere('user.mobile = :loginName', { loginName })
-            .orWhere('user.email = :loginName', { loginName: loginName.toLocaleLowerCase() })
+            .where('user.username = :username', { username: loginName })
+            .orWhere('user.mobile = :mobile', { mobile: loginName })
+            .orWhere('user.email = :email', { email: loginName.toLocaleLowerCase() })
             .getOne();
 
         await this.checkUserStatus(user);
@@ -293,9 +293,9 @@ export class UserService {
             .leftJoin('infoItem.infoGroups', 'infoGroups')
             .leftJoin('infoGroups.role', 'role')
             .leftJoin('role.users', 'users')
-            .where('users.username = :loginName', { loginName })
-            .orWhere('users.mobile = :loginName', { loginName })
-            .orWhere('users.email = :loginName', { loginName: loginName.toLocaleLowerCase() })
+            .where('user.username = :username', { username: loginName })
+            .orWhere('user.mobile = :mobile', { mobile: loginName })
+            .orWhere('user.email = :email', { email: loginName.toLocaleLowerCase() })
             .orderBy('infoItem.order', 'ASC')
             .getMany();
 

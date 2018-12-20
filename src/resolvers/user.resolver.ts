@@ -70,7 +70,7 @@ export class UserResolver {
     @Mutation('banUser')
     @Permission({ name: 'ban_user', identify: 'user:banUser', action: 'update' })
     async banUser(req, body: { userId: number }): Promise<CommonResult> {
-        await this.userService.recycleOrBanUser(body.userId, 'recycle');
+        await this.userService.recycleOrBanUser(body.userId, 'ban');
         return { code: 200, message: t('Ban user successfully') };
     }
 

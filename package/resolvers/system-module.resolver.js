@@ -21,16 +21,25 @@ let SystemModuleResolver = class SystemModuleResolver {
     constructor(systemModuleService) {
         this.systemModuleService = systemModuleService;
     }
-    async findSystemModules() {
-        const data = await this.systemModuleService.findSystemModules();
-        return { code: 200, message: i18n_1.__('Query the system modules successfully'), data };
+    async findSystemModules(req, body) {
+        const result = await this.systemModuleService.findSystemModules(body.pageNumber, body.pageSize);
+        let data;
+        let count;
+        if (typeof result[1] === 'number') {
+            data = result[0];
+            count = result[1];
+        }
+        else {
+            data = result;
+        }
+        return { code: 200, message: i18n_1.__('Query the system modules successfully'), data, count };
     }
 };
 __decorate([
     graphql_1.Query('findSystemModules'),
     decorators_1.Permission({ name: 'find_system_modules', identify: 'systemModule:findSystemModules', action: 'find' }),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], SystemModuleResolver.prototype, "findSystemModules", null);
 SystemModuleResolver = __decorate([

@@ -24,8 +24,18 @@ export declare class UserService {
     deleteUser(id: number): Promise<void>;
     revertBannedOrRecycledUser(id: number, status: 'recycled' | 'banned'): Promise<void>;
     updateUserInfo(id: number, updateUserInput: UpdateUserInput): Promise<void>;
-    findByRoleId(roleId: number): Promise<UserInfoData[]>;
-    findByOrganizationId(organizationId: number): Promise<UserInfoData[]>;
+    findAllUsers(pageNumber?: number, pageSize?: number): Promise<UserInfoData[] | {
+        count: number;
+        usersInfo: UserInfoData[];
+    }>;
+    findByRoleId(roleId: number, pageNumber?: number, pageSize?: number): Promise<{
+        usersInfo: UserInfoData[];
+        count: number;
+    }>;
+    findByOrganizationId(organizationId: number, pageNumber?: number, pageSize?: number): Promise<{
+        usersInfo: UserInfoData[];
+        count: number;
+    }>;
     findOneWithRolesAndPermissions(loginName: string): Promise<User>;
     findUserInfoById(id: number | number[]): Promise<UserInfoData | UserInfoData[]>;
     findOneWithInfoItemsByRoleIds(roleIds: number[]): Promise<InfoItem[]>;

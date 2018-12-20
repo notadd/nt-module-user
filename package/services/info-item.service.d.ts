@@ -9,5 +9,5 @@ export declare class InfoItemService {
     create(infoItem: InfoItem): Promise<void>;
     delete(id: number): Promise<void>;
     update(updateInfoItemInput: UpdateInfoItemInput): Promise<void>;
-    findAll(): Promise<InfoItem[]>;
+    findAll(pageNumber?: number, pageSize?: number): Promise<InfoItem[] | [InfoItem[], number]>;
 }

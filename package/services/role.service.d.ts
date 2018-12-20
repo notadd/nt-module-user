@@ -13,7 +13,7 @@ export declare class RoleService {
     updateRole(id: number, name: string): Promise<void>;
     deleteRole(id: number): Promise<void>;
     setPermissions(id: number, permissionIds: number[]): Promise<void>;
-    findRoles(): Promise<Role[]>;
+    findRoles(pageNumber?: number, pageSize?: number): Promise<Role[] | [Role[], number]>;
     findOneRoleInfo(roleId: number): Promise<RoleInfoData>;
     findInfoGroupItemsByIds(ids: number[]): Promise<InfoItem[]>;
 }

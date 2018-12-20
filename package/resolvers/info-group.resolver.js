@@ -41,9 +41,18 @@ let InfoGroupResolver = class InfoGroupResolver {
         await this.infoGroupService.deleteIntoItem(body.infoGroupId, body.infoItemIds);
         return { code: 200, message: i18n_1.__('Delete the information item in the information group successfully') };
     }
-    async findAllInfoGroup() {
-        const data = await this.infoGroupService.findAll();
-        return { code: 200, message: i18n_1.__('Query all information groups successfully'), data };
+    async findAllInfoGroup(req, body) {
+        const result = await this.infoGroupService.findAll(body.pageNumber, body.pageSize);
+        let data;
+        let count;
+        if (typeof result[1] === 'number') {
+            data = result[0];
+            count = result[1];
+        }
+        else {
+            data = result;
+        }
+        return { code: 200, message: i18n_1.__('Query all information groups successfully'), data, count };
     }
     async findInfoItemsByGroupId(req, body) {
         const data = await this.infoGroupService.findItemsById(body.groupId);
@@ -89,7 +98,7 @@ __decorate([
     graphql_1.Query('findAllInfoGroup'),
     decorators_1.Permission({ name: 'find_all_info_group', identify: 'infoGroup:findAllInfoGroup', action: 'find' }),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], InfoGroupResolver.prototype, "findAllInfoGroup", null);
 __decorate([

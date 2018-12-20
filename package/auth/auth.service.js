@@ -26,19 +26,19 @@ const jwt = __importStar(require("jsonwebtoken"));
 const auth_constant_1 = require("../constants/auth.constant");
 const user_service_1 = require("../services/user.service");
 let AuthService = class AuthService {
-    constructor(userService, authTokenWhiteList) {
+    constructor(userService, authTokenWhiteList, authTokenExpiresIn) {
         this.userService = userService;
         this.authTokenWhiteList = authTokenWhiteList;
+        this.authTokenExpiresIn = authTokenExpiresIn;
     }
     async createToken(payload) {
-        const accessToken = jwt.sign(payload, 'secretKey', { expiresIn: '1d' });
-        return { accessToken, expiresIn: 60 * 60 * 24 };
+        const accessToken = jwt.sign(payload, 'secretKey', { expiresIn: this.authTokenExpiresIn });
+        return { accessToken, expiresIn: this.authTokenExpiresIn };
     }
-    async validateUser(req) {
-        if (req.body && this.authTokenWhiteList.some(item => req.body.query.includes(item))) {
+    async validateUser(token, operationName) {
+        if (this.authTokenWhiteList.some(item => item === operationName)) {
             return;
         }
-        let token = req.headers.authorization;
         if (!token) {
             throw new apollo_server_core_1.AuthenticationError(i18n_1.__('Request header lacks authorization parameters，it should be: Authorization'));
         }
@@ -66,6 +66,7 @@ AuthService = __decorate([
     common_1.Injectable(),
     __param(0, common_1.Inject(common_1.forwardRef(() => user_service_1.UserService))),
     __param(1, common_1.Inject(auth_constant_1.AUTH_TOKEN_WHITE_LIST)),
-    __metadata("design:paramtypes", [user_service_1.UserService, Array])
+    __param(2, common_1.Inject(auth_constant_1.AUTH_TOKEN_EXPIRES_IN)),
+    __metadata("design:paramtypes", [user_service_1.UserService, Array, Number])
 ], AuthService);
 exports.AuthService = AuthService;

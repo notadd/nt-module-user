@@ -20,7 +20,10 @@ let SystemModuleService = class SystemModuleService {
     constructor(systemModuleRepo) {
         this.systemModuleRepo = systemModuleRepo;
     }
-    async findSystemModules() {
+    async findSystemModules(pageNumber, pageSize) {
+        if (pageNumber && pageSize) {
+            return this.systemModuleRepo.findAndCount({ skip: (pageNumber - 1) * pageSize, take: pageSize });
+        }
         return this.systemModuleRepo.find();
     }
 };

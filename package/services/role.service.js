@@ -70,7 +70,10 @@ let RoleService = class RoleService {
         role.permissions = permissionArr;
         await this.roleRepo.save(role);
     }
-    async findRoles() {
+    async findRoles(pageNumber, pageSize) {
+        if (pageNumber && pageSize) {
+            return this.roleRepo.findAndCount({ skip: (pageNumber - 1) * pageSize, take: pageSize });
+        }
         return this.roleRepo.find();
     }
     async findOneRoleInfo(roleId) {

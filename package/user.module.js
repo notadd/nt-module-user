@@ -75,6 +75,9 @@ let UserModule = UserModule_1 = class UserModule {
             defaultLocale: options.i18n,
             directory: 'src/i18n'
         });
+        if (!options.authTokenExpiresIn) {
+            options.authTokenExpiresIn = 60 * 60 * 24;
+        }
         if (options.authTokenWhiteList) {
             options.authTokenWhiteList.push(...['IntrospectionQuery', 'login', 'adminLogin', 'register']);
         }
@@ -82,7 +85,10 @@ let UserModule = UserModule_1 = class UserModule {
             options.authTokenWhiteList = ['IntrospectionQuery', 'login', 'adminLogin', 'register'];
         }
         return {
-            providers: [{ provide: auth_constant_1.AUTH_TOKEN_WHITE_LIST, useValue: options.authTokenWhiteList }],
+            providers: [
+                { provide: auth_constant_1.AUTH_TOKEN_WHITE_LIST, useValue: options.authTokenWhiteList },
+                { provide: auth_constant_1.AUTH_TOKEN_EXPIRES_IN, useValue: options.authTokenExpiresIn }
+            ],
             module: UserModule_1
         };
     }

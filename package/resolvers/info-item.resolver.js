@@ -33,9 +33,18 @@ let InfoItemResolver = class InfoItemResolver {
         await this.infoItemService.update(body.updateInfoItemInput);
         return { code: 200, message: i18n_1.__('Update information item successfully') };
     }
-    async findAllInfoItem() {
-        const data = await this.infoItemService.findAll();
-        return { code: 200, message: i18n_1.__('Query all information items successfully'), data };
+    async findAllInfoItem(req, body) {
+        const result = await this.infoItemService.findAll(body.pageNumber, body.pageSize);
+        let data;
+        let count;
+        if (typeof result[1] === 'number') {
+            data = result[0];
+            count = result[1];
+        }
+        else {
+            data = result;
+        }
+        return { code: 200, message: i18n_1.__('Query all information items successfully'), data, count };
     }
 };
 __decorate([
@@ -63,7 +72,7 @@ __decorate([
     graphql_1.Query('findAllInfoItem'),
     decorators_1.Permission({ name: 'find_all_info_item', identify: 'infoItem:findAllInfoItem', action: 'find' }),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], InfoItemResolver.prototype, "findAllInfoItem", null);
 InfoItemResolver = __decorate([

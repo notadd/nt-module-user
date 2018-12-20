@@ -102,12 +102,25 @@ let UserResolver = class UserResolver {
         return { code: 200, message: i18n_1.__('Query user registration information item successfully'), data };
     }
     async findUsersInRole(req, body) {
-        const data = await this.userService.findByRoleId(body.roleId);
-        return { code: 200, message: i18n_1.__('Query the user under the role successfully'), data };
+        const { usersInfo, count } = await this.userService.findByRoleId(body.roleId, body.pageNumber, body.pageSize);
+        return { code: 200, message: i18n_1.__('Query the user under the role successfully'), data: usersInfo, count };
     }
     async findUsersInOrganization(req, body) {
-        const data = await this.userService.findByOrganizationId(body.organizationId);
-        return { code: 200, message: i18n_1.__('Query users under the organization successfully'), data };
+        const { usersInfo, count } = await this.userService.findByOrganizationId(body.organizationId, body.pageNumber, body.pageSize);
+        return { code: 200, message: i18n_1.__('Query users under the organization successfully'), data: usersInfo, count };
+    }
+    async findAllUsers(req, body) {
+        const result = await this.userService.findAllUsers(body.pageNumber, body.pageSize);
+        let data;
+        let count;
+        if (!(result instanceof Array)) {
+            data = result.usersInfo;
+            count = result.count;
+        }
+        else {
+            data = result;
+        }
+        return { code: 200, message: i18n_1.__('Query all users successfully'), data, count };
     }
 };
 __decorate([
@@ -230,6 +243,13 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "findUsersInOrganization", null);
+__decorate([
+    graphql_1.Query('findAllUsers'),
+    decorators_1.Permission({ name: 'find_all_users', identify: 'user:findAllUsers', action: 'find' }),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], UserResolver.prototype, "findAllUsers", null);
 UserResolver = __decorate([
     graphql_1.Resolver(),
     decorators_1.Resource({ name: 'user_manage', identify: 'user:manage' }),

@@ -21,6 +21,7 @@ export declare class UserModule implements OnModuleInit {
     constructor(userService: UserService, modulesContainer: ModulesContainer, systemModuleRepo: Repository<SystemModule>, resourceRepo: Repository<Resource>, permissionRepo: Repository<Permission>, roleRepo: Repository<Role>, infoGroupRepo: Repository<InfoGroup>, userRepo: Repository<User>);
     static forRoot(options: {
         i18n: 'en-US' | 'zh-CN';
+        authTokenExpiresIn?: number;
         authTokenWhiteList?: string[];
     }): DynamicModule;
     onModuleInit(): Promise<void>;

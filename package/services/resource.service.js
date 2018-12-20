@@ -20,7 +20,15 @@ let ResourceService = class ResourceService {
     constructor(resourceRep) {
         this.resourceRep = resourceRep;
     }
-    async findResources(moduleId) {
+    async findResources(moduleId, pageNumber, pageSize) {
+        if (pageNumber && pageSize) {
+            return this.resourceRep.findAndCount({
+                where: { systemModule: { id: moduleId } },
+                relations: ['permissions'],
+                skip: (pageNumber - 1) * pageSize,
+                take: pageSize
+            });
+        }
         return this.resourceRep.find({ where: { systemModule: { id: moduleId } }, relations: ['permissions'] });
     }
 };

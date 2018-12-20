@@ -1,1 +1,2 @@
 export declare const AUTH_TOKEN_WHITE_LIST = "AUTH_TOKEN_WHITE_LIST";
+export declare const AUTH_TOKEN_EXPIRES_IN = "AUTH_TOKEN_EXPIRES_IN";

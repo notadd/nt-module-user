@@ -18,8 +18,17 @@ let ResourceResolver = class ResourceResolver {
         this.resourceService = resourceService;
     }
     async findResources(req, body) {
-        const data = await this.resourceService.findResources(body.systemModuleId);
-        return { code: 200, message: i18n_1.__('Query the resource successfully'), data };
+        const result = await this.resourceService.findResources(body.systemModuleId, body.pageNumber, body.pageSize);
+        let data;
+        let count;
+        if (typeof result[1] === 'number') {
+            data = result[0];
+            count = result[1];
+        }
+        else {
+            data = result;
+        }
+        return { code: 200, message: i18n_1.__('Query the resource successfully'), data, count };
     }
 };
 __decorate([

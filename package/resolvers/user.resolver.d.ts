@@ -1,5 +1,5 @@
 import { CommonResult } from '../interfaces/common-result.interface';
-import { CreateUserInput, UpdateUserInput } from '../interfaces/user.interface';
+import { CreateUserInput, UpdateUserInput, UserInfoData } from '../interfaces/user.interface';
 import { UserService } from '../services/user.service';
 export declare class UserResolver {
     private readonly userService;
@@ -55,8 +55,31 @@ export declare class UserResolver {
     findRegisterUserInputInfo(): Promise<CommonResult>;
     findUsersInRole(req: any, body: {
         roleId: number;
-    }): Promise<CommonResult>;
+        pageNumber: number;
+        pageSize: number;
+    }): Promise<{
+        code: number;
+        message: string;
+        data: UserInfoData[];
+        count: number;
+    }>;
     findUsersInOrganization(req: any, body: {
         organizationId: number;
-    }): Promise<CommonResult>;
+        pageNumber: number;
+        pageSize: number;
+    }): Promise<{
+        code: number;
+        message: string;
+        data: UserInfoData[];
+        count: number;
+    }>;
+    findAllUsers(req: any, body: {
+        pageNumber: number;
+        pageSize: number;
+    }): Promise<{
+        code: number;
+        message: string;
+        data: UserInfoData[];
+        count: number;
+    }>;
 }

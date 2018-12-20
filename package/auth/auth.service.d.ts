@@ -4,7 +4,8 @@ import { UserService } from '../services/user.service';
 export declare class AuthService {
     private readonly userService;
     private readonly authTokenWhiteList;
-    constructor(userService: UserService, authTokenWhiteList: [string]);
+    private readonly authTokenExpiresIn;
+    constructor(userService: UserService, authTokenWhiteList: string[], authTokenExpiresIn: number);
     createToken(payload: JwtPayload): Promise<JwtReply>;
-    validateUser(req: any): Promise<User>;
+    validateUser(token: string, operationName: string): Promise<User>;
 }

@@ -51,7 +51,10 @@ let InfoGroupService = class InfoGroupService {
         await this.entityCheckService.checkNameExist(info_group_entity_1.InfoGroup, name);
         await this.infoGroupRepo.update(id, { name, role: { id: roleId } });
     }
-    async findAll() {
+    async findAll(pageNumber, pageSize) {
+        if (pageNumber && pageSize) {
+            return this.infoGroupRepo.findAndCount({ skip: (pageNumber - 1) * pageSize, take: pageSize });
+        }
         return this.infoGroupRepo.find();
     }
     async findItemsById(id) {

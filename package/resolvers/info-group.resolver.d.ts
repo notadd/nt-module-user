@@ -1,3 +1,4 @@
+import { InfoGroup } from '../entities/info-group.entity';
 import { CommonResult } from '../interfaces/common-result.interface';
 import { InfoGroupService } from '../services/info-group.service';
 export declare class InfoGroupResolver {
@@ -23,7 +24,15 @@ export declare class InfoGroupResolver {
         infoGroupId: number;
         infoItemIds: number[];
     }): Promise<CommonResult>;
-    findAllInfoGroup(): Promise<CommonResult>;
+    findAllInfoGroup(req: any, body: {
+        pageNumber: number;
+        pageSize: number;
+    }): Promise<{
+        code: number;
+        message: string;
+        data: InfoGroup[];
+        count: number;
+    }>;
     findInfoItemsByGroupId(req: any, body: {
         groupId: number;
     }): Promise<CommonResult>;

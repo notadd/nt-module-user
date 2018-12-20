@@ -33,9 +33,18 @@ let RoleResolver = class RoleResolver {
         await this.roleService.setPermissions(body.roleId, body.permissionIds);
         return { code: 200, message: i18n_1.__('Set role permissions successfully') };
     }
-    async findRoles() {
-        const data = await this.roleService.findRoles();
-        return { code: 200, message: i18n_1.__('Query all roles successfully'), data };
+    async findRoles(req, body) {
+        const result = await this.roleService.findRoles(body.pageNumber, body.pageSize);
+        let data;
+        let count;
+        if (typeof result[1] === 'number') {
+            data = result[0];
+            count = result[1];
+        }
+        else {
+            data = result;
+        }
+        return { code: 200, message: i18n_1.__('Query all roles successfully'), data, count };
     }
     async findOneRoleInfo(req, body) {
         const data = await this.roleService.findOneRoleInfo(body.roleId);
@@ -74,7 +83,7 @@ __decorate([
     graphql_1.Query('findRoles'),
     decorators_1.Permission({ name: 'find_roles', identify: 'role:findRoles', action: 'find' }),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], RoleResolver.prototype, "findRoles", null);
 __decorate([

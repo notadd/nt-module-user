@@ -52,7 +52,10 @@ let InfoItemService = class InfoItemService {
             await this.infoItemRepo.update(updateInfoItemInput.id, { informationDisplay: updateInfoItemInput.informationDisplay });
         }
     }
-    async findAll() {
+    async findAll(pageNumber, pageSize) {
+        if (pageNumber && pageSize) {
+            return this.infoItemRepo.findAndCount({ skip: (pageNumber - 1) * pageSize, take: pageSize });
+        }
         return this.infoItemRepo.find({ order: { order: 'ASC' } });
     }
 };

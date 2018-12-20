@@ -10,6 +10,6 @@ export declare class InfoGroupService {
     delete(id: number): Promise<void>;
     deleteIntoItem(infoGroupId: number, infoItemIds: number[]): Promise<void>;
     update(id: number, name: string, roleId: number): Promise<void>;
-    findAll(): Promise<InfoGroup[]>;
+    findAll(pageNumber?: number, pageSize?: number): Promise<InfoGroup[] | [InfoGroup[], number]>;
     findItemsById(id: number): Promise<any[]>;
 }

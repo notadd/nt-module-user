@@ -1,16 +1,22 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Inject, Injectable } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 
 import { PERMISSION_DEFINITION } from '../decorators';
 import { Permission } from '../entities/permission.entity';
-import { User } from '../entities/user.entity';
+import { AuthService } from './auth.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
+    constructor(@Inject(AuthService) private readonly authService: AuthService) { }
+
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const gqlCtx = GqlExecutionContext.create(context);
+        const req = gqlCtx.getContext().req;
+        const operationName = gqlCtx.getInfo().fieldName;
+        const token = req.headers.authorization as string;
 
-        const user: User = gqlCtx.getContext().user;
+        const user = await this.authService.validateUser(token, operationName);
+        gqlCtx.getContext().user = user;
 
         if (user && user.username === 'sadmin') return true;
 

@@ -3,7 +3,7 @@ import { AuthenticationError } from 'apollo-server-core';
 import { __ as t } from 'i18n';
 import * as jwt from 'jsonwebtoken';
 
-import { AUTH_TOKEN_WHITE_LIST } from '../constants/auth.constant';
+import { AUTH_TOKEN_EXPIRES_IN, AUTH_TOKEN_WHITE_LIST } from '../constants/auth.constant';
 import { User } from '../entities/user.entity';
 import { JwtPayload, JwtReply } from '../interfaces/jwt.interface';
 import { UserService } from '../services/user.service';
@@ -12,20 +12,20 @@ import { UserService } from '../services/user.service';
 export class AuthService {
     constructor(
         @Inject(forwardRef(() => UserService)) private readonly userService: UserService,
-        @Inject(AUTH_TOKEN_WHITE_LIST) private readonly authTokenWhiteList: [string]
+        @Inject(AUTH_TOKEN_WHITE_LIST) private readonly authTokenWhiteList: string[],
+        @Inject(AUTH_TOKEN_EXPIRES_IN) private readonly authTokenExpiresIn: number
     ) { }
 
     async createToken(payload: JwtPayload): Promise<JwtReply> {
-        const accessToken = jwt.sign(payload, 'secretKey', { expiresIn: '1d' });
-        return { accessToken, expiresIn: 60 * 60 * 24 };
+        const accessToken = jwt.sign(payload, 'secretKey', { expiresIn: this.authTokenExpiresIn });
+        return { accessToken, expiresIn: this.authTokenExpiresIn };
     }
 
-    async validateUser(req: any): Promise<User> {
-        if (req.body && this.authTokenWhiteList.some(item => req.body.query.includes(item))) {
+    async validateUser(token: string, operationName: string): Promise<User> {
+        if (this.authTokenWhiteList.some(item => item === operationName)) {
             return;
         }
 
-        let token = req.headers.authorization as string;
         if (!token) {
             throw new AuthenticationError(t('Request header lacks authorization parameters，it should be: Authorization'));
         }

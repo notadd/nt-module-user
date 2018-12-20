@@ -117,5 +117,7 @@
     "ban_user": "ban_user",
     "revert_banned_user": "revert_banned_user",
     "revert_recycled_user": "revert_recycled_user",
-    "UserModule": "UserModule"
+    "UserModule": "UserModule",
+    "find_all_users": "find_all_users",
+    "Query all users successfully": "successfully"
 }

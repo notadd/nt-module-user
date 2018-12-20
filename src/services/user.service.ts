@@ -173,20 +173,43 @@ export class UserService {
     }
 
     /**
+     * Query all users
+     */
+    async findAllUsers(pageNumber?: number, pageSize?: number) {
+        if (pageNumber && pageSize) {
+            const usersAndCount = await this.userRepo.findAndCount({ skip: (pageNumber - 1) * pageSize, take: pageSize });
+            const usersInfo = await this.findUserInfoById(usersAndCount[0].map(u => u.id)) as UserInfoData[];
+            return { count: usersAndCount[1], usersInfo };
+        }
+        const users = await this.userRepo.find();
+        return this.findUserInfoById(users.map(u => u.id)) as Promise<UserInfoData[]>;
+    }
+
+    /**
      * Query the user by role ID
      *
      * @param roleId The specified role id
      */
-    async findByRoleId(roleId: number) {
-        const users = await this.userRepo.createQueryBuilder('user')
+    async findByRoleId(roleId: number, pageNumber?: number, pageSize?: number) {
+        const qb = this.userRepo.createQueryBuilder('user')
             .leftJoinAndSelect('user.roles', 'roles')
             .where('roles.id = :roleId', { roleId })
-            .andWhere('user.recycle = false')
-            .getMany();
+            .andWhere('user.recycle = false');
+
+        let users: User[];
+        let count: number;
+        if (pageNumber && pageSize) {
+            const usersAndCount = await qb.skip((pageNumber - 1) * pageSize).take(pageSize).getManyAndCount();
+            users = usersAndCount[0];
+            count = usersAndCount[1];
+        } else {
+            users = await qb.getMany();
+        }
         if (!users.length) {
             throw new HttpException(t('No users belong to this role'), 404);
         }
-        return this.findUserInfoById(users.map(user => user.id)) as Promise<UserInfoData[]>;
+        const usersInfo = await this.findUserInfoById(users.map(user => user.id)) as UserInfoData[];
+        return { usersInfo, count };
     }
 
     /**
@@ -194,16 +217,26 @@ export class UserService {
      *
      * @param id The specified organization id
      */
-    async findByOrganizationId(organizationId: number): Promise<UserInfoData[]> {
-        const users = await this.userRepo.createQueryBuilder('user')
+    async findByOrganizationId(organizationId: number, pageNumber?: number, pageSize?: number) {
+        const qb = this.userRepo.createQueryBuilder('user')
             .leftJoinAndSelect('user.organizations', 'organizations')
             .where('organizations.id = :organizationId', { organizationId })
-            .andWhere('user.recycle = false')
-            .getMany();
+            .andWhere('user.recycle = false');
+
+        let users: User[];
+        let count: number;
+        if (pageNumber && pageSize) {
+            const usersAndCount = await qb.skip((pageNumber - 1) * pageSize).take(pageSize).getManyAndCount();
+            users = usersAndCount[0];
+            count = usersAndCount[1];
+        } else {
+            users = await qb.getMany();
+        }
         if (!users.length) {
             throw new HttpException(t('No users belong to this organization'), 404);
         }
-        return this.findUserInfoById(users.map(user => user.id)) as Promise<UserInfoData[]>;
+        const usersInfo = await this.findUserInfoById(users.map(user => user.id)) as UserInfoData[];
+        return { usersInfo, count };
     }
 
     /**

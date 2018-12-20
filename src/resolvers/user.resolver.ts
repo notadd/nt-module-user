@@ -136,15 +136,30 @@ export class UserResolver {
 
     @Query('findUsersInRole')
     @Permission({ name: 'find_users_in_role', identify: 'user:findUsersInRole', action: 'find' })
-    async findUsersInRole(req, body: { roleId: number }): Promise<CommonResult> {
-        const data = await this.userService.findByRoleId(body.roleId);
-        return { code: 200, message: t('Query the user under the role successfully'), data };
+    async findUsersInRole(req, body: { roleId: number, pageNumber: number, pageSize: number }) {
+        const { usersInfo, count } = await this.userService.findByRoleId(body.roleId, body.pageNumber, body.pageSize);
+        return { code: 200, message: t('Query the user under the role successfully'), data: usersInfo, count };
     }
 
     @Query('findUsersInOrganization')
     @Permission({ name: 'find_users_in_organization', identify: 'user:findUsersInOrganization', action: 'find' })
-    async findUsersInOrganization(req, body: { organizationId: number }): Promise<CommonResult> {
-        const data = await this.userService.findByOrganizationId(body.organizationId);
-        return { code: 200, message: t('Query users under the organization successfully'), data };
+    async findUsersInOrganization(req, body: { organizationId: number, pageNumber: number, pageSize: number }) {
+        const { usersInfo, count } = await this.userService.findByOrganizationId(body.organizationId, body.pageNumber, body.pageSize);
+        return { code: 200, message: t('Query users under the organization successfully'), data: usersInfo, count };
+    }
+
+    @Query('findAllUsers')
+    @Permission({ name: 'find_all_users', identify: 'user:findAllUsers', action: 'find' })
+    async findAllUsers(req, body: { pageNumber: number, pageSize: number }) {
+        const result = await this.userService.findAllUsers(body.pageNumber, body.pageSize);
+        let data: UserInfoData[];
+        let count: number;
+        if (!(result instanceof Array)) {
+            data = result.usersInfo;
+            count = result.count;
+        } else {
+            data = result;
+        }
+        return { code: 200, message: t('Query all users successfully'), data, count };
     }
 }

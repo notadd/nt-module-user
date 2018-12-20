@@ -19,7 +19,7 @@ import { GraphQLConfigService } from './graphql-config.service';
             database: 'module_user',
             entities: ['src/**/**.entity.ts', 'node_modules/**/**.entity.js'],
             logger: 'advanced-console',
-            logging: false,
+            logging: true,
             synchronize: true,
             dropSchema: false
         }),

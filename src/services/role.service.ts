@@ -96,7 +96,10 @@ export class RoleService {
     /**
      * Query all roles
      */
-    async findRoles() {
+    async findRoles(pageNumber?: number, pageSize?: number) {
+        if (pageNumber && pageSize) {
+            return this.roleRepo.findAndCount({ skip: (pageNumber - 1) * pageSize, take: pageSize });
+        }
         return this.roleRepo.find();
     }
 

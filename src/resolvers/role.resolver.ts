@@ -2,6 +2,7 @@ import { Mutation, Query, Resolver } from '@nestjs/graphql';
 import { __ as t } from 'i18n';
 
 import { Permission, Resource } from '../decorators';
+import { Role } from '../entities/role.entity';
 import { CommonResult } from '../interfaces/common-result.interface';
 import { RoleService } from './../services/role.service';
 
@@ -42,9 +43,17 @@ export class RoleResolver {
 
     @Query('findRoles')
     @Permission({ name: 'find_roles', identify: 'role:findRoles', action: 'find' })
-    async findRoles(): Promise<CommonResult> {
-        const data = await this.roleService.findRoles();
-        return { code: 200, message: t('Query all roles successfully'), data };
+    async findRoles(req, body: { pageNumber: number, pageSize: number }) {
+        const result = await this.roleService.findRoles(body.pageNumber, body.pageSize);
+        let data: Role[];
+        let count: number;
+        if (typeof result[1] === 'number') {
+            data = (result as [Role[], number])[0];
+            count = (result as [Role[], number])[1];
+        } else {
+            data = result as Role[];
+        }
+        return { code: 200, message: t('Query all roles successfully'), data, count };
     }
 
     @Query('findOneRoleInfo')

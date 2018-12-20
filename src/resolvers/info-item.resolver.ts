@@ -38,8 +38,16 @@ export class InfoItemResolver {
 
     @Query('findAllInfoItem')
     @Permission({ name: 'find_all_info_item', identify: 'infoItem:findAllInfoItem', action: 'find' })
-    async findAllInfoItem(): Promise<CommonResult> {
-        const data = await this.infoItemService.findAll();
-        return { code: 200, message: t('Query all information items successfully'), data };
+    async findAllInfoItem(req, body: { pageNumber: number, pageSize: number }) {
+        const result = await this.infoItemService.findAll(body.pageNumber, body.pageSize);
+        let data: InfoItem[];
+        let count: number;
+        if (typeof result[1] === 'number') {
+            data = (result as [InfoItem[], number])[0];
+            count = (result as [InfoItem[], number])[1];
+        } else {
+            data = result as InfoItem[];
+        }
+        return { code: 200, message: t('Query all information items successfully'), data, count };
     }
 }

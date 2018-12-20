@@ -10,7 +10,10 @@ export class SystemModuleService {
         @InjectRepository(SystemModule) private readonly systemModuleRepo: Repository<SystemModule>
     ) { }
 
-    async findSystemModules() {
+    async findSystemModules(pageNumber?: number, pageSize?: number) {
+        if (pageNumber && pageSize) {
+            return this.systemModuleRepo.findAndCount({ skip: (pageNumber - 1) * pageSize, take: pageSize });
+        }
         return this.systemModuleRepo.find();
     }
 }

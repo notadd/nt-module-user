@@ -198,6 +198,9 @@ export class GraphQLConfigService implements GqlOptionsFactory {
 - `findUsersInOrganization(organizationId: Int!)` 获取指定组织ID下的用户
 
 > 注意：手机号+验证码方式的登录使用的是腾讯云短信服务，需提前调用 `sms` 相关接口进行短信服务的配置
+> `createSms` 配置短信插件
+> `addTemplateToSms` 增加短信模板
+> `sendMessage` 发送短信
 
 **Mutation**：
 

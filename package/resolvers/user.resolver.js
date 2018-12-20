@@ -62,7 +62,7 @@ let UserResolver = class UserResolver {
         return { code: 200, message: i18n_1.__('Delete user role successfully') };
     }
     async banUser(req, body) {
-        await this.userService.recycleOrBanUser(body.userId, 'recycle');
+        await this.userService.recycleOrBanUser(body.userId, 'ban');
         return { code: 200, message: i18n_1.__('Ban user successfully') };
     }
     async recycleUser(req, body) {

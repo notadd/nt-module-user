@@ -76,7 +76,7 @@ import { UserModule } from '@notadd/module-user';
            useClass: GraphQLConfigService
         }),
         TypeOrmModule.forRoot(),
-        UserModule.forRoot({ i18n: 'zh-CN', authTokenWhiteList: [''] })
+        UserModule.forRoot({ i18n: 'zh-CN', authTokenExpiresIn: 3600, authTokenWhiteList: [''] })
     ],
     controllers: [],
     providers: [],
@@ -85,7 +85,11 @@ import { UserModule } from '@notadd/module-user';
 export class AppModule { }
 ```
 
-> Tips: `i18n` 配置用于用户模块的返回消息及资源、权限注解的 `i18n` 功能，`authTokenWhiteList` 可以传入字符串数组，用于配置授权白名单的接口，不配置白名单时，可不用传入 `authTokenWhiteList` 选项
+> Tips: `i18n` 配置用于用户模块的返回消息及资源、权限注解的 `i18n` 功能
+>
+> `authTokenWhiteList` 可以传入字符串数组，用于配置授权白名单的接口，不配置白名单时，可不用传入 `authTokenWhiteList`
+>
+> `authTokenExpiresIn` 用于配置授权token有效期，单位：秒，默认是一天(`60 * 60 * 24`)
 
 #### 鉴权功能，在 graphql 上下文中 使用 `AuthService` 类的 `validateUser` 方法，并将通过身份验证的用户传递给上下文
 
@@ -109,10 +113,7 @@ export class GraphQLConfigService implements GqlOptionsFactory {
         return {
             typePaths: ['./**/*.types.graphql'],
             resolvers: { JSON: GraphQLJSON },
-            context: async ({ req }) => {
-                const user = await this.authService.validateUser(req);
-                return { user };
-            }
+            context: async ({ req }) => ({ req })
         };
     }
 }

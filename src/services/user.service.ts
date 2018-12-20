@@ -293,9 +293,9 @@ export class UserService {
             .leftJoin('infoItem.infoGroups', 'infoGroups')
             .leftJoin('infoGroups.role', 'role')
             .leftJoin('role.users', 'users')
-            .where('user.username = :username', { username: loginName })
-            .orWhere('user.mobile = :mobile', { mobile: loginName })
-            .orWhere('user.email = :email', { email: loginName.toLocaleLowerCase() })
+            .where('users.username = :username', { username: loginName })
+            .orWhere('users.mobile = :mobile', { mobile: loginName })
+            .orWhere('users.email = :email', { email: loginName.toLocaleLowerCase() })
             .orderBy('infoItem.order', 'ASC')
             .getMany();
 

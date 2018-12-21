@@ -43,7 +43,7 @@ type Mutation {
 }
 
 input RegisterUserInput {
-    username: String!
+    username: String
     email: String
     mobile: String
     password: String!
@@ -56,6 +56,7 @@ input CreateUserInput {
     email: String
     mobile: String
     password: String!
+    banned: Boolean
     """Information item key-value pair, key is the ID of the information item (infoItem.id), and the value is the value of the information item (userInfo.value)"""
     infoKVs: [RegisterOrCreateInfoKV]
     roleIds: [Int]
@@ -66,6 +67,7 @@ input UpdateUserInput {
     email: String
     mobile: String
     password: String
+    banned: Boolean
     """Information item value key-value pair, key is the ID of the user information item (userInfo.id), and value is the value of the information item (userInfo.value)"""
     infoKVs: [UpdateInfoKV]
     """An array of role ID objects owned, each item must contain the role ID (before) before the update, and the role ID (after) after the update"""

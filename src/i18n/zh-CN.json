@@ -67,6 +67,7 @@
 	"Create a role successfully": "创建角色成功",
 	"Delete role successfully": "删除角色成功",
 	"Update role successfully": "更新角色成功",
+	"Remove permission of role successfully": "删除角色权限成功",
 	"Set role permissions successfully": "设置角色权限成功",
 	"Query all roles successfully": "查询所有角色成功",
 	"Query role information successfully": "查询角色信息成功",
@@ -119,5 +120,6 @@
 	"revert_recycled_user": "恢复用户",
 	"UserModule": "用户模块",
 	"find_all_users": "查询所有用户信息",
-	"Query all users successfully": "查询所有用户信息成功"
+	"Query all users successfully": "查询所有用户信息成功",
+	"remove_permission_of_role": "remove_permission_of_role"
 }

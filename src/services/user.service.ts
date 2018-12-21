@@ -155,6 +155,9 @@ export class UserService {
             const newPassword = await this.cryptoUtil.encryptPassword(updateUserInput.password);
             await this.userRepo.update(user.id, { password: newPassword });
         }
+        if (updateUserInput.banned !== undefined) {
+            await this.userRepo.update(user.id, { banned: updateUserInput.banned });
+        }
         if (updateUserInput.roleIds && updateUserInput.roleIds.length) {
             updateUserInput.roleIds.forEach(async roleId => {
                 await this.userRepo.createQueryBuilder('user').relation(User, 'roles').of(user).remove(roleId.before);
@@ -434,8 +437,8 @@ export class UserService {
             mobile: user.mobile,
             banned: user.banned,
             recycle: user.recycle,
-            createTime: user.createTime,
-            updateTime: user.updateTime,
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt,
             userRoles: user.roles,
             userOrganizations: user.organizations,
             userInfos: infoItems.length ? infoItems.map(infoItem => {

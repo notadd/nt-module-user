@@ -53,6 +53,9 @@ let RoleService = class RoleService {
             throw new common_1.HttpException(i18n_1.__('Database error %s', err.toString()), 500);
         }
     }
+    async removePermission(id, permissionId) {
+        await this.roleRepo.createQueryBuilder().relation(role_entity_1.Role, 'permissions').of(id).remove(permissionId);
+    }
     async setPermissions(id, permissionIds) {
         const role = await this.roleRepo.findOne(id);
         if (!role) {

@@ -29,6 +29,10 @@ let RoleResolver = class RoleResolver {
         await this.roleService.updateRole(body.id, body.name);
         return { code: 200, message: i18n_1.__('Update role successfully') };
     }
+    async removePermissionOfRole(req, body) {
+        await this.roleService.removePermission(body.roleId, body.permissionId);
+        return { code: 200, message: i18n_1.__('Remove permission of role successfully') };
+    }
     async setPermissionsToRole(req, body) {
         await this.roleService.setPermissions(body.roleId, body.permissionIds);
         return { code: 200, message: i18n_1.__('Set role permissions successfully') };
@@ -72,6 +76,13 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], RoleResolver.prototype, "updateRole", null);
+__decorate([
+    graphql_1.Mutation('removePermissionOfRole'),
+    decorators_1.Permission({ name: 'remove_permission_of_role', identify: 'role:removePermissionOfRole', action: 'delete' }),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], RoleResolver.prototype, "removePermissionOfRole", null);
 __decorate([
     graphql_1.Mutation('setPermissionsToRole'),
     decorators_1.Permission({ name: 'set_permissions_to_role', identify: 'role:setPermissionsToRole', action: 'create' }),

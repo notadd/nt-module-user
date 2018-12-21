@@ -12,6 +12,7 @@ export declare class RoleService {
     createRole(name: string): Promise<void>;
     updateRole(id: number, name: string): Promise<void>;
     deleteRole(id: number): Promise<void>;
+    removePermission(id: number, permissionId: number): Promise<void>;
     setPermissions(id: number, permissionIds: number[]): Promise<void>;
     findRoles(pageNumber?: number, pageSize?: number): Promise<Role[] | [Role[], number]>;
     findOneRoleInfo(roleId: number): Promise<RoleInfoData>;

@@ -14,6 +14,10 @@ export declare class RoleResolver {
         id: number;
         name: string;
     }): Promise<CommonResult>;
+    removePermissionOfRole(req: any, body: {
+        roleId: number;
+        permissionId: number;
+    }): Promise<CommonResult>;
     setPermissionsToRole(req: any, body: {
         roleId: number;
         permissionIds: number[];

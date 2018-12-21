@@ -90,7 +90,7 @@ __decorate([
         }
     }),
     __metadata("design:type", String)
-], User.prototype, "createTime", void 0);
+], User.prototype, "createdAt", void 0);
 __decorate([
     typeorm_1.UpdateDateColumn({
         transformer: {
@@ -103,7 +103,7 @@ __decorate([
         }
     }),
     __metadata("design:type", String)
-], User.prototype, "updateTime", void 0);
+], User.prototype, "updatedAt", void 0);
 User = __decorate([
     typeorm_1.Entity('user')
 ], User);

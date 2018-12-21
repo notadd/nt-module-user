@@ -5,8 +5,8 @@ export interface UserInfoData {
     mobile: string;
     banned: boolean;
     recycle: boolean;
-    createTime: string;
-    updateTime: string;
+    createdAt: string;
+    updatedAt: string;
     userRoles: {
         id: number;
         name: string;
@@ -32,6 +32,7 @@ export interface CreateUserInput {
     email?: string;
     mobile?: string;
     password: string;
+    banned?: boolean;
     infoKVs?: {
         key: number;
         value: string;
@@ -44,6 +45,7 @@ export interface UpdateUserInput {
     email?: string;
     mobile?: string;
     password?: string;
+    banned?: boolean;
     infoKVs?: {
         key: number;
         value: string;

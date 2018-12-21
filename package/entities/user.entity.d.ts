@@ -12,6 +12,6 @@ export declare class User {
     recycle: boolean;
     roles: Role[];
     organizations: Organization[];
-    createTime: string;
-    updateTime: string;
+    createdAt: string;
+    updatedAt: string;
 }

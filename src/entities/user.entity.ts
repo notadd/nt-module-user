@@ -75,7 +75,7 @@ export class User {
             }
         }
     })
-    createTime: string;
+    createdAt: string;
 
     @UpdateDateColumn({
         transformer: {
@@ -87,5 +87,5 @@ export class User {
             }
         }
     })
-    updateTime: string;
+    updatedAt: string;
 }

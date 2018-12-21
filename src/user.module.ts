@@ -40,7 +40,7 @@ import { CryptoUtil } from './utils/crypto.util';
             username: 'postgres',
             password: '123456',
             database: 'module_user',
-            entities: [__dirname + '/../src/**/*.entity.ts'],
+            entities: [__dirname + '/**/*.entity.ts'],
             logger: 'advanced-console',
             logging: true,
             synchronize: true,

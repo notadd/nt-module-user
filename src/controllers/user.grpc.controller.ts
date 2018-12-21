@@ -102,15 +102,31 @@ export class UserGrpcController {
     }
 
     @GrpcMethod('UserService')
-    async findUsersInRole(payload: { roleId: number }) {
-        const data = await this.userService.findByRoleId(payload.roleId);
-        return { code: 200, message: t('Query the user under the role successfully'), data };
+    async findAllUsers(payload: { pageNumber: number, pageSize: number }) {
+        const result = await this.userService.findAllUsers(payload.pageNumber, payload.pageSize);
+        let data: UserInfoData[];
+        let count: number;
+        if (!(result instanceof Array)) {
+            data = result.usersInfo;
+            count = result.count;
+        } else {
+            data = result;
+        }
+        return { code: 200, message: t('Query all users successfully'), data, count };
     }
 
     @GrpcMethod('UserService')
-    async findUsersInOrganization(payload: { organizationId: number }) {
-        const data = await this.userService.findByOrganizationId(payload.organizationId);
-        return { code: 200, message: t('Query users under the organization successfully'), data };
+    async findUsersInRole(payload: { roleId: number, pageNumber: number, pageSize: number }) {
+        const { roleId, pageNumber, pageSize } = payload;
+        const { usersInfo, count } = await this.userService.findByRoleId(roleId, pageNumber, pageSize);
+        return { code: 200, message: t('Query the user under the role successfully'), data: usersInfo, count };
+    }
+
+    @GrpcMethod('UserService')
+    async findUsersInOrganization(payload: { organizationId: number, pageNumber: number, pageSize: number }) {
+        const { organizationId, pageNumber, pageSize } = payload;
+        const { usersInfo, count } = await this.userService.findByOrganizationId(organizationId, pageNumber, pageSize);
+        return { code: 200, message: t('Query users under the organization successfully'), data: usersInfo, count };
     }
 
     @GrpcMethod('UserService')

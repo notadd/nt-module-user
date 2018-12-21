@@ -31,8 +31,16 @@ export class InfoItemGrpcController {
     }
 
     @GrpcMethod('InfoItemService')
-    async findAllInfoItem() {
-        const data = await this.infoItemService.findAll();
-        return { code: 200, message: t('Query all information items successfully'), data };
+    async findAllInfoItem(payload: { pageNumber: number, pageSize: number }) {
+        const result = await this.infoItemService.findAll(payload.pageNumber, payload.pageSize);
+        let data: InfoItem[];
+        let count: number;
+        if (typeof result[1] === 'number') {
+            data = (result as [InfoItem[], number])[0];
+            count = (result as [InfoItem[], number])[1];
+        } else {
+            data = result as InfoItem[];
+        }
+        return { code: 200, message: t('Query all information items successfully'), data, count };
     }
 }

@@ -2,6 +2,7 @@ import { Controller, Inject } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
 import { __ as t } from 'i18n';
 
+import { Resource } from '../entities/resource.entity';
 import { ResourceService } from '../services/resource.service';
 
 @Controller()
@@ -18,8 +19,17 @@ export class ResourceGrpcController {
     }
 
     @GrpcMethod('ResourceService')
-    async findResources(payload: { systemModuleId: number }) {
-        const data = await this.resourceService.findResources(payload.systemModuleId);
-        return { code: 200, message: t('Query the resource successfully'), data };
+    async findResources(payload: { systemModuleId: number, pageNumber: number, pageSize: number }) {
+        const { systemModuleId, pageNumber, pageSize } = payload;
+        const result = await this.resourceService.findResources(systemModuleId, pageNumber, pageSize);
+        let data: Resource[];
+        let count: number;
+        if (typeof result[1] === 'number') {
+            data = (result as [Resource[], number])[0];
+            count = (result as [Resource[], number])[1];
+        } else {
+            data = result as Resource[];
+        }
+        return { code: 200, message: t('Query the resource successfully'), data, count };
     }
 }

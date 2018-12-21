@@ -65,10 +65,6 @@
     "Username already exists": "Username already exists",
     "Mobile already exists": "Mobile already exists",
     "Email already exists": "Email already exists",
-    "Request header lacks authorization parameters，it should be: Authorization or authorization": "Request header lacks authorization parameters，it should be: Authorization or authorization",
-    "The authorization code prefix is incorrect. it should be: Bearer or bearer": "The authorization code prefix is incorrect. it should be: Bearer or bearer",
-    "The authorization code is incorrect": "The authorization code is incorrect",
-    "The authorization code has expired": "The authorization code has expired",
     "Ban User successfully": "Ban User successfully",
     "Revert banned user successfully": "Revert banned user successfully",
     "Revert recycled user successfully": "Revert recycled user successfully",
@@ -76,5 +72,6 @@
     "Delete permission of user successfully": "Delete permission of user successfully",
     "The permission has already been added": "The permission has already been added",
     "The permission has already been deleted": "The permission has already been deleted",
-    "Can not delete the permission which is not exist in this user's permissions": "Can not delete the permission which is not exist in this user's permissions"
+    "Can not delete the permission which is not exist in this user's permissions": "Can not delete the permission which is not exist in this user's permissions",
+    "Query all users successfully": "Query all users successfully"
 }

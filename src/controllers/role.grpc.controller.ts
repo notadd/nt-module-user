@@ -2,6 +2,7 @@ import { Controller } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
 import { __ as t } from 'i18n';
 
+import { Role } from '../entities/role.entity';
 import { RoleService } from '../services/role.service';
 
 @Controller()
@@ -29,7 +30,7 @@ export class RoleGrpcController {
     }
 
     @GrpcMethod('RoleService')
-    async removePermission(payload: { roleId: number, permissionId: number }) {
+    async removePermissionOfRole(payload: { roleId: number, permissionId: number }) {
         await this.roleService.removePermission(payload.roleId, payload.permissionId);
         return { code: 200, message: t('Remove permission from role successfully') };
     }
@@ -41,9 +42,17 @@ export class RoleGrpcController {
     }
 
     @GrpcMethod('RoleService')
-    async findRoles() {
-        const data = await this.roleService.findRoles();
-        return { code: 200, message: t('Query all roles successfully'), data };
+    async findRoles(payload: { pageNumber: number, pageSize: number }) {
+        const result = await this.roleService.findRoles(payload.pageNumber, payload.pageSize);
+        let data: Role[];
+        let count: number;
+        if (typeof result[1] === 'number') {
+            data = (result as [Role[], number])[0];
+            count = (result as [Role[], number])[1];
+        } else {
+            data = result as Role[];
+        }
+        return { code: 200, message: t('Query all roles successfully'), data, count };
     }
 
     @GrpcMethod('RoleService')

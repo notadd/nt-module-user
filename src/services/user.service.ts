@@ -200,20 +200,43 @@ export class UserService {
     }
 
     /**
+     * Query all users
+     */
+    async findAllUsers(pageNumber?: number, pageSize?: number) {
+        if (pageNumber && pageSize) {
+            const usersAndCount = await this.userRepo.findAndCount({ skip: (pageNumber - 1) * pageSize, take: pageSize });
+            const usersInfo = await this.findUserInfoById(usersAndCount[0].map(u => u.id)) as UserInfoData[];
+            return { count: usersAndCount[1], usersInfo };
+        }
+        const users = await this.userRepo.find();
+        return this.findUserInfoById(users.map(u => u.id)) as Promise<UserInfoData[]>;
+    }
+
+    /**
      * Query the user by role ID
      *
      * @param roleId The specified role id
      */
-    async findByRoleId(roleId: number) {
-        const users = await this.userRepo.createQueryBuilder('user')
+    async findByRoleId(roleId: number, pageNumber?: number, pageSize?: number) {
+        const qb = this.userRepo.createQueryBuilder('user')
             .leftJoinAndSelect('user.roles', 'roles')
             .where('roles.id = :roleId', { roleId })
-            .andWhere('user.recycle = false')
-            .getMany();
+            .andWhere('user.recycle = false');
+
+        let users: User[];
+        let count: number;
+        if (pageNumber && pageSize) {
+            const usersAndCount = await qb.skip((pageNumber - 1) * pageSize).take(pageSize).getManyAndCount();
+            users = usersAndCount[0];
+            count = usersAndCount[1];
+        } else {
+            users = await qb.getMany();
+        }
         if (!users.length) {
             throw new RpcException({ code: 404, message: t('No users belong to this role') });
         }
-        return this.findUserInfoById(users.map(user => user.id)) as Promise<UserInfoData[]>;
+        const usersInfo = await this.findUserInfoById(users.map(user => user.id)) as UserInfoData[];
+        return { usersInfo, count };
     }
 
     /**
@@ -221,16 +244,26 @@ export class UserService {
      *
      * @param id The specified organization id
      */
-    async findByOrganizationId(organizationId: number): Promise<UserInfoData[]> {
-        const users = await this.userRepo.createQueryBuilder('user')
+    async findByOrganizationId(organizationId: number, pageNumber?: number, pageSize?: number) {
+        const qb = this.userRepo.createQueryBuilder('user')
             .leftJoinAndSelect('user.organizations', 'organizations')
             .where('organizations.id = :organizationId', { organizationId })
-            .andWhere('user.recycle = false')
-            .getMany();
+            .andWhere('user.recycle = false');
+
+        let users: User[];
+        let count: number;
+        if (pageNumber && pageSize) {
+            const usersAndCount = await qb.skip((pageNumber - 1) * pageSize).take(pageSize).getManyAndCount();
+            users = usersAndCount[0];
+            count = usersAndCount[1];
+        } else {
+            users = await qb.getMany();
+        }
         if (!users.length) {
             throw new RpcException({ code: 404, message: t('No users belong to this organization') });
         }
-        return this.findUserInfoById(users.map(user => user.id)) as Promise<UserInfoData[]>;
+        const usersInfo = await this.findUserInfoById(users.map(user => user.id)) as UserInfoData[];
+        return { usersInfo, count };
     }
 
     /**
@@ -308,9 +341,9 @@ export class UserService {
             .leftJoinAndSelect('user.organizations', 'organizations')
             .leftJoinAndSelect('user.userInfos', 'userInfos')
             .leftJoinAndSelect('userInfos.infoItem', 'infoItem')
-            .where('user.username = :loginName', { loginName })
-            .orWhere('user.mobile = :loginName', { loginName })
-            .orWhere('user.email = :loginName', { loginName: loginName.toLocaleLowerCase() })
+            .where('user.username = :username', { username: loginName })
+            .orWhere('user.mobile = :mobile', { mobile: loginName })
+            .orWhere('user.email = :email', { email: loginName.toLocaleLowerCase() })
             .getOne();
 
         await this.checkUserStatus(user);
@@ -322,9 +355,9 @@ export class UserService {
             .leftJoin('infoItem.infoGroups', 'infoGroups')
             .leftJoin('infoGroups.role', 'role')
             .leftJoin('role.users', 'users')
-            .where('users.username = :loginName', { loginName })
-            .orWhere('users.mobile = :loginName', { loginName })
-            .orWhere('users.email = :loginName', { loginName: loginName.toLocaleLowerCase() })
+            .where('users.username = :username', { username: loginName })
+            .orWhere('users.mobile = :mobile', { mobile: loginName })
+            .orWhere('users.email = :email', { email: loginName.toLocaleLowerCase() })
             .orderBy('infoItem.order', 'ASC')
             .getMany();
 

@@ -2,6 +2,7 @@ import { Controller, Inject } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
 import { __ as t } from 'i18n';
 
+import { InfoGroup } from '../entities/info-group.entity';
 import { InfoGroupService } from '../services/info-group.service';
 
 @Controller()
@@ -41,9 +42,17 @@ export class InfoGroupGrpcController {
     }
 
     @GrpcMethod('InfoGroupService')
-    async findAllInfoGroup() {
-        const data = await this.infoGroupService.findAll();
-        return { code: 200, message: t('Query all information groups successfully'), data };
+    async findAllInfoGroup(payload: { pageNumber: number, pageSize: number }) {
+        const result = await this.infoGroupService.findAll(payload.pageNumber, payload.pageSize);
+        let data: InfoGroup[];
+        let count: number;
+        if (typeof result[1] === 'number') {
+            data = (result as [InfoGroup[], number])[0];
+            count = (result as [InfoGroup[], number])[1];
+        } else {
+            data = result as InfoGroup[];
+        }
+        return { code: 200, message: t('Query all information groups successfully'), data, count };
     }
 
     @GrpcMethod('InfoGroupService')

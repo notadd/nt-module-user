@@ -65,10 +65,6 @@
 	"Username already exists": "用户名已存在",
 	"Mobile already exists": "手机号已存在",
 	"Email already exists": "邮箱已存在",
-	"Request header lacks authorization parameters，it should be: Authorization or authorization": "请求头缺少授权参数，授权参数名称为 Authorization 或 authorization",
-	"The authorization code prefix is incorrect. it should be: Bearer or bearer": "授权码前缀有误，前缀为 Bearer 或 bearer",
-	"The authorization code is incorrect": "授权码错误",
-	"The authorization code has expired": "授权码已过期",
 	"Ban User successfully": "封禁用户成功",
 	"Revert banned user successfully": "解封用户成功",
 	"Revert recycled user successfully": "恢复用户成功",
@@ -76,5 +72,6 @@
 	"Delete permission of user successfully": "删除用户的权限成功",
 	"The permission has already been added": "权限已经被增加",
 	"The permission has already been deleted": "权限已经被删除",
-	"Can not delete the permission which is not exist in this user's permissions": "无法删除此用户权限中不存在的权限"
+	"Can not delete the permission which is not exist in this user's permissions": "无法删除此用户权限中不存在的权限",
+	"Query all users successfully": "查询所有用户信息成功"
 }

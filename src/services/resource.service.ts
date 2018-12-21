@@ -92,7 +92,15 @@ export class ResourceService {
         }
     }
 
-    async findResources(systemModuleId: number) {
+    async findResources(systemModuleId: number, pageNumber?: number, pageSize?: number) {
+        if (pageNumber && pageSize) {
+            return this.resourceRepo.findAndCount({
+                where: { systemModule: { id: systemModuleId } },
+                relations: ['permissions'],
+                skip: (pageNumber - 1) * pageSize,
+                take: pageSize
+            });
+        }
         return this.resourceRepo.find({ where: { systemModule: { id: systemModuleId } }, relations: ['permissions'] });
     }
 }

@@ -70,7 +70,10 @@ export class InfoItemService {
     /**
      * Query all information items
      */
-    async findAll() {
+    async findAll(pageNumber?: number, pageSize?: number) {
+        if (pageNumber && pageSize) {
+            return this.infoItemRepo.findAndCount({ skip: (pageNumber - 1) * pageSize, take: pageSize, order: { order: 'ASC' } });
+        }
         return this.infoItemRepo.find({ order: { order: 'ASC' } });
     }
 }

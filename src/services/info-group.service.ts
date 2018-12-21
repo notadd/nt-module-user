@@ -96,7 +96,10 @@ export class InfoGroupService {
     /**
      * Query all groups
      */
-    async findAll() {
+    async findAll(pageNumber?: number, pageSize?: number) {
+        if (pageNumber && pageSize) {
+            return this.infoGroupRepo.findAndCount({ skip: (pageNumber - 1) * pageSize, take: pageSize });
+        }
         return this.infoGroupRepo.find();
     }
 

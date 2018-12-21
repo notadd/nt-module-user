@@ -67,6 +67,16 @@ export class RoleService {
     }
 
     /**
+     * Remove a permission from role
+     *
+     * @param id The specified role's id
+     * @param permissionId The specified permission's id to be remove
+     */
+    async removePermission(id: number, permissionId: number) {
+        await this.roleRepo.createQueryBuilder().relation(Role, 'permissions').of(id).remove(permissionId);
+    }
+
+    /**
      * Set permissions for a role
      *
      * @param id The specified role's id

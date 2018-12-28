@@ -282,8 +282,8 @@ export class UserService {
         if (id instanceof Array) {
             const userInfoData: UserInfoData[] = [];
             const users = await userQb.whereInIds(id).getMany();
-            const infoItems = await infoItemQb.where('users.id IN (:...id)', { id }).orderBy('infoItem.order', 'ASC').getMany();
             for (const user of users) {
+                const infoItems = await infoItemQb.where('users.id = :id', { id: user.id }).orderBy('infoItem.order', 'ASC').getMany();
                 (userInfoData as UserInfoData[]).push(this.refactorUserData(user, infoItems));
             }
             return userInfoData;

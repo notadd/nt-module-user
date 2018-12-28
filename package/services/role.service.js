@@ -95,7 +95,7 @@ let RoleService = class RoleService {
     async findInfoGroupItemsByIds(ids) {
         let infoItemsArr = [];
         const roles = await this.roleRepo.createQueryBuilder('role')
-            .leftJoinAndSelect('infoGroup', 'infoGroup')
+            .leftJoinAndSelect('role.infoGroup', 'infoGroup')
             .leftJoinAndSelect('infoGroup.infoItems', 'infoItems')
             .whereInIds(ids)
             .orderBy('infoItems.order', 'ASC')

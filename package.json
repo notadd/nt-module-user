@@ -27,7 +27,7 @@
         "pg": "^7.7.1",
         "reflect-metadata": "^0.1.12",
         "rxjs": "^6.3.3",
-        "typeorm": "^0.2.9",
+        "typeorm": "^0.2.10",
         "typescript": "^3.2.2"
     },
     "devDependencies": {

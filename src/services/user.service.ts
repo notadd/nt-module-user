@@ -51,8 +51,9 @@ export class UserService {
         if (createUserInput.email && await this.userRepo.findOne({ where: { email: createUserInput.email } })) {
             throw new RpcException({ code: 409, message: t('Email already exists') });
         }
-
-        createUserInput.password = await this.cryptoUtil.encryptPassword(createUserInput.password);
+        if (createUserInput.password) {
+            createUserInput.password = await this.cryptoUtil.encryptPassword(createUserInput.password);
+        }
         if (createUserInput.email) createUserInput.email = createUserInput.email.toLocaleLowerCase();
         const user = await this.userRepo.save(this.userRepo.create(createUserInput));
 
@@ -177,10 +178,12 @@ export class UserService {
             }
             await this.userRepo.update(user.id, { email: updateUserInput.email.toLocaleLowerCase() });
         }
-
         if (updateUserInput.password) {
             const newPassword = await this.cryptoUtil.encryptPassword(updateUserInput.password);
             await this.userRepo.update(user.id, { password: newPassword });
+        }
+        if (updateUserInput.banned !== undefined) {
+            await this.userRepo.update(user.id, { banned: updateUserInput.banned });
         }
         if (updateUserInput.roleIds && updateUserInput.roleIds.length) {
             updateUserInput.roleIds.forEach(async roleId => {
@@ -308,8 +311,8 @@ export class UserService {
         if (id instanceof Array) {
             const userInfoData: UserInfoData[] = [];
             const users = await userQb.whereInIds(id).getMany();
-            const infoItems = await infoItemQb.where('users.id IN (:...id)', { id }).orderBy('infoItem.order', 'ASC').getMany();
             for (const user of users) {
+                const infoItems = await infoItemQb.where('users.id = :id', { id: user.id }).orderBy('infoItem.order', 'ASC').getMany();
                 (userInfoData as UserInfoData[]).push(this.refactorUserData(user, infoItems));
             }
             return userInfoData;

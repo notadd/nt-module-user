@@ -29,10 +29,10 @@ export interface UserInfoData {
 }
 
 export interface CreateUserInput {
-    username: string;
+    username?: string;
     email?: string;
     mobile?: string;
-    password: string;
+    password?: string;
     infoKVs?: CreateUserInfoKVs[];
     roleIds?: number[];
     organizationIds?: number[];
@@ -43,6 +43,7 @@ export interface UpdateUserInput {
     email?: string;
     mobile?: string;
     password?: string;
+    banned?: boolean;
     infoKVs?: UpdateUserInfoKVs[];
     roleIds?: {
         before: number;

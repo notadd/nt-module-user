@@ -342,14 +342,15 @@ message UpdateUserInput {
   string email = 2;
   string mobile = 3;
   string password = 4;
-  repeated UpdateUserInfoKV infoKVs = 5;
+  bool banned = 5;
+  repeated UpdateUserInfoKV infoKVs = 6;
   message UpdateUserInfoKV {
     int32 userInfoId = 1;
     string userInfoValue = 2;
     int32 infoItemId = 3;
   }
-  repeated ChangedUserRoleOrOrganization roleIds = 6;
-  repeated ChangedUserRoleOrOrganization organizationIds = 7;
+  repeated ChangedUserRoleOrOrganization roleIds = 7;
+  repeated ChangedUserRoleOrOrganization organizationIds = 8;
   message ChangedUserRoleOrOrganization {
     int32 before = 1;
     int32 after = 2;

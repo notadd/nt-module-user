@@ -280,9 +280,9 @@ export class UserService {
             .leftJoinAndSelect('userPersonalPermissions.permission', 'personalPermissions')
             .leftJoinAndSelect('user.roles', 'roles')
             .leftJoinAndSelect('roles.permissions', 'permissions')
-            .where('user.username = :loginName', { loginName })
-            .orWhere('user.mobile = :loginName', { loginName })
-            .orWhere('user.email = :loginName', { loginName: loginName.toLocaleLowerCase() })
+            .where('user.username = :username', { username: loginName })
+            .orWhere('user.mobile = :mobile', { mobile: loginName })
+            .orWhere('user.email = :email', { email: loginName.toLocaleLowerCase() })
             .getOne();
 
         if (!user) {

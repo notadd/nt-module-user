@@ -33,6 +33,7 @@ export interface CreateUserInput {
     email?: string;
     mobile?: string;
     password?: string;
+    banned?: boolean;
     infoKVs?: CreateUserInfoKVs[];
     roleIds?: number[];
     organizationIds?: number[];
@@ -44,6 +45,7 @@ export interface UpdateUserInput {
     mobile?: string;
     password?: string;
     banned?: boolean;
+    recycle?: boolean;
     infoKVs?: UpdateUserInfoKVs[];
     roleIds?: {
         before: number;

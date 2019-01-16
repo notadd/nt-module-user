@@ -160,20 +160,20 @@ export class UserService {
      */
     async updateUserInfo(id: number, updateUserInput: UpdateUserInput): Promise<void> {
         const user = await this.userRepo.findOne(id, { relations: ['userInfos'] });
-        if (updateUserInput.username) {
+        if (updateUserInput.username && updateUserInput.username !== user.username) {
             if (await this.userRepo.findOne({ where: { username: updateUserInput.username } })) {
                 throw new RpcException({ code: 409, message: t('Username already exists') });
             }
             await this.userRepo.update(user.id, { username: updateUserInput.username });
         }
-        if (updateUserInput.mobile) {
+        if (updateUserInput.mobile && updateUserInput.mobile !== user.mobile) {
             if (await this.userRepo.findOne({ where: { mobile: updateUserInput.mobile } })) {
                 throw new RpcException({ code: 409, message: t('Mobile already exists') });
             }
             await this.userRepo.update(user.id, { mobile: updateUserInput.mobile });
         }
-        if (updateUserInput.email) {
-            if (await this.userRepo.findOne({ where: { email: updateUserInput.email } })) {
+        if (updateUserInput.email && updateUserInput.email.toLocaleLowerCase() !== user.email) {
+            if (await this.userRepo.findOne({ where: { email: updateUserInput.email.toLocaleLowerCase() } })) {
                 throw new RpcException({ code: 409, message: t('Email already exists') });
             }
             await this.userRepo.update(user.id, { email: updateUserInput.email.toLocaleLowerCase() });
@@ -184,6 +184,9 @@ export class UserService {
         }
         if (updateUserInput.banned !== undefined) {
             await this.userRepo.update(user.id, { banned: updateUserInput.banned });
+        }
+        if (updateUserInput.recycle !== undefined) {
+            await this.userRepo.update(user.id, { recycle: updateUserInput.recycle });
         }
         if (updateUserInput.roleIds && updateUserInput.roleIds.length) {
             updateUserInput.roleIds.forEach(async roleId => {

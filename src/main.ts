@@ -9,8 +9,8 @@ async function bootstrap() {
         transport: Transport.GRPC,
         options: {
             url: '0.0.0.0' + ':50051',
-            package: 'notadd_module_user',
-            protoPath: join(__dirname, 'protobufs/user-module.proto'),
+            package: 'nt_module_user',
+            protoPath: join(__dirname, 'protobufs/nt-module-user.proto'),
             loader: {
                 arrays: true
             }

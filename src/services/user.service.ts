@@ -189,16 +189,16 @@ export class UserService {
             await this.userRepo.update(user.id, { recycle: updateUserInput.recycle });
         }
         if (updateUserInput.roleIds && updateUserInput.roleIds.length) {
-            updateUserInput.roleIds.forEach(async roleId => {
+            for (const roleId of updateUserInput.roleIds) {
                 await this.userRepo.createQueryBuilder('user').relation(User, 'roles').of(user).remove(roleId.before);
                 await this.userRepo.createQueryBuilder('user').relation(User, 'roles').of(user).add(roleId.after);
-            });
+            }
         }
         if (updateUserInput.organizationIds && updateUserInput.organizationIds.length) {
-            updateUserInput.organizationIds.forEach(async organizationId => {
+            for (const organizationId of updateUserInput.organizationIds) {
                 await this.userRepo.createQueryBuilder('user').relation(User, 'organizations').of(user).remove(organizationId.before);
                 await this.userRepo.createQueryBuilder('user').relation(User, 'organizations').of(user).add(organizationId.after);
-            });
+            }
         }
         if (updateUserInput.infoKVs && updateUserInput.infoKVs.length) {
             await this.createOrUpdateUserInfos(user, updateUserInput.infoKVs, 'update');
@@ -445,21 +445,21 @@ export class UserService {
     private async createOrUpdateUserInfos(user: User, infoKVs: CreateUserInfoKVs[] | UpdateUserInfoKVs[], action: 'create' | 'update') {
         if (infoKVs.length) {
             if (action === 'create') {
-                (infoKVs as CreateUserInfoKVs[]).forEach(async infoKV => {
+                for (const infoKV of (infoKVs as CreateUserInfoKVs[])) {
                     const userInfo = this.userInfoRepo.create({ value: infoKV.userInfoValue, user, infoItem: { id: infoKV.infoItemId } });
                     await this.userInfoRepo.save(userInfo);
-                });
+                }
                 return;
             }
 
-            (infoKVs as UpdateUserInfoKVs[]).forEach(async infoKV => {
+            for (const infoKV of (infoKVs as UpdateUserInfoKVs[])) {
                 if (infoKV.userInfoId) {
                     await this.userInfoRepo.update(infoKV.userInfoId, { value: infoKV.userInfoValue });
                 } else {
                     const userInfo = this.userInfoRepo.create({ value: infoKV.userInfoValue, user, infoItem: { id: infoKV.infoItemId } });
                     await this.userInfoRepo.save(userInfo);
                 }
-            });
+            }
         }
     }
 

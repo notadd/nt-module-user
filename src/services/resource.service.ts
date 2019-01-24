@@ -42,7 +42,7 @@ export class ResourceService {
         // Sacnned resources
         for (const [key, value] of metadataMap) {
             const resourceModule = await this.systemModuleRepo.findOne({ where: { name: value.name } });
-            value.resource.forEach(async resouece => {
+            value.resource.forEach(resouece => {
                 resouece.systemModule = resourceModule;
             });
         }

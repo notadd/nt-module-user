@@ -37,7 +37,7 @@
     "@types/bcryptjs": "2.4.2",
     "@types/i18n": "0.8.3",
     "@types/jsonwebtoken": "8.3.0",
-    "@types/node": "10.12.18",
+    "@types/node": "10.14.6",
     "nodemon": "1.18.9",
     "ts-node": "7.0.1",
     "tsconfig-paths": "3.7.0",

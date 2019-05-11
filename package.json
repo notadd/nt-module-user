@@ -24,7 +24,7 @@
     "bcryptjs": "2.4.3",
     "grpc": "1.17.0",
     "i18n": "0.8.3",
-    "jsonwebtoken": "8.4.0",
+    "jsonwebtoken": "8.5.1",
     "moment": "2.23.0",
     "pg": "7.8.0",
     "reflect-metadata": "0.1.13",
@@ -36,7 +36,7 @@
   "devDependencies": {
     "@types/bcryptjs": "2.4.2",
     "@types/i18n": "0.8.3",
-    "@types/jsonwebtoken": "8.3.0",
+    "@types/jsonwebtoken": "8.3.2",
     "@types/node": "10.12.18",
     "nodemon": "1.18.9",
     "ts-node": "7.0.1",

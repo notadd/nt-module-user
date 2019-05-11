@@ -39,7 +39,7 @@
     "@types/jsonwebtoken": "8.3.0",
     "@types/node": "10.14.6",
     "nodemon": "1.18.9",
-    "ts-node": "7.0.1",
+    "ts-node": "8.1.0",
     "tsconfig-paths": "3.8.0",
     "tslint": "5.16.0"
   },

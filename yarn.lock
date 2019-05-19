@@ -26,19 +26,19 @@
     lodash.camelcase "^4.3.0"
     protobufjs "^6.8.6"
 
-"@nestjs/common@6.2.0":
-  version "6.2.0"
-  resolved "https://registry.yarnpkg.com/@nestjs/common/-/common-6.2.0.tgz#edc59fa0b42c5d7b96e88bdc3c52012780758da3"
-  integrity sha512-0svQuCrG6ofMYgHzk/GzJ+vpIkLq4vZmTeww1qLipggS40IjQ0+NzwEBOTr6TeHVDmsM2YDmIU1DJiaGy2o9Hw==
+"@nestjs/common@6.2.1":
+  version "6.2.1"
+  resolved "https://registry.yarnpkg.com/@nestjs/common/-/common-6.2.1.tgz#13edac39d8e993d34d1c8395e71705cc070bb91c"
+  integrity sha512-fgtB0NkCENg6lu+J67zEjkSvL6XmufFl2dpOKLXmhvW+yYyzeaJTJupO4eKXaBk2l8VgqBsjNHf301oyTMXFtQ==
   dependencies:
     axios "0.18.0"
     cli-color "1.4.0"
     uuid "3.3.2"
 
-"@nestjs/core@6.2.0":
-  version "6.2.0"
-  resolved "https://registry.yarnpkg.com/@nestjs/core/-/core-6.2.0.tgz#cf716a5b86357a94ddd0419a3560c181d333334e"
-  integrity sha512-K5Wje2unjStkA7AG5sTSD9trx2BEf8asL5xOFT4DwG+ICB04JLebTwqwbQNi3RNZ3buL/pXNXIOOleOgqK7fGw==
+"@nestjs/core@6.2.1":
+  version "6.2.1"
+  resolved "https://registry.yarnpkg.com/@nestjs/core/-/core-6.2.1.tgz#14847cef2ad3552ee6ad812ca96e90c4a00d5131"
+  integrity sha512-J3PoqQimSgT+k7QZseC8iU5YcInjeb51yS7zt4kU2NBCUQM8esrRVVkJnBg+/ozjV8JpejlDPUCFDo4x4kIeiw==
   dependencies:
     "@nuxtjs/opencollective" "0.2.1"
     fast-safe-stringify "2.0.6"
@@ -47,10 +47,10 @@
     optional "0.1.4"
     uuid "3.3.2"
 
-"@nestjs/microservices@6.2.0":
-  version "6.2.0"
-  resolved "https://registry.yarnpkg.com/@nestjs/microservices/-/microservices-6.2.0.tgz#589cf05b86955c8ec54d2bea8d53d71df72c836a"
-  integrity sha512-F4DNhF9qfKBL7v2toz4rlgfeuy8dVXslBNj0lFWDDjoANsYN5WYQVW5ygLbRkyb2ldlA/yBwfx/ULSBUHAvjZg==
+"@nestjs/microservices@6.2.1":
+  version "6.2.1"
+  resolved "https://registry.yarnpkg.com/@nestjs/microservices/-/microservices-6.2.1.tgz#49b2a362709b2768a092de0a8f03b447aa5461b6"
+  integrity sha512-6FGIfqz1VVM+ZQ72fFMtjNY87DGZySYsCIqKwvl4O5SnknBM3pIgzsU/DwTeY3A+6inxcWIkV748LUdd9SACng==
   dependencies:
     iterare "1.1.2"
     json-socket "0.3.0"

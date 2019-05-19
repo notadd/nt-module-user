@@ -16,7 +16,7 @@
   "license": "Apache-2.0",
   "private": false,
   "dependencies": {
-    "@grpc/proto-loader": "0.5.0",
+    "@grpc/proto-loader": "0.5.1",
     "@nestjs/common": "6.2.1",
     "@nestjs/core": "6.2.1",
     "@nestjs/microservices": "6.2.1",
